@@ -5305,6 +5305,10 @@ table _MISURE
 
 		annotation PBI_FormatHint = {"isDecimal":true}
 
+	measure ___Nuova_Misura = DISTINCTCOUNT(Cons_Proj_Table[_Short_Name_Code])
+		formatString: 0
+		lineageTag: 6218148a-1ef8-43cd-bc26-ddc6bda5bf4f
+
 	partition _MISURE = m
 		mode: import
 		source =

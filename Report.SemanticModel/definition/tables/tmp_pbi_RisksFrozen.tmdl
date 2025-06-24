@@ -409,9 +409,10 @@ table tmp_pbi_RisksFrozen
 				let
 				    Source = Sql.Database("we-sqldbserver-pr-irm01.database.windows.net", "we-sqldb-pr-irm01"),
 				    dbo_tmp_pbi_RisksFrozen = Source{[Schema="dbo",Item="tmp_pbi_RisksFrozen"]}[Data],
+				    #"Kept First Rows" = Table.FirstN(dbo_tmp_pbi_RisksFrozen,10000),
 				    
 				    // Creazione colonne temporali
-				    #"Duplicated Column" = Table.DuplicateColumn(dbo_tmp_pbi_RisksFrozen, "Period", "Period - Copy"),
+				    #"Duplicated Column" = Table.DuplicateColumn(#"Kept First Rows", "Period", "Period - Copy"),
 				    #"Extracted Text Before Delimiter" = Table.TransformColumns(#"Duplicated Column", {{"Period - Copy", each Text.BeforeDelimiter(_, "-"), type text}}),
 				    #"Duplicated Column1" = Table.DuplicateColumn(#"Extracted Text Before Delimiter", "Period", "Period - Copy.1"),
 				    #"Extracted Text After Delimiter" = Table.TransformColumns(#"Duplicated Column1", {{"Period - Copy.1", each Text.AfterDelimiter(_, "-"), type text}}),
@@ -434,7 +435,7 @@ table tmp_pbi_RisksFrozen
 				    #"Changed Type1"
 				```
 
-	annotation PBI_ResultType = Table
+	annotation PBI_ResultType = Exception
 
 	annotation PBI_NavigationStepName = Navigation
 
