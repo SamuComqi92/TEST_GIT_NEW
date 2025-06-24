@@ -1,0 +1,51 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "b16df1d83ee13453cbc8",
+  "position": {
+    "x": 18.17045895639637,
+    "y": 140.82105691207187,
+    "z": 18000,
+    "height": 133.25003234690669,
+    "width": 134.76423725993973,
+    "tabOrder": 19000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Progetti che presentano un ammontare di crediti scaduti pari ad almeno il 4% ",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  },
+                  {
+                    "value": "dei Ricavi da",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "13.3333px"
+                    }
+                  },
+                  {
+                    "value": " Revised Control Budget.",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

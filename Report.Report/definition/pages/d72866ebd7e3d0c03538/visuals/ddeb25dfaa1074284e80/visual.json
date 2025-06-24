@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "ddeb25dfaa1074284e80",
+  "position": {
+    "x": 10,
+    "y": 144.28571428571431,
+    "z": 1000,
+    "height": 145.71428571428572,
+    "width": 138.57142857142858,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Progetti che presentano, per 3 forecast consecutivi  rischi con probabilità di accadimento superiore a una certa soglia (40%) e valore atteso elevato (> 5 M€)",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

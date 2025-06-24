@@ -1,0 +1,59 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "b506cb6a15362ca64607",
+  "position": {
+    "x": 16.785562298053431,
+    "y": 139.44928678382851,
+    "z": 5000,
+    "height": 134.28449838442745,
+    "width": 139.44928678382851,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Progetti il cui avanzamento dei costi ",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  },
+                  {
+                    "value": "actual ",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontStyle": "italic",
+                      "fontSize": "9pt"
+                    }
+                  },
+                  {
+                    "value": "delle principali fasi esecutive è superiore all’avanzamento fisico delle attività stesse.",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

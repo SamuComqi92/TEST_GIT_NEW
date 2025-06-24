@@ -1,0 +1,685 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "3e91e2dba0e9179eca8a",
+  "position": {
+    "x": 20,
+    "y": 98,
+    "z": 1000,
+    "height": 600,
+    "width": 1240,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Cons_Proj_Table"
+                    }
+                  },
+                  "Property": "_Short_Name_Code"
+                }
+              },
+              "queryRef": "Cons_Proj_Table.Short Name Code",
+              "nativeQueryRef": "Progetto",
+              "displayName": "Progetto"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Card_Consolidated"
+                    }
+                  },
+                  "Property": "Overall Progress Actual New"
+                }
+              },
+              "queryRef": "Sum(PSR_Card_Consolidated.Overall Progress Actual New)",
+              "nativeQueryRef": "Progress Actual",
+              "displayName": "Progress Actual"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "PSR_Card_Consolidated"
+                        }
+                      },
+                      "Property": "Overall Progress Planned New"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(PSR_Card_Consolidated.Overall Progress Planned New)",
+              "nativeQueryRef": "Progress Planned",
+              "displayName": "Progress Planned"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Revenues_Costs"
+                    }
+                  },
+                  "Property": "PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate"
+                }
+              },
+              "queryRef": "PSR_Revenues_Costs.PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate",
+              "nativeQueryRef": "Revenues RCB",
+              "displayName": "Revenues RCB"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Revenues_Costs"
+                    }
+                  },
+                  "Property": "PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate"
+                }
+              },
+              "queryRef": "PSR_Revenues_Costs.PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate",
+              "nativeQueryRef": "Revenue CF ",
+              "displayName": "Revenue CF "
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Revenues_Costs"
+                    }
+                  },
+                  "Property": "PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate"
+                }
+              },
+              "queryRef": "PSR_Revenues_Costs.PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate",
+              "nativeQueryRef": "Gross Margin CF",
+              "displayName": "Gross Margin CF"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Revenues_Costs"
+                    }
+                  },
+                  "Property": "PSR_Revenues_Costs.RCB_Gross_Margin"
+                }
+              },
+              "queryRef": "PSR_Revenues_Costs.PSR_Revenues_Costs.RCB_Gross_Margin",
+              "nativeQueryRef": "Gross Margin RCB",
+              "displayName": "Gross Margin RCB"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Revenues_Costs"
+                    }
+                  },
+                  "Property": "CF Contingencies"
+                }
+              },
+              "queryRef": "Sum(PSR_Revenues_Costs.CF Contingencies)",
+              "nativeQueryRef": "CF Contingencies"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Card_Consolidated"
+                    }
+                  },
+                  "Property": "PSR_Card_Consolidated.K_Factor_Total_Project_Current_Forecast"
+                }
+              },
+              "queryRef": "PSR_Card_Consolidated.PSR_Card_Consolidated.K_Factor_Total_Project_Current_Forecast",
+              "nativeQueryRef": "K Factor",
+              "displayName": "K Factor"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Progress"
+                    }
+                  },
+                  "Property": "PSR_Progress.Miles_Dates_Baseline_Mechanical_Completion_Date"
+                }
+              },
+              "queryRef": "PSR_Progress.PSR_Progress.Miles_Dates_Baseline_Mechanical_Completion_Date",
+              "nativeQueryRef": "Baseline_Completion_Date",
+              "displayName": "Baseline_Completion_Date"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Progress"
+                    }
+                  },
+                  "Property": "PSR_Progress.Miles_Dates_Effect_Or_Forecast_Early_Date_Mech_Compl_Date"
+                }
+              },
+              "queryRef": "PSR_Progress.PSR_Progress.Miles_Dates_Effect_Or_Forecast_Early_Date_Mech_Compl_Date",
+              "nativeQueryRef": "Forecast_Compl_Date",
+              "displayName": "Forecast_Compl_Date"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Risks_Opportunity"
+                    }
+                  },
+                  "Property": "PSR_Risks_Opportunities.VAR_75"
+                }
+              },
+              "queryRef": "PSR_Risks_Opportunity.PSR_Risks_Opportunities.VAR_75",
+              "nativeQueryRef": "VAR_75",
+              "displayName": "VAR_75"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "PSR_Risks_Opportunity"
+                    }
+                  },
+                  "Property": "PRR (Project Risk Rate)"
+                }
+              },
+              "queryRef": "PSR_Risks_Opportunity.PRR (Project Risk Rate)",
+              "nativeQueryRef": "PRR (Project Risk Rate)"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "PHI Index"
+                        }
+                      },
+                      "Property": "[PHI_Index]"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(PHI Index.[PHI_Index])",
+              "nativeQueryRef": "PHI (Project Health Ind)",
+              "displayName": "PHI (Project Health Ind)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "PSR_Progress"
+                  }
+                },
+                "Property": "PSR_Progress.Miles_Dates_Effect_Or_Forecast_Early_Date_Mech_Compl_Date"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 1,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            },
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#9FB4BB'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontColorPrimary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0D6ABF'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontColorSecondary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0D6ABF'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "135.3093985506948D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Sum(PSR_Revenues_Costs.Total Revenue)"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "115.72095622162335D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Cons_Proj_Table.Business_Organization_T1_Code"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "203.51548910124984D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Cons_Proj_Table.Client"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "177.6561809611789D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PSR_Revenues_Costs.Cluster Valore Revenue"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "180.91743536330625D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "PSR_Card_Consolidated.Cluster Progress"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "titleWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "Filter7197d0dd9391b8e671b0",
+        "ordinal": 0,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Progress"
+              }
+            },
+            "Property": "PSR_Progress.Miles_Dates_Baseline_Mechanical_Completion_Date"
+          }
+        },
+        "type": "Categorical",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filter1bbb050c25ccfbe556aa",
+        "ordinal": 1,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Revenues_Costs"
+              }
+            },
+            "Property": "CF Contingencies"
+          }
+        },
+        "type": "Advanced",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filter394e6b3e8b6c9c5db369",
+        "ordinal": 2,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Progress"
+              }
+            },
+            "Property": "PSR_Progress.Miles_Dates_Effect_Or_Forecast_Early_Date_Mech_Compl_Date"
+          }
+        },
+        "type": "Categorical",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filter9741b79074476b085d8e",
+        "ordinal": 3,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Revenues_Costs"
+              }
+            },
+            "Property": "PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate"
+          }
+        },
+        "type": "Advanced",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filterd019b46a5ec7ed079d49",
+        "ordinal": 4,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Revenues_Costs"
+              }
+            },
+            "Property": "PSR_Revenues_Costs.RCB_Gross_Margin"
+          }
+        },
+        "type": "Categorical",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filter909c103402e3bdf2136c",
+        "ordinal": 5,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Card_Consolidated"
+              }
+            },
+            "Property": "PSR_Card_Consolidated.K_Factor_Total_Project_Current_Forecast"
+          }
+        },
+        "type": "Advanced",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filter6f9354a81bc7c75b8906",
+        "ordinal": 6,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Card_Consolidated"
+              }
+            },
+            "Property": "Overall Progress Actual New"
+          }
+        },
+        "type": "Advanced",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filter9a398deb33401f50d9ae",
+        "ordinal": 7,
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "PSR_Card_Consolidated"
+                  }
+                },
+                "Property": "Overall Progress Planned New"
+              }
+            },
+            "Function": 0
+          }
+        },
+        "type": "Advanced",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filter3adca38e9bcd86fc423a",
+        "ordinal": 8,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Risks_Opportunity"
+              }
+            },
+            "Property": "PRR (Project Risk Rate)"
+          }
+        },
+        "type": "Advanced",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filter7493cfba0ec0bcb6ac9f",
+        "ordinal": 9,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Revenues_Costs"
+              }
+            },
+            "Property": "PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate"
+          }
+        },
+        "type": "Advanced",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filterb174aa6d1ca7e30d11a2",
+        "ordinal": 10,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Revenues_Costs"
+              }
+            },
+            "Property": "PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate"
+          }
+        },
+        "type": "Advanced",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "Filterbb4338c021b7fec4d408",
+        "ordinal": 11,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_Risks_Opportunity"
+              }
+            },
+            "Property": "PSR_Risks_Opportunities.VAR_75"
+          }
+        },
+        "type": "Categorical",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "5c1f222f2d6c000820c0",
+        "ordinal": 12,
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "PHI Index"
+                  }
+                },
+                "Property": "[PHI_Index]"
+              }
+            },
+            "Function": 0
+          }
+        },
+        "type": "Advanced",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      },
+      {
+        "name": "dfff3d1e01079a4230e8",
+        "ordinal": 13,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Cons_Proj_Table"
+              }
+            },
+            "Property": "_Short_Name_Code"
+          }
+        },
+        "type": "Categorical",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      }
+    ],
+    "filterSortOrder": "Custom"
+  }
+}

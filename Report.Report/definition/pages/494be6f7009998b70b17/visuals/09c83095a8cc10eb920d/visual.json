@@ -1,0 +1,44 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "09c83095a8cc10eb920d",
+  "position": {
+    "x": 18,
+    "y": 141,
+    "z": 17000,
+    "height": 132,
+    "width": 133,
+    "tabOrder": 17000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Progetti che presentano un ammontare di pending revenues pari ad almeno il 4% dei Ricavi da Revised Control Budget.",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

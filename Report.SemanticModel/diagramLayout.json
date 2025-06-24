@@ -1,0 +1,372 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 1740.5607768428704,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 848.53639015819226,
+            "y": 0
+          },
+          "nodeIndex": "tmp_pbi_RisksFrozen",
+          "nodeLineageTag": "fc316697-4abd-4002-b6ae-81efd344673e",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 19
+        },
+        {
+          "location": {
+            "x": 173.0600662192698,
+            "y": 250.91558521767027
+          },
+          "nodeIndex": "PSR_Revenues_Costs",
+          "nodeLineageTag": "926fb714-a957-4bdf-9781-0edc53e5ccc2",
+          "size": {
+            "height": 145,
+            "width": 244
+          },
+          "zIndex": 12
+        },
+        {
+          "location": {
+            "x": 202.8690831512896,
+            "y": 905.95534086483224
+          },
+          "nodeIndex": "PSR_Card_Consolidated",
+          "nodeLineageTag": "3fc1d4a3-20db-4948-8b2c-23a24dbadfc1",
+          "size": {
+            "height": 145,
+            "width": 245.98479141872735
+          },
+          "zIndex": 18
+        },
+        {
+          "location": {
+            "x": 347.0296392610735,
+            "y": 78.49711086230792
+          },
+          "nodeIndex": "PSR_Revenues_status",
+          "nodeLineageTag": "490b60b0-a669-443d-8e94-8d87e56c3592",
+          "size": {
+            "height": 145,
+            "width": 232.26730195841674
+          },
+          "zIndex": 13
+        },
+        {
+          "location": {
+            "x": 937.38221365058826,
+            "y": 415.21737326134803
+          },
+          "nodeIndex": "PSR Group By",
+          "nodeLineageTag": "2b9afc49-0228-4e4f-b11d-85008807981e",
+          "size": {
+            "height": 722.59466984028677,
+            "width": 409.78973280631863
+          },
+          "zIndex": 25
+        },
+        {
+          "location": {
+            "x": 254.25260478210896,
+            "y": 1129.1921063033983
+          },
+          "nodeIndex": "PSR_Progress",
+          "nodeLineageTag": "5983a83c-dac4-48a6-a786-b75e92d8fd4f",
+          "size": {
+            "height": 145,
+            "width": 236.06781088839614
+          },
+          "zIndex": 9
+        },
+        {
+          "location": {
+            "x": 1163.275669921464,
+            "y": 1426.8218848148642
+          },
+          "nodeIndex": "PSR_Risks_Opportunity",
+          "nodeLineageTag": "5cdc68dd-9bf1-4250-b667-87d385da2e48",
+          "size": {
+            "height": 145,
+            "width": 222.79810250547462
+          },
+          "zIndex": 16
+        },
+        {
+          "location": {
+            "x": 178.81262331610895,
+            "y": 701.72152937685917
+          },
+          "nodeIndex": "PHI Index",
+          "nodeLineageTag": "7adc3186-7775-460c-aef9-9b321d1289e8",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 1795.2215854369781,
+            "y": 310.22965953612606
+          },
+          "nodeIndex": "Frozen EV",
+          "nodeLineageTag": "c03cb130-5d6c-4399-89d3-dea25470114b",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 22
+        },
+        {
+          "location": {
+            "x": 2191.0228403319438,
+            "y": 282.48391396027705
+          },
+          "nodeIndex": "Revenue Costs 1",
+          "nodeLineageTag": "2e56056e-ed80-49d9-95dc-18195a973cc5",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 14
+        },
+        {
+          "location": {
+            "x": 2414.8118177974952,
+            "y": 1.602549819129063
+          },
+          "nodeIndex": "Revenue Status 1",
+          "nodeLineageTag": "3801c2fa-4e6b-4d4c-8d30-13648065e5fb",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 17
+        },
+        {
+          "location": {
+            "x": 1130.3536312405065,
+            "y": 0
+          },
+          "nodeIndex": "PSR_List_Data",
+          "nodeLineageTag": "1379358a-5510-47f2-a75b-0a1e2111da17",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 758.31728367619746,
+            "y": 1393.5334106942439
+          },
+          "nodeIndex": "PSR_Card11_Progress",
+          "nodeLineageTag": "fb905dd2-1261-4ff4-b89e-4bf9a0ad1ff5",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 21
+        },
+        {
+          "location": {
+            "x": 169.21466525657513,
+            "y": 469.41417963682153
+          },
+          "nodeIndex": "PSR_Card04_Revenue_Cost",
+          "nodeLineageTag": "f5f704a9-8929-4c9f-9914-e5e3856d2e91",
+          "size": {
+            "height": 145,
+            "width": 256.92395709363791
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 590.3506488741408,
+            "y": 23.908748512365584
+          },
+          "nodeIndex": "Cons_Proj_Table",
+          "nodeLineageTag": "d9f2f029-1c8e-43d2-973a-238fcd7856ab",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 3253.0725006589687,
+            "y": 16.5076042906362
+          },
+          "nodeIndex": "_MISURE",
+          "nodeLineageTag": "4e46d814-4c97-4826-aff2-1686de86916e",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 20
+        },
+        {
+          "location": {
+            "x": 1711.6130425575434,
+            "y": 1133.1112701263753
+          },
+          "nodeIndex": "PSR_Card14_Actual_Invoicing",
+          "nodeLineageTag": "d746836a-28f6-47cd-b462-72e710991fe9",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 23
+        },
+        {
+          "location": {
+            "x": 1465.4704478406879,
+            "y": 1314.8772119881969
+          },
+          "nodeIndex": "PSR_Card08_Revenues_Details",
+          "nodeLineageTag": "9444073b-3fc4-44df-9349-99ee4e9cfdb1",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 477.661371127391,
+            "y": 1306.7550526726966
+          },
+          "nodeIndex": "PSR_CardER_Currency_Exch_Rates",
+          "nodeLineageTag": "3e78e30c-824d-43df-96ca-36c788bc8e09",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 24
+        },
+        {
+          "location": {
+            "x": 2969.1270541043646,
+            "y": 14.205241561641685
+          },
+          "nodeIndex": "Table Exchange Rate",
+          "nodeLineageTag": "cf6fc450-d91e-4b9d-a2db-bd0027fe8861",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 2971.8793191063023,
+            "y": 241.09801390740324
+          },
+          "nodeIndex": "Z__Table_phase",
+          "nodeLineageTag": "260e0a3c-d126-4645-bff4-27e1dbfd0c0c",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 1730.3719901626002,
+            "y": 849.89378813960025
+          },
+          "nodeIndex": "Z_Distinct_ForecastYearAxis",
+          "nodeLineageTag": "96074e4e-92f0-4886-8506-cc3f1df37d40",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2964.9285573176376,
+            "y": 386.05659592575324
+          },
+          "nodeIndex": "Z_Distinct_ForecastYearAxis_Details",
+          "nodeLineageTag": "0cd3fd51-ad0e-4dc7-9f1a-2dd9b66dd151",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3257.7550675536518,
+            "y": 157.34143067239609
+          },
+          "nodeIndex": "Calculation group",
+          "nodeLineageTag": "aa2c5163-8943-46a6-a756-6ca1f32870a9",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2967.2685121304326,
+            "y": 615.63257995078868
+          },
+          "nodeIndex": "Z_Distinct_ForecastYearAxis_separated",
+          "nodeLineageTag": "023f40be-6adf-4801-a615-7702563f2988",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2970.1550623038588,
+            "y": 847.551176057712
+          },
+          "nodeIndex": "Z_forecast_periods_FROZEN",
+          "nodeLineageTag": "cfa8b63e-9b2e-4101-8436-d7752233ccef",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3372.5404022970765,
+            "y": 685.91094240743212
+          },
+          "nodeIndex": "Z_Project_PSR",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 42.687391896058713,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

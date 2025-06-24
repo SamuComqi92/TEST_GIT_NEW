@@ -1,0 +1,61 @@
+table Z__Table_phase
+	isHidden
+	lineageTag: 260e0a3c-d126-4645-bff4-27e1dbfd0c0c
+
+	column Phase
+		dataType: string
+		isHidden
+		lineageTag: 2fffcdc2-b910-4831-b514-1cc8e66c22ff
+		summarizeBy: none
+		sourceColumn: Phase
+		sortByColumn: Sort
+
+		changedProperty = IsHidden
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sort
+		dataType: int64
+		formatString: 0
+		lineageTag: 632a03ba-238f-42a7-b313-e423b6624827
+		summarizeBy: sum
+		sourceColumn: Sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CBS Description'
+		dataType: string
+		lineageTag: d7355fb9-d07b-4cdd-a384-3723e71209df
+		summarizeBy: none
+		sourceColumn: CBS Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column CBS_Code
+		dataType: string
+		lineageTag: bf2aa5aa-99c3-4287-8ad9-897b6ec03106
+		summarizeBy: none
+		sourceColumn: CBS_Code
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Z__Table_phase = m
+		mode: import
+		source =
+				let
+				    // Questa tabella è stata creata esclusivamente per il KCI5
+				    // La colonna Phase è utilizzata nelle pagine aggregate
+				    // La colonna CBS Description è utilizzata invece nelle pagine di dettaglio assieme alla colonna Phase
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("pZXbbtswDIZfRch1CzhJW+zWtdtu2FpstXcxdEVBy4TLVYdAloZmTz86abYElYEoudKJ/ydSpOmHh8k1NI4keLJG/ADXiqnINW/9EaciN51VMDmZFNl5zsOWLa/mk8eTuN414OGVAZ88qGWyvgStQbO8qvP7YYDQElOhoXRnrl49OgOKOWVogETplqK08oU3vudXx/C+/AxZNruoRfGMxjCaAzbtcT7eWoXiw+AsvIAbgkeDHahjmN/IdC1YnhXPZNLd+wyOdDDr8KzB/oAQv0IvobNBgagW1qoGehwyUOXpKEvGo7iz5AZEYblKkyH3QQergkYzpO2OOnQHRFVb0aAokZ9ak8E2ETCLf2qXCfrYp5ag36qSS6uxl+K0BjK/6M1ip2QO40arLwF1E5ZgYOPOepUMGS3hBEY82XsD5juPzVnT770pDoJFXzgBdcMthvf+I4f9dMponhIgo3lKYMTztDfgbKcdY98DYStu2TGD4p01vz6n0q3vKPe/I+7kGKAibnhVWKD7Tf36oMgunrIpTyJn05WIG2PvXZCra6vQSGu8A+n7jXo2TLaMeDlbKUvurNKLj8Qxdxvr+Zh1jXphHfBv9RokKfKE/644j4oe/wI=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"CBS Description" = _t, CBS_Code = _t, Phase = _t, Sort = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Sort", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

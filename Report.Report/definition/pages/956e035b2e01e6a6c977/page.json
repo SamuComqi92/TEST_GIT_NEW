@@ -1,0 +1,88 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "956e035b2e01e6a6c977",
+  "displayName": "Progress-KCI4 - Storico",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "image": {
+            "image": {
+              "name": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'42 (1).svg'"
+                  }
+                }
+              },
+              "url": {
+                "expr": {
+                  "ResourcePackageItem": {
+                    "PackageName": "RegisteredResources",
+                    "PackageType": 1,
+                    "ItemName": "42_(1)27932828540056986.svg"
+                  }
+                }
+              },
+              "scaling": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Fit'"
+                  }
+                }
+              }
+            }
+          },
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visibility": "HiddenInViewMode",
+  "visualInteractions": [
+    {
+      "source": "7e50eef39d1264040326",
+      "target": "5015a4d03c69115754ae",
+      "type": "NoFilter"
+    },
+    {
+      "source": "7e50eef39d1264040326",
+      "target": "958d201abda25eb595b1",
+      "type": "NoFilter"
+    },
+    {
+      "source": "7e50eef39d1264040326",
+      "target": "555a6694e10ba070a400",
+      "type": "DataFilter"
+    },
+    {
+      "source": "7e50eef39d1264040326",
+      "target": "a40a67256bde05d538c4",
+      "type": "NoFilter"
+    },
+    {
+      "source": "555a6694e10ba070a400",
+      "target": "a40a67256bde05d538c4",
+      "type": "NoFilter"
+    },
+    {
+      "source": "b43997f65a8c1070ca50",
+      "target": "a40a67256bde05d538c4",
+      "type": "NoFilter"
+    },
+    {
+      "source": "099d36d8c0b2240ed239",
+      "target": "a40a67256bde05d538c4",
+      "type": "NoFilter"
+    }
+  ]
+}

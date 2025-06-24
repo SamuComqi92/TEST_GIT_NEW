@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "065581e64638e14e322b",
+  "position": {
+    "x": 17.101322756343347,
+    "y": 141.47457916611313,
+    "z": 5000,
+    "height": 130.59191923025827,
+    "width": 130.59191923025827,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Progetti per cui i costi associati alle principali fasi esecutive non variano per due forecast consecutivi.",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

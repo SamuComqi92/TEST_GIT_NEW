@@ -1,0 +1,574 @@
+table PSR_Card_Consolidated
+	lineageTag: 3fc1d4a3-20db-4948-8b2c-23a24dbadfc1
+
+	column 'PSR_Card_Consolidated.K_Factor_Total_Project_Current_Forecast'
+		dataType: double
+		lineageTag: 4b714e7d-264b-49a8-9bab-3e66c83a7118
+		summarizeBy: sum
+		sourceColumn: PSR_Card_Consolidated.K_Factor_Total_Project_Current_Forecast
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR_Card_Consolidated.P_Key'
+		dataType: string
+		lineageTag: b968ad14-1057-4bb6-a0d3-eef39691e72d
+		summarizeBy: none
+		sourceColumn: PSR_Card_Consolidated.P_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR_Card_Consolidated.Total_Revenues_Total_Project_Current_Forecast'
+		dataType: double
+		lineageTag: 8aafe3a1-5a13-4ad0-aed9-fabb967c0963
+		summarizeBy: sum
+		sourceColumn: PSR_Card_Consolidated.Total_Revenues_Total_Project_Current_Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Overall Progress Actual New'
+		dataType: double
+		formatString: 0.000
+		lineageTag: d9de0ef2-3231-4907-9b9d-5eb0ae06bab2
+		summarizeBy: sum
+		sourceColumn: Overall Progress Actual New
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Overall Progress Planned New'
+		dataType: double
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 86edbfe4-7769-4bd1-ac0f-0840f3594dd3
+		summarizeBy: sum
+		sourceColumn: Overall Progress Planned New
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Overall_percentage = PSR_Card_Consolidated[Overall Progress Actual New] * 100
+		dataType: double
+		formatString: 0
+		lineageTag: 01d07b8c-f845-4a28-89d2-7930bfc4a6b7
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Cluster_Progress =
+			
+			
+			// Gli spazi sono stati aggiunti per creare un ordinamento custom (senza creare una colonna numerica)
+			SWITCH(
+			    TRUE(),
+			    AND( PSR_Card_Consolidated[_Overall_percentage] >= 0, PSR_Card_Consolidated[_Overall_percentage]< 10 ), " Early Phase",
+			    AND( PSR_Card_Consolidated[_Overall_percentage] >= 10, PSR_Card_Consolidated[_Overall_percentage]< 95 ),"  Fully in Execution",
+			    "   Close to Completion"
+			)
+		dataType: string
+		lineageTag: 45cd7848-ebc4-44bf-b419-622ef9f6e552
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Overall_percentage_simb = PSR_Card_Consolidated[Overall Progress Actual New]
+		dataType: double
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 7a43567b-5076-4fc3-80df-610bd05139ea
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column _ConsolidationCode = LEFT( PSR_Card_Consolidated[PSR_Card_Consolidated.P_Key], 8 )
+		lineageTag: b74453ad-023d-46c3-aee2-60f78ebef46b
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _ForecastYearAxis = ```
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[_ForecastYearAxis], 
+			    'PSR Group By'[List_Data_GroupBy.List_Data.P_Key], 
+			    'PSR_Card_Consolidated'[PSR_Card_Consolidated.P_Key]
+			)
+			```
+		lineageTag: 44a1e8e3-8c65-4927-908a-e2a9d8a7db72
+		summarizeBy: none
+		sortByColumn: _Rank_Desc_Forecast
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Overall_planned_percentage = PSR_Card_Consolidated[Overall Progress Planned New] * 100
+		lineageTag: eecc1f4a-ca70-4a09-b10e-2de20d491608
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _FlagMaxForecast = ```
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[_Flag_MaxIDPKEY], 
+			    'PSR Group By'[List_Data_GroupBy.List_Data.P_Key], 
+			    'PSR_Card_Consolidated'[PSR_Card_Consolidated.P_Key]
+			)
+			```
+		formatString: 0
+		lineageTag: 0374182d-621a-433e-a4a2-1fc144927ac5
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Gross_Margin_Current = ```
+			
+			
+			CALCULATE(
+			    SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate]),  -- Nuovo campo indicato
+			    ALLEXCEPT(
+			        PSR_Card_Consolidated, 
+			        PSR_Card_Consolidated[_ConsolidationCode], 
+			        PSR_Card_Consolidated[_Rank_Forecast_Curr]
+			    )
+			)
+			```
+		formatString: #,0
+		lineageTag: 4fc9e5a2-8c14-46b8-8cc9-f7306f3f7786
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Rank_Forecast_Curr = ```
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[_Rank_Prev_Forecast], 
+			    'PSR Group By'[List_Data_GroupBy.List_Data.P_Key], 
+			    'PSR_Card_Consolidated'[PSR_Card_Consolidated.P_Key]
+			)
+			```
+		formatString: 0
+		lineageTag: f3bd7e7b-747f-403b-8d55-9774850a83cf
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Forecast_Prev = [_Rank_Forecast_Curr] - 1
+		formatString: 0
+		lineageTag: 70ddc4f3-316b-4923-b699-fe616985cecd
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Variaz_Margine = ```
+			
+			
+			IF(
+			    PSR_Card_Consolidated[_Gross_Margin_Diff] >= -2000       &&
+			    PSR_Card_Consolidated[_FlagMaxForecast] = 1              &&
+			    PSR_Card_Consolidated[_Flagmaxprevforecast] = "NO", 
+			    "ALERT"
+			)
+			```
+		lineageTag: b5e6c8c9-1b3e-4730-8700-7fbc3d21a73d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flagprevforecast-3 = ```
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[_Flagprevforecast-3], 
+			    'PSR Group By'[List_Data_GroupBy.List_Data.P_Key], 
+			    'PSR_Card_Consolidated'[PSR_Card_Consolidated.P_Key]
+			)
+			```
+		lineageTag: 479ff5ea-e14d-4b00-ac6f-02f7efd9ce1c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Gross_Margin_Prev = ```
+			
+			
+			CALCULATE(
+			    SUM(PSR_Card_Consolidated[_Gross_Margin_Current]), 
+			    PSR_Card_Consolidated[_Rank_Forecast_Curr] = EARLIER( PSR_Card_Consolidated[_Rank_Forecast_Prev]) - 1,
+			    ALLEXCEPT(
+			        PSR_Card_Consolidated, 
+			        PSR_Card_Consolidated[_ConsolidationCode], 
+			        PSR_Card_Consolidated[_Rank_Forecast_Curr]
+			    )
+			)
+			```
+		formatString: #,0
+		lineageTag: 767fd609-6f65-4392-bcac-f74d80d5cac0
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Gross_Margin_Diff = PSR_Card_Consolidated[_Gross_Margin_Current] - PSR_Card_Consolidated[_Gross_Margin_Prev]
+		formatString: #,0
+		lineageTag: f42d136a-9556-4a5d-bb21-bba5981119b8
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Flag_Progress = ```
+			
+			
+			IF(
+			    PSR_Card_Consolidated[_Planned - Current Progress] > 5, 
+			    "ALERT", 
+			    ""
+			)
+			```
+		lineageTag: 615efb17-1b6d-494e-a0d7-5bfd68e2ce51
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Progress_Alert_Count = ```
+			
+			
+			CALCULATE(
+			    COUNT('PSR_Card_Consolidated'[_Flag_Progress]),
+			    PSR_Card_Consolidated[_Flag_Progress] = "ALERT", 
+			    PSR_Card_Consolidated[_Flagprevforecast-3] = "SI",
+			    ALLEXCEPT(
+			        'PSR_Card_Consolidated',
+			        'PSR_Card_Consolidated'[_ConsolidationCode]
+			    )
+			)
+			```
+		formatString: 0
+		lineageTag: f9af85e7-7f1f-4b4f-801b-19c1c91df19c
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Variaz_Margine_Alert_Count = ```
+			
+			
+			CALCULATE(
+			    COUNT('PSR_Card_Consolidated'[_Flag_Variaz_Margine]),
+			    PSR_Card_Consolidated[_Flag_Variaz_Margine] = "ALERT", 
+			    PSR_Card_Consolidated[_Flagprevforecast-3] = "SI",
+			    ALLEXCEPT(
+			        'PSR_Card_Consolidated',
+			        'PSR_Card_Consolidated'[_ConsolidationCode]
+			    )
+			)
+			```
+		formatString: 0
+		lineageTag: 0b6a0881-adb4-4a5f-975d-277ffe1548ad
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Progress_Margin_Alert = ```
+			
+			
+			IF(
+			    AND(
+			        PSR_Card_Consolidated[_Flag_Progress_Alert_Count] = 3,
+			        PSR_Card_Consolidated[_Flag_Variaz_Margine_Alert_Count] = 1
+			    ), 
+			    "ALERT", 
+			    ""
+			)
+			```
+		lineageTag: 361eee4c-473a-4ed4-818b-461729903d9c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_Planned - Current Progress' =
+			
+			
+			PSR_Card_Consolidated[_Overall_planned_percentage] - PSR_Card_Consolidated[_Overall_percentage]
+		lineageTag: bea300b4-1fd4-48c0-8965-e314dc63969f
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Andamento_Icon =
+			
+			
+			IF(
+			    AND(
+			        PSR_Card_Consolidated[_Gross_Margin_Diff] > -2000,
+			        PSR_Card_Consolidated[_Gross_Margin_Diff] < 2000
+			    ),
+			    "Stabile",
+			    "Crescente"
+			)
+		lineageTag: 8bd39cbb-ff19-4778-a1d9-43dbf98609f2
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column '_Planned - Current Progress%' =
+			
+			
+			( PSR_Card_Consolidated[_Overall_planned_percentage] - PSR_Card_Consolidated[_Overall_percentage] ) / 100
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 0517d1cc-36ba-43e9-8b7a-271066754dd4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Desc_Forecast = ```
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[_Rank_Desc_Forecast], 
+			    'PSR Group By'[List_Data_GroupBy.List_Data.P_Key], 
+			    PSR_Card_Consolidated[PSR_Card_Consolidated.P_Key]
+			)
+			```
+		formatString: 0
+		lineageTag: 02a4242e-91c6-48c9-bdb9-67a87c200668
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flagmaxprevforecast =
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[_Flagprevmaxfor],
+			    'PSR Group By'[List_Data_GroupBy.List_Data.P_Key],
+			    PSR_Card_Consolidated[PSR_Card_Consolidated.P_Key]
+			)
+		lineageTag: 9514024c-2630-4a42-ae7c-0d9ad288023e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flagprevforecast-4 = ```
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[_Flagprevforecast-4], 
+			    'PSR Group By'[List_Data_GroupBy.List_Data.P_Key], 
+			    'PSR_Card_Consolidated'[PSR_Card_Consolidated.P_Key]
+			)
+			```
+		lineageTag: fb91974d-8fe1-47bf-8651-985ab183f5b0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Variaz_Margine_CF-1 =
+			
+			
+			IF(
+			    AND(
+			        PSR_Card_Consolidated[_Gross_Margin_Diff] >= -2000,
+			        PSR_Card_Consolidated[_Flagmaxprevforecast] = "SI"
+			    ),
+			    "ALERT"
+			)
+		lineageTag: 4fa7ed91-9542-4378-9602-fe502c1daf32
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Variaz_Margine_Alert_Count_CF-1 = ```
+			
+			
+			CALCULATE(
+			    COUNT('PSR_Card_Consolidated'[_Flag_Variaz_Margine_CF-1]),
+			    PSR_Card_Consolidated[_Flag_Variaz_Margine_CF-1] = "ALERT", 
+			    PSR_Card_Consolidated[_Flagprevforecast-4] = "SI",
+			    ALLEXCEPT(
+			        'PSR_Card_Consolidated',
+			        'PSR_Card_Consolidated'[_ConsolidationCode]
+			    )
+			)
+			```
+		formatString: 0
+		lineageTag: 57d7ff71-1e69-4cb2-844f-358a3b81e668
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Progress_Alert_Count_CF-1 = ```
+			
+			
+			CALCULATE(
+			    COUNT('PSR_Card_Consolidated'[_Flag_Progress]),
+			    PSR_Card_Consolidated[_Flag_Progress] = "ALERT", 
+			    PSR_Card_Consolidated[_Flagprevforecast-4] = "SI",
+			    ALLEXCEPT(
+			        'PSR_Card_Consolidated',
+			        'PSR_Card_Consolidated'[_ConsolidationCode]
+			    )
+			)
+			```
+		formatString: 0
+		lineageTag: 3c5159c5-282b-40e4-9957-b36c0b789512
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Progress_Margin_Alert_CF-1 = ```
+			
+			
+			IF(
+			    AND(
+			        PSR_Card_Consolidated[_Flag_Progress_Alert_Count_CF-1] = 3,
+			        PSR_Card_Consolidated[_Flag_Variaz_Margine_Alert_Count_CF-1] = 1
+			    ), 
+			    "ALERT", 
+			    ""
+			)
+			```
+		lineageTag: 0f80455b-cc53-4215-b24c-c3ba3c019d37
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Revenue_250_CF-1 = ```
+			
+			
+			IF(
+			    CALCULATE(
+			        SUM(PSR_Card_Consolidated[PSR_Card_Consolidated.Total_Revenues_Total_Project_Current_Forecast]), 
+			        'PSR_Card_Consolidated'[_Flagmaxprevforecast] = "SI", 
+			        PSR_Card_Consolidated[_Flagprevforecast-4] = "SI", 
+			        ALLEXCEPT(
+			            PSR_Card_Consolidated, 
+			            PSR_Card_Consolidated[_ConsolidationCode], 
+			            PSR_Card_Consolidated[_Flagprevforecast-4]
+			        )
+			    ) > 25000, 
+			    "SI", 
+			    "NO"
+			)
+			```
+		lineageTag: aea9c628-702d-4bf3-9a97-2f71d2a02301
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _NEW_FORECAST_SLICER = ```
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[NEW_FORECAST_SLICER], 
+			    'PSR Group By'[List_Data_GroupBy.List_Data.P_Key], 
+			    'PSR_Card_Consolidated'[PSR_Card_Consolidated.P_Key]
+			)
+			```
+		lineageTag: 323aba74-2669-4b84-bc1a-64416ac26491
+		summarizeBy: none
+		sortByColumn: _Rank_Desc_Forecast
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Revenue_250 = ```
+			
+			
+			IF(
+			    CALCULATE(
+			        SUM(PSR_Card_Consolidated[PSR_Card_Consolidated.Total_Revenues_Total_Project_Current_Forecast]), 
+			        'PSR_Card_Consolidated'[_Flagmaxprevforecast] = "NO", 
+			        PSR_Card_Consolidated[_FlagMaxForecast] = 1, 
+			        PSR_Card_Consolidated[_Flagprevforecast-3] = "SI", 
+			        ALLEXCEPT(
+			            PSR_Card_Consolidated, 
+			            PSR_Card_Consolidated[_ConsolidationCode], 
+			            PSR_Card_Consolidated[_Flagprevforecast-3]
+			        )
+			    ) > 25000, 
+			    "SI", 
+			    "NO"
+			)
+			```
+		lineageTag: 33a66a94-b0b2-4049-ae05-9eb4a9e23fae
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PSR_Card_Consolidated = m
+		mode: import
+		source =
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Report", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[PSR_Card_Consolidated]", {"[PSR_Card_Consolidated].[Direct_Costs_Current_Year_ActualToDate].[Direct_Costs_Current_Year_ActualToDate]", "[PSR_Card_Consolidated].[Direct_Costs_Current_Year_Budget].[Direct_Costs_Current_Year_Budget]", "[PSR_Card_Consolidated].[Direct_Costs_Current_Year_Current_Forecast].[Direct_Costs_Current_Year_Current_Forecast]", "[PSR_Card_Consolidated].[Direct_Costs_Current_Year_Official_PrevForecast].[Direct_Costs_Current_Year_Official_PrevForecast]", "[PSR_Card_Consolidated].[Direct_Costs_Next_Years_Forecast].[Direct_Costs_Next_Years_Forecast]", "[PSR_Card_Consolidated].[Direct_Costs_Total_Project_ActualToDate].[Direct_Costs_Total_Project_ActualToDate]", "[PSR_Card_Consolidated].[Direct_Costs_Total_Project_Budget].[Direct_Costs_Total_Project_Budget]", "[PSR_Card_Consolidated].[Direct_Costs_Total_Project_Current_Forecast].[Direct_Costs_Total_Project_Current_Forecast]", "[PSR_Card_Consolidated].[Direct_Costs_Total_Project_Official_PrevForecast].[Direct_Costs_Total_Project_Official_PrevForecast]", "[PSR_Card_Consolidated].[Economic_Progress_perc].[Economic_Progress_perc]", "[PSR_Card_Consolidated].[Equalization_Margin_Current_Year_ActualToDate].[Equalization_Margin_Current_Year_ActualToDate]", "[PSR_Card_Consolidated].[Equalization_Margin_Current_Year_Budget].[Equalization_Margin_Current_Year_Budget]", "[PSR_Card_Consolidated].[Equalization_Margin_Current_Year_Current_Forecast].[Equalization_Margin_Current_Year_Current_Forecast]", "[PSR_Card_Consolidated].[Equalization_Margin_Current_Year_Official_PrevForecast].[Equalization_Margin_Current_Year_Official_PrevForecast]", "[PSR_Card_Consolidated].[Equalization_Margin_Next_Years_Current_Forecast].[Equalization_Margin_Next_Years_Current_Forecast]", "[PSR_Card_Consolidated].[Equalization_Margin_Total_Project_ActualToDate].[Equalization_Margin_Total_Project_ActualToDate]", "[PSR_Card_Consolidated].[Equalization_Margin_Total_Project_Budget].[Equalization_Margin_Total_Project_Budget]", "[PSR_Card_Consolidated].[Equalization_Margin_Total_Project_Current_Forecast].[Equalization_Margin_Total_Project_Current_Forecast]", "[PSR_Card_Consolidated].[Equalization_Margin_Total_Project_Official_PrevForecast].[Equalization_Margin_Total_Project_Official_PrevForecast]", "[PSR_Card_Consolidated].[Error_Upload].[Error_Upload]", "[PSR_Card_Consolidated].[Gross_Margin_Current_Year_ActualToDate].[Gross_Margin_Current_Year_ActualToDate]", "[PSR_Card_Consolidated].[Gross_Margin_Current_Year_Budget].[Gross_Margin_Current_Year_Budget]", "[PSR_Card_Consolidated].[Gross_Margin_Current_Year_Current_Forecast].[Gross_Margin_Current_Year_Current_Forecast]", "[PSR_Card_Consolidated].[Gross_Margin_Current_Year_Official_PrevForecast].[Gross_Margin_Current_Year_Official_PrevForecast]", "[PSR_Card_Consolidated].[Gross_Margin_Next_Years_Forecast].[Gross_Margin_Next_Years_Forecast]", "[PSR_Card_Consolidated].[Gross_Margin_Total_Project_ActualToDate].[Gross_Margin_Total_Project_ActualToDate]", "[PSR_Card_Consolidated].[Gross_Margin_Total_Project_Budget].[Gross_Margin_Total_Project_Budget]", "[PSR_Card_Consolidated].[Gross_Margin_Total_Project_Current_Forecast].[Gross_Margin_Total_Project_Current_Forecast]", "[PSR_Card_Consolidated].[Gross_Margin_Total_Project_Official_PrevForecast].[Gross_Margin_Total_Project_Official_PrevForecast]", "[PSR_Card_Consolidated].[ID].[ID]", "[PSR_Card_Consolidated].[K_Factor_Current_Year_ActualToDate].[K_Factor_Current_Year_ActualToDate]", "[PSR_Card_Consolidated].[K_Factor_Current_Year_Budget].[K_Factor_Current_Year_Budget]", "[PSR_Card_Consolidated].[K_Factor_Current_Year_Current_Forecast].[K_Factor_Current_Year_Current_Forecast]", "[PSR_Card_Consolidated].[K_Factor_Current_Year_Official_PrevForecast].[K_Factor_Current_Year_Official_PrevForecast]", "[PSR_Card_Consolidated].[K_Factor_Next_Years_Forecast].[K_Factor_Next_Years_Forecast]", "[PSR_Card_Consolidated].[K_Factor_Total_Project_ActualToDate].[K_Factor_Total_Project_ActualToDate]", "[PSR_Card_Consolidated].[K_Factor_Total_Project_Budget].[K_Factor_Total_Project_Budget]", "[PSR_Card_Consolidated].[K_Factor_Total_Project_Current_Forecast].[K_Factor_Total_Project_Current_Forecast]", "[PSR_Card_Consolidated].[K_Factor_Total_Project_Official_PrevForecast].[K_Factor_Total_Project_Official_PrevForecast]", "[PSR_Card_Consolidated].[Neutralisation_Current_Year_ActualToDate].[Neutralisation_Current_Year_ActualToDate]", "[PSR_Card_Consolidated].[Neutralisation_Current_Year_Budget].[Neutralisation_Current_Year_Budget]", "[PSR_Card_Consolidated].[Neutralisation_Current_Year_Current_Forecast].[Neutralisation_Current_Year_Current_Forecast]", "[PSR_Card_Consolidated].[Neutralisation_Current_Year_Official_PrevForecast].[Neutralisation_Current_Year_Official_PrevForecast]", "[PSR_Card_Consolidated].[Neutralisation_Next_Years_Current_Forecast].[Neutralisation_Next_Years_Current_Forecast]", "[PSR_Card_Consolidated].[Neutralisation_Total_Project_ActualToDate].[Neutralisation_Total_Project_ActualToDate]", "[PSR_Card_Consolidated].[Neutralisation_Total_Project_Budget].[Neutralisation_Total_Project_Budget]", "[PSR_Card_Consolidated].[Neutralisation_Total_Project_Current_Forecast].[Neutralisation_Total_Project_Current_Forecast]", "[PSR_Card_Consolidated].[Neutralisation_Total_Project_Official_PrevForecast].[Neutralisation_Total_Project_Official_PrevForecast]", "[PSR_Card_Consolidated].[P_Key].[P_Key]", "[PSR_Card_Consolidated].[Provision_Anticipated_Loss_Current_Year_ActualToDate].[Provision_Anticipated_Loss_Current_Year_ActualToDate]", "[PSR_Card_Consolidated].[Provision_Anticipated_Loss_Current_Year_Budget].[Provision_Anticipated_Loss_Current_Year_Budget]", "[PSR_Card_Consolidated].[Provision_Anticipated_Loss_Current_Year_Current_Forecast].[Provision_Anticipated_Loss_Current_Year_Current_Forecast]", "[PSR_Card_Consolidated].[Provision_Anticipated_Loss_Current_Year_Official_PrevForecast].[Provision_Anticipated_Loss_Current_Year_Official_PrevForecast]", "[PSR_Card_Consolidated].[Provision_Anticipated_Loss_Next_Years_Forecast].[Provision_Anticipated_Loss_Next_Years_Forecast]", "[PSR_Card_Consolidated].[Provision_Anticipated_Loss_Total_Project_ActualToDate].[Provision_Anticipated_Loss_Total_Project_ActualToDate]", "[PSR_Card_Consolidated].[Provision_Anticipated_Loss_Total_Project_Budget].[Provision_Anticipated_Loss_Total_Project_Budget]", "[PSR_Card_Consolidated].[Provision_Anticipated_Loss_Total_Project_Current_Forecast].[Provision_Anticipated_Loss_Total_Project_Current_Forecast]", "[PSR_Card_Consolidated].[Provision_Anticipated_Loss_Total_Project_Official_PrevForecast].[Provision_Anticipated_Loss_Total_Project_Official_PrevForecast]", "[PSR_Card_Consolidated].[Revenues_Main_Contract_Current_Year_ActualToDate].[Revenues_Main_Contract_Current_Year_ActualToDate]", "[PSR_Card_Consolidated].[Revenues_Main_Contract_Current_Year_Budget].[Revenues_Main_Contract_Current_Year_Budget]", "[PSR_Card_Consolidated].[Revenues_Main_Contract_Current_Year_Current_Forecast].[Revenues_Main_Contract_Current_Year_Current_Forecast]", "[PSR_Card_Consolidated].[Revenues_Main_Contract_Current_Year_Official_PrevForecast].[Revenues_Main_Contract_Current_Year_Official_PrevForecast]", "[PSR_Card_Consolidated].[Revenues_Main_Contract_Next_Years_Current_Forecast].[Revenues_Main_Contract_Next_Years_Current_Forecast]", "[PSR_Card_Consolidated].[Revenues_Main_Contract_Total_Project_ActualToDate].[Revenues_Main_Contract_Total_Project_ActualToDate]", "[PSR_Card_Consolidated].[Revenues_Main_Contract_Total_Project_Budget].[Revenues_Main_Contract_Total_Project_Budget]", "[PSR_Card_Consolidated].[Revenues_Main_Contract_Total_Project_Current_Forecast].[Revenues_Main_Contract_Total_Project_Current_Forecast]", "[PSR_Card_Consolidated].[Revenues_Main_Contract_Total_Project_Official_PrevForecast].[Revenues_Main_Contract_Total_Project_Official_PrevForecast]", "[PSR_Card_Consolidated].[Revenues_Tech_Assistance_Current_Year_ActualToDate].[Revenues_Tech_Assistance_Current_Year_ActualToDate]", "[PSR_Card_Consolidated].[Revenues_Tech_Assistance_Current_Year_Budget].[Revenues_Tech_Assistance_Current_Year_Budget]", "[PSR_Card_Consolidated].[Revenues_Tech_Assistance_Current_Year_Current_Forecast].[Revenues_Tech_Assistance_Current_Year_Current_Forecast]", "[PSR_Card_Consolidated].[Revenues_Tech_Assistance_Current_Year_Official_PrevForecast].[Revenues_Tech_Assistance_Current_Year_Official_PrevForecast]", "[PSR_Card_Consolidated].[Revenues_Tech_Assistance_Next_Years_Current_Forecast].[Revenues_Tech_Assistance_Next_Years_Current_Forecast]", "[PSR_Card_Consolidated].[Revenues_Tech_Assistance_Total_Project_ActualToDate].[Revenues_Tech_Assistance_Total_Project_ActualToDate]", "[PSR_Card_Consolidated].[Revenues_Tech_Assistance_Total_Project_Budget].[Revenues_Tech_Assistance_Total_Project_Budget]", "[PSR_Card_Consolidated].[Revenues_Tech_Assistance_Total_Project_Current_Forecast].[Revenues_Tech_Assistance_Total_Project_Current_Forecast]", "[PSR_Card_Consolidated].[Revenues_Tech_Assistance_Total_Project_Official_PrevForecast].[Revenues_Tech_Assistance_Total_Project_Official_PrevForecast]", "[PSR_Card_Consolidated].[Total_Revenues_Current_Year_ActualToDate].[Total_Revenues_Current_Year_ActualToDate]", "[PSR_Card_Consolidated].[Total_Revenues_Current_Year_Budget].[Total_Revenues_Current_Year_Budget]", "[PSR_Card_Consolidated].[Total_Revenues_Current_Year_Current_Forecast].[Total_Revenues_Current_Year_Current_Forecast]", "[PSR_Card_Consolidated].[Total_Revenues_Current_Year_Official_PrevForecast].[Total_Revenues_Current_Year_Official_PrevForecast]", "[PSR_Card_Consolidated].[Total_Revenues_Next_Years_Current_Forecast].[Total_Revenues_Next_Years_Current_Forecast]", "[PSR_Card_Consolidated].[Total_Revenues_Total_Project_ActualToDate].[Total_Revenues_Total_Project_ActualToDate]", "[PSR_Card_Consolidated].[Total_Revenues_Total_Project_Budget].[Total_Revenues_Total_Project_Budget]", "[PSR_Card_Consolidated].[Total_Revenues_Total_Project_Current_Forecast].[Total_Revenues_Total_Project_Current_Forecast]", "[PSR_Card_Consolidated].[Total_Revenues_Total_Project_Official_PrevForecast].[Total_Revenues_Total_Project_Official_PrevForecast]"}, {"PSR_Card_Consolidated.Direct_Costs_Current_Year_ActualToDate", "PSR_Card_Consolidated.Direct_Costs_Current_Year_Budget", "PSR_Card_Consolidated.Direct_Costs_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Direct_Costs_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Direct_Costs_Next_Years_Forecast", "PSR_Card_Consolidated.Direct_Costs_Total_Project_ActualToDate", "PSR_Card_Consolidated.Direct_Costs_Total_Project_Budget", "PSR_Card_Consolidated.Direct_Costs_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Direct_Costs_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Economic_Progress_perc", "PSR_Card_Consolidated.Equalization_Margin_Current_Year_ActualToDate", "PSR_Card_Consolidated.Equalization_Margin_Current_Year_Budget", "PSR_Card_Consolidated.Equalization_Margin_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Equalization_Margin_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Equalization_Margin_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Equalization_Margin_Total_Project_ActualToDate", "PSR_Card_Consolidated.Equalization_Margin_Total_Project_Budget", "PSR_Card_Consolidated.Equalization_Margin_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Equalization_Margin_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Error_Upload", "PSR_Card_Consolidated.Gross_Margin_Current_Year_ActualToDate", "PSR_Card_Consolidated.Gross_Margin_Current_Year_Budget", "PSR_Card_Consolidated.Gross_Margin_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Gross_Margin_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Gross_Margin_Next_Years_Forecast", "PSR_Card_Consolidated.Gross_Margin_Total_Project_ActualToDate", "PSR_Card_Consolidated.Gross_Margin_Total_Project_Budget", "PSR_Card_Consolidated.Gross_Margin_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Gross_Margin_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.ID", "PSR_Card_Consolidated.K_Factor_Current_Year_ActualToDate", "PSR_Card_Consolidated.K_Factor_Current_Year_Budget", "PSR_Card_Consolidated.K_Factor_Current_Year_Current_Forecast", "PSR_Card_Consolidated.K_Factor_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.K_Factor_Next_Years_Forecast", "PSR_Card_Consolidated.K_Factor_Total_Project_ActualToDate", "PSR_Card_Consolidated.K_Factor_Total_Project_Budget", "PSR_Card_Consolidated.K_Factor_Total_Project_Current_Forecast", "PSR_Card_Consolidated.K_Factor_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Neutralisation_Current_Year_ActualToDate", "PSR_Card_Consolidated.Neutralisation_Current_Year_Budget", "PSR_Card_Consolidated.Neutralisation_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Neutralisation_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Neutralisation_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Neutralisation_Total_Project_ActualToDate", "PSR_Card_Consolidated.Neutralisation_Total_Project_Budget", "PSR_Card_Consolidated.Neutralisation_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Neutralisation_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.P_Key", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Current_Year_ActualToDate", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Current_Year_Budget", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Current_Year_Official_PrevForec", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Next_Years_Forecast", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Total_Project_ActualToDate", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Total_Project_Budget", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Total_Project_Official_PrevFore", "PSR_Card_Consolidated.Revenues_Main_Contract_Current_Year_ActualToDate", "PSR_Card_Consolidated.Revenues_Main_Contract_Current_Year_Budget", "PSR_Card_Consolidated.Revenues_Main_Contract_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Revenues_Main_Contract_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Revenues_Main_Contract_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Revenues_Main_Contract_Total_Project_ActualToDate", "PSR_Card_Consolidated.Revenues_Main_Contract_Total_Project_Budget", "PSR_Card_Consolidated.Revenues_Main_Contract_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Revenues_Main_Contract_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Current_Year_ActualToDate", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Current_Year_Budget", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Current_Year_Official_PrevForecas", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Total_Project_ActualToDate", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Total_Project_Budget", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Total_Project_Official_PrevForeca", "PSR_Card_Consolidated.Total_Revenues_Current_Year_ActualToDate", "PSR_Card_Consolidated.Total_Revenues_Current_Year_Budget", "PSR_Card_Consolidated.Total_Revenues_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Total_Revenues_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Total_Revenues_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Total_Revenues_Total_Project_ActualToDate", "PSR_Card_Consolidated.Total_Revenues_Total_Project_Budget", "PSR_Card_Consolidated.Total_Revenues_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Total_Revenues_Total_Project_Official_PrevForecast"}},
+				            {Cube.AddMeasureColumn, "Actual K EL", "[Measures].[Actual K EL]"},
+				            {Cube.AddMeasureColumn, "Actual K YEAR", "[Measures].[Actual K YEAR]"},
+				            {Cube.AddMeasureColumn, "Budget K EL", "[Measures].[Budget K EL]"},
+				            {Cube.AddMeasureColumn, "Budget K YEAR", "[Measures].[Budget K YEAR]"},
+				            {Cube.AddMeasureColumn, "CF K YEAR", "[Measures].[CF K YEAR]"},
+				            {Cube.AddMeasureColumn, "Cost Progress @Cut-off", "[Measures].[Cost Progress @Cut-off]"},
+				            {Cube.AddMeasureColumn, "Economic Progress Weighted by OCB", "[Measures].[Economic Progress Weighted by OCB]"},
+				            {Cube.AddMeasureColumn, "IB Costs - CF Costs", "[Measures].[IB Costs - CF Costs]"},
+				            {Cube.AddMeasureColumn, "IB Costs / CF Costs", "[Measures].[IB Costs / CF Costs]"},
+				            {Cube.AddMeasureColumn, "IB Revenues - CF Revenues", "[Measures].[IB Revenues - CF Revenues]"},
+				            {Cube.AddMeasureColumn, "IB Revenues / CF Revenues", "[Measures].[IB Revenues / CF Revenues]"},
+				            {Cube.AddMeasureColumn, "K EL Deviation", "[Measures].[K EL Deviation]"},
+				            {Cube.AddMeasureColumn, "K YEAR Deviation", "[Measures].[K YEAR Deviation]"},
+				            {Cube.AddMeasureColumn, "Margin EL Deviation", "[Measures].[Margin EL Deviation]"},
+				            {Cube.AddMeasureColumn, "Margin EL IB Deviation", "[Measures].[Margin EL IB Deviation]"},
+				            {Cube.AddMeasureColumn, "Margin YEAR Deviation", "[Measures].[Margin YEAR Deviation]"},
+				            {Cube.AddMeasureColumn, "Overall Progress Actual New", "[Measures].[Overall Progress Actual New]"},
+				            {Cube.AddMeasureColumn, "Overall Progress Planned New", "[Measures].[Overall Progress Planned New]"},
+				            {Cube.AddMeasureColumn, "PF K EL", "[Measures].[PF K EL]"},
+				            {Cube.AddMeasureColumn, "PF K YEAR", "[Measures].[PF K YEAR]"},
+				            {Cube.AddMeasureColumn, "Physical Progress @Economic Cut-off", "[Measures].[Physical Progress @Economic Cut-off]"},
+				            {Cube.AddMeasureColumn, "PROJECT ETC EL", "[Measures].[PROJECT ETC EL]"},
+				            {Cube.AddMeasureColumn, "Revenue Weight", "[Measures].[Revenue Weight]"},
+				            {Cube.AddMeasureColumn, "Revenues EL Deviation", "[Measures].[Revenues EL Deviation]"},
+				            {Cube.AddMeasureColumn, "Revenues Progress @Cut-off", "[Measures].[Revenues Progress @Cut-off]"},
+				            {Cube.AddMeasureColumn, "Revenues YEAR Deviation", "[Measures].[Revenues YEAR Deviation]"}
+				        }),
+				
+				    // Filtro per rimuovere dati prima del 2022 (non essendoci una colonna "anno", il filtro è applicato cercando delle stringhe nella chiave)
+				    #"Filtered Rows_year" = Table.SelectRows(#"Added Items", each not Text.Contains([PSR_Card_Consolidated.P_Key], "_2010_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2011_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2012_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2013_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2014_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2015_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2016_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2017_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2018_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2019_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2020_") and not Text.Contains([PSR_Card_Consolidated.P_Key], "_2021_")),
+				
+				    // Filtro per rimuovere P-Key null
+				    #"Filtered Rows" = Table.SelectRows(#"Filtered Rows_year", each (Cube.AttributeMemberId([PSR_Card_Consolidated.P_Key]) <> "[PSR_Card_Consolidated].[P_Key].&" meta [DisplayName = "(null)"])),
+				
+				    // Rimozione colonne non più utilizzate
+				    #"Removed Columns" = Table.RemoveColumns(#"Filtered Rows",{"Actual K EL", "Actual K YEAR", "Budget K EL", "Budget K YEAR", "CF K YEAR", "Cost Progress @Cut-off", "Economic Progress Weighted by OCB", "IB Costs - CF Costs", "IB Costs / CF Costs", "IB Revenues - CF Revenues", "IB Revenues / CF Revenues", "K EL Deviation", "K YEAR Deviation", "Margin EL Deviation", "Margin EL IB Deviation", "Margin YEAR Deviation", "PF K EL", "PF K YEAR", "Physical Progress @Economic Cut-off", "PROJECT ETC EL", "Revenue Weight", "Revenues EL Deviation", "Revenues Progress @Cut-off", "Revenues YEAR Deviation", "PSR_Card_Consolidated.Direct_Costs_Current_Year_ActualToDate", "PSR_Card_Consolidated.Direct_Costs_Current_Year_Budget", "PSR_Card_Consolidated.Direct_Costs_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Direct_Costs_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Direct_Costs_Next_Years_Forecast", "PSR_Card_Consolidated.Direct_Costs_Total_Project_ActualToDate", "PSR_Card_Consolidated.Direct_Costs_Total_Project_Budget", "PSR_Card_Consolidated.Direct_Costs_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Direct_Costs_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Equalization_Margin_Current_Year_ActualToDate", "PSR_Card_Consolidated.Equalization_Margin_Current_Year_Budget", "PSR_Card_Consolidated.Equalization_Margin_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Equalization_Margin_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Equalization_Margin_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Equalization_Margin_Total_Project_ActualToDate", "PSR_Card_Consolidated.Equalization_Margin_Total_Project_Budget", "PSR_Card_Consolidated.Equalization_Margin_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Equalization_Margin_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Error_Upload", "PSR_Card_Consolidated.Gross_Margin_Current_Year_ActualToDate", "PSR_Card_Consolidated.Gross_Margin_Current_Year_Budget", "PSR_Card_Consolidated.Gross_Margin_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Gross_Margin_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Gross_Margin_Next_Years_Forecast", "PSR_Card_Consolidated.Gross_Margin_Total_Project_ActualToDate", "PSR_Card_Consolidated.Gross_Margin_Total_Project_Budget", "PSR_Card_Consolidated.Gross_Margin_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.ID", "PSR_Card_Consolidated.K_Factor_Current_Year_ActualToDate", "PSR_Card_Consolidated.K_Factor_Current_Year_Budget", "PSR_Card_Consolidated.K_Factor_Current_Year_Current_Forecast", "PSR_Card_Consolidated.K_Factor_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.K_Factor_Next_Years_Forecast", "PSR_Card_Consolidated.K_Factor_Total_Project_ActualToDate", "PSR_Card_Consolidated.K_Factor_Total_Project_Budget", "PSR_Card_Consolidated.K_Factor_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Neutralisation_Current_Year_ActualToDate", "PSR_Card_Consolidated.Neutralisation_Current_Year_Budget", "PSR_Card_Consolidated.Neutralisation_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Neutralisation_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Neutralisation_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Neutralisation_Total_Project_ActualToDate", "PSR_Card_Consolidated.Neutralisation_Total_Project_Budget", "PSR_Card_Consolidated.Neutralisation_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Neutralisation_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Current_Year_ActualToDate", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Current_Year_Budget", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Current_Year_Official_PrevForec", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Next_Years_Forecast", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Total_Project_ActualToDate", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Total_Project_Budget", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Provision_Anticipated_Loss_Total_Project_Official_PrevFore", "PSR_Card_Consolidated.Revenues_Main_Contract_Current_Year_ActualToDate", "PSR_Card_Consolidated.Revenues_Main_Contract_Current_Year_Budget", "PSR_Card_Consolidated.Revenues_Main_Contract_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Revenues_Main_Contract_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Revenues_Main_Contract_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Revenues_Main_Contract_Total_Project_ActualToDate", "PSR_Card_Consolidated.Revenues_Main_Contract_Total_Project_Budget", "PSR_Card_Consolidated.Revenues_Main_Contract_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Revenues_Main_Contract_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Current_Year_ActualToDate", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Current_Year_Budget", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Current_Year_Official_PrevForecas", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Total_Project_ActualToDate", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Total_Project_Budget", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Revenues_Tech_Assistance_Total_Project_Official_PrevForeca", "PSR_Card_Consolidated.Total_Revenues_Current_Year_ActualToDate", "PSR_Card_Consolidated.Total_Revenues_Current_Year_Budget", "PSR_Card_Consolidated.Total_Revenues_Current_Year_Current_Forecast", "PSR_Card_Consolidated.Total_Revenues_Current_Year_Official_PrevForecast", "PSR_Card_Consolidated.Total_Revenues_Next_Years_Current_Forecast", "PSR_Card_Consolidated.Total_Revenues_Total_Project_ActualToDate", "PSR_Card_Consolidated.Total_Revenues_Total_Project_Budget", "PSR_Card_Consolidated.Total_Revenues_Total_Project_Official_PrevForecast", "PSR_Card_Consolidated.Gross_Margin_Total_Project_Current_Forecast", "PSR_Card_Consolidated.Economic_Progress_perc"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"PSR_Card_Consolidated.Total_Revenues_Total_Project_Current_Forecast", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

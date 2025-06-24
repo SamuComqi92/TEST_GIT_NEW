@@ -1,0 +1,20 @@
+table Z_Distinct_ForecastYearAxis
+	lineageTag: 96074e4e-92f0-4886-8506-cc3f1df37d40
+
+	column _ForecastYearAxis
+		lineageTag: 2ab3cbb1-f819-4f46-bf06-115feef1cc74
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR Group By[_ForecastYearAxis]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Z_Distinct_ForecastYearAxis = calculated
+		mode: import
+		source =
+				
+				
+				DISTINCT( 'PSR Group By'[_ForecastYearAxis] )
+
+	annotation PBI_Id = f4997d03ea7849d0949f076916934510
+

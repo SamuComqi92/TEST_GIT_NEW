@@ -1,0 +1,306 @@
+table 'PSR Group By'
+	lineageTag: 2b9afc49-0228-4e4f-b11d-85008807981e
+
+	column 'List_Data_GroupBy.Cons_Project'
+		dataType: string
+		lineageTag: 5c29cc87-e530-4def-8380-d3f8e2613d6a
+		summarizeBy: none
+		sourceColumn: List_Data_GroupBy.Cons_Project
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'List_Data_GroupBy.Forecast'
+		dataType: string
+		lineageTag: ea8e5c95-175b-4529-bec1-9bd892e47e36
+		summarizeBy: none
+		sourceColumn: List_Data_GroupBy.Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'List_Data_GroupBy.List_Data.P_Key'
+		dataType: string
+		lineageTag: 4dbf5d43-d27c-4800-b314-1ef6c34211c1
+		summarizeBy: none
+		sourceColumn: List_Data_GroupBy.List_Data.P_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'List_Data_GroupBy.MaxIDPKEY'
+		dataType: int64
+		formatString: 0
+		lineageTag: f59ef85a-f0d5-42ef-86fb-34ae9558d0d6
+		summarizeBy: sum
+		sourceColumn: List_Data_GroupBy.MaxIDPKEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'List_Data_GroupBy.Year'
+		dataType: int64
+		formatString: 0
+		lineageTag: aca7048d-455c-4b05-bc37-695217991b48
+		summarizeBy: sum
+		sourceColumn: List_Data_GroupBy.Year
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_MaxIDPKEY = ```
+			
+			
+			IF(
+			    'PSR Group By'[List_Data_GroupBy.MaxIDPKEY] = [MaxIDPKEY_NUM], 
+			    1, 
+			    0
+			)
+			```
+		formatString: 0
+		lineageTag: 340d4a01-5cbe-4099-9da0-a405f2d9ed24
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Period = ```
+			
+			
+			CALCULATE(
+			    MAX('PSR Group By'[List_Data_GroupBy.Forecast]), 
+			    'PSR Group By'[_Flag_MaxIDPKEY] = 1,
+			    ALLEXCEPT(
+			        'PSR Group By', 
+			        'PSR Group By'[List_Data_GroupBy.Cons_Project]
+			    )
+			)    
+			```
+		lineageTag: 43714f73-2275-4662-a72c-9138c96c74ae
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Period_def = 'PSR Group By'[List_Data_GroupBy.Year] & "-" & 'PSR Group By'[_Period]
+		lineageTag: 9cd9d6cc-b388-4981-985f-7d3e98323375
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Forecast_Order = ```
+			
+			
+			SWITCH(
+			    'PSR Group By'[List_Data_GroupBy.Forecast],
+			    "I Forecast", "1",
+			    "II Forecast", "2",
+			    "II Forecast (June Rate)", "3",
+			    "III Forecast", "4",
+			    "Preliminary Balance", "5",
+			    "Official Balance", "6",
+			    "0"
+			)    
+			```
+		dataType: int64
+		formatString: 0
+		lineageTag: 1940c7b4-e033-4871-a732-0f4baa41907e
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Ranking_Forecast_Prev = 'PSR Group By'[List_Data_GroupBy.Year] & 'PSR Group By'[_Forecast_Order]
+		dataType: int64
+		formatString: 0
+		lineageTag: 4452f5a3-95fc-446e-ba36-cab1d2813388
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Prev_Forecast =
+			
+			
+			RANKX(
+			    'PSR Group By',
+			    'PSR Group By'[_Ranking_Forecast_Prev],
+			    'PSR Group By'[_Ranking_Forecast_Prev],
+			    ASC,
+			    Dense
+			)
+		formatString: 0
+		lineageTag: 0bfb982a-9979-482f-b20b-21f25ff3a318
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _ForecastYear = 'PSR Group By'[_Rank_Prev_Forecast] & "-" & 'PSR Group By'[List_Data_GroupBy.Forecast]
+		lineageTag: 6a7c52e2-b48b-42d3-92b0-ca599d65271c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _ForecastYearAxis = 'PSR Group By'[List_Data_GroupBy.Year] & "-" & 'PSR Group By'[List_Data_GroupBy.Forecast]
+		lineageTag: 04b7ed6f-e271-43fb-89a2-64f9ab77da73
+		summarizeBy: none
+		sortByColumn: _Rank_Desc_Forecast
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flagprevforecast-3 = ```
+			
+			
+			VAR MAXRANK = 
+			CALCULATE(
+			    MAX('PSR Group By'[_Rank_Prev_Forecast]),
+			    'PSR Group By'[_Flag_MaxIDPKEY] = 1,
+			    ALLEXCEPT(
+			        'PSR Group By',
+			        'PSR Group By'[List_Data_GroupBy.Cons_Project]
+			    )
+			)
+			 
+			RETURN
+			
+			IF(
+			    AND(
+			        'PSR Group By'[_Rank_Prev_Forecast] >= MAXRANK - 2,
+			        'PSR Group By'[_Rank_Prev_Forecast] <= MAXRANK
+			    ),
+			    "SI",
+			    "NO"
+			)
+			```
+		lineageTag: 85deb39e-672a-4b9a-a229-83250dae6072
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Cluster_Progress_VL =
+			
+			
+			LOOKUPVALUE(
+			    PSR_Card_Consolidated[_Cluster_Progress],
+			    PSR_Card_Consolidated[_ConsolidationCode],
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project]
+			)
+		lineageTag: c09cc61b-7fed-4e71-9c71-497b9e94a5b4
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Cluster =
+			
+			
+			IF(
+			    'PSR Group By'[_Flag_MaxIDPKEY] = 1,
+			    'PSR Group By'[_Cluster_Progress_VL],
+			    ""
+			)
+		lineageTag: 5e3e25e8-80c5-4f38-a961-980beb3b0c77
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Desc_Forecast =
+			
+			
+			RANKX(
+			    'PSR Group By',
+			    'PSR Group By'[_Ranking_Forecast_Prev],
+			    'PSR Group By'[_Ranking_Forecast_Prev],
+			    DESC,
+			    Dense
+			)
+		formatString: 0
+		lineageTag: e7ee5b04-b29e-4ee8-8496-a4dbc84b5efe
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flagprevmaxfor =
+			
+			
+			IF(
+			    AND(
+			        'PSR Group By'[_Rank_Prev_Forecast] >= MAX('PSR Group By'[_Rank_Prev_Forecast]) - 1,
+			        'PSR Group By'[_Rank_Prev_Forecast] < MAX('PSR Group By'[_Rank_Prev_Forecast])
+			    ),
+			    "SI",
+			    "NO"
+			)
+		lineageTag: 46c98d4b-d807-4d51-be6f-ff06257dabd8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flagprevforecast-4 = ```
+			
+			
+			VAR MAXRANK = 
+			CALCULATE(
+			    MAX('PSR Group By'[_Rank_Prev_Forecast]),
+			    'PSR Group By'[_Flagprevmaxfor] = "SI",
+			    ALLEXCEPT(
+			        'PSR Group By',
+			        'PSR Group By'[List_Data_GroupBy.Cons_Project]
+			    )
+			)
+			 
+			RETURN
+			
+			IF(
+			    AND(
+			        'PSR Group By'[_Rank_Prev_Forecast] >= MAXRANK - 2,
+			        'PSR Group By'[_Rank_Prev_Forecast] <= MAXRANK
+			    ),
+			    "SI",
+			    "NO"
+			)
+			```
+		lineageTag: ca75d9c4-ffc0-46fd-b4b2-3b6674b1473d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column NEW_FORECAST_SLICER
+		dataType: string
+		lineageTag: 45da12ec-7a60-40e0-b911-8909bd50da12
+		summarizeBy: none
+		sourceColumn: NEW_FORECAST_SLICER
+		sortByColumn: _Rank_Prev_Forecast
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PSR Group By' = m
+		mode: import
+		source = ```
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Report", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[List_Data_GroupBy]", {"[List_Data_GroupBy].[Actual base cut-off Key].[Actual base cut-off Key]", "[List_Data_GroupBy].[Actual update cut-off Key].[Actual update cut-off Key]", "[List_Data_GroupBy].[Cons_Project].[Cons_Project]", "[List_Data_GroupBy].[Forecast].[Forecast]", "[List_Data_GroupBy].[List_Data.P_Key].[List_Data.P_Key]", "[List_Data_GroupBy].[MaxIDPKEY].[MaxIDPKEY]", "[List_Data_GroupBy].[NewPKEY].[NewPKEY]", "[List_Data_GroupBy].[PrevForecast_PKey].[PrevForecast_PKey]", "[List_Data_GroupBy].[Previous Forecast].[Previous Forecast]", "[List_Data_GroupBy].[PrevYear].[PrevYear]", "[List_Data_GroupBy].[Session].[Session]", "[List_Data_GroupBy].[WF_Status].[WF_Status]", "[List_Data_GroupBy].[Year].[Year]"}, {"List_Data_GroupBy.Actual base cut-off Key", "List_Data_GroupBy.Actual update cut-off Key", "List_Data_GroupBy.Cons_Project", "List_Data_GroupBy.Forecast", "List_Data_GroupBy.List_Data.P_Key", "List_Data_GroupBy.MaxIDPKEY", "List_Data_GroupBy.NewPKEY", "List_Data_GroupBy.PrevForecast_PKey", "List_Data_GroupBy.Previous Forecast", "List_Data_GroupBy.PrevYear", "List_Data_GroupBy.Session", "List_Data_GroupBy.WF_Status", "List_Data_GroupBy.Year"}}
+				        }),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Added Items",{{"List_Data_GroupBy.Year", Int64.Type}}),
+				    
+				    // Filtri applicati sulle colonne + Filtro temporale (anno >= 2022)
+				    #"Filtered Rows" = Table.SelectRows(#"Changed Type2", each (Cube.AttributeMemberId([List_Data_GroupBy.Cons_Project]) <> "[List_Data_GroupBy].[Cons_Project].&" meta [DisplayName = "(null)"])),
+				    #"Filtered Rows1" = Table.SelectRows(#"Filtered Rows", each ([List_Data_GroupBy.Year] >= 2022)),
+				
+				    // Rimozione colonne non utilizzate
+				    #"Removed Columns" = Table.RemoveColumns(#"Filtered Rows1",{"List_Data_GroupBy.Actual base cut-off Key", "List_Data_GroupBy.Actual update cut-off Key", "List_Data_GroupBy.NewPKEY", "List_Data_GroupBy.PrevForecast_PKey", "List_Data_GroupBy.PrevYear", "List_Data_GroupBy.Session", "List_Data_GroupBy.WF_Status", "List_Data_GroupBy.Previous Forecast"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"List_Data_GroupBy.MaxIDPKEY", Int64.Type}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type", "NEW_FORECAST_SLICER", each if (Text.From([List_Data_GroupBy.Year]) & "-" & [List_Data_GroupBy.Forecast]) = Max_Forecast then "Last available forecast" else (Text.From([List_Data_GroupBy.Year]) & "-" & [List_Data_GroupBy.Forecast])),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"NEW_FORECAST_SLICER", type text}, {"List_Data_GroupBy.Year", type text}})
+				in
+				    #"Changed Type1"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

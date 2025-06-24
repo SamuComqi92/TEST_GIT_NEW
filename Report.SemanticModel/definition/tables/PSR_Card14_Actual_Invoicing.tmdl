@@ -1,0 +1,277 @@
+table PSR_Card14_Actual_Invoicing
+	lineageTag: d746836a-28f6-47cd-b462-72e710991fe9
+
+	column 'PSR5_Card14_Actual_Invoicing.Achieved'
+		dataType: double
+		lineageTag: c630ac89-72c7-49b7-8c0b-f52d306a0c62
+		summarizeBy: sum
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Achieved
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR5_Card14_Actual_Invoicing.Date_Upload'
+		dataType: string
+		lineageTag: 40bf923f-85fd-4b5b-8071-1275a9ae5377
+		summarizeBy: none
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Date_Upload
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card14_Actual_Invoicing.Error_Upload'
+		dataType: string
+		lineageTag: e4782cb8-8800-4974-a294-62b82d67bb18
+		summarizeBy: none
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Error_Upload
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card14_Actual_Invoicing.ID'
+		dataType: string
+		lineageTag: 3563d76f-fec7-4e1e-9060-57c6d10d621e
+		summarizeBy: none
+		sourceColumn: PSR5_Card14_Actual_Invoicing.ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card14_Actual_Invoicing.Invoiced'
+		dataType: double
+		lineageTag: faf4c8e5-a522-485e-bae7-5f906589b346
+		summarizeBy: sum
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Invoiced
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR5_Card14_Actual_Invoicing.Job_Number_Company'
+		dataType: string
+		lineageTag: 126b3156-2964-4693-a87a-ec93a8d733b6
+		summarizeBy: none
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Job_Number_Company
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card14_Actual_Invoicing.Orig_Currency'
+		dataType: string
+		lineageTag: 12e60cca-e288-46af-a2ab-5ffb02318be7
+		summarizeBy: none
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Orig_Currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Amount_Total'
+		dataType: double
+		formatString: #,0
+		lineageTag: e49d9919-51fa-4707-838a-ba2841275461
+		summarizeBy: sum
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Amount_Total
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Below_12_Months'
+		dataType: double
+		formatString: #,0
+		lineageTag: 02af4929-dcd7-4957-8263-8932586b38f8
+		summarizeBy: sum
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Below_12_Months
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Not_Due'
+		dataType: double
+		lineageTag: bf34bb69-cff8-4e24-b61f-a31008e7661c
+		summarizeBy: sum
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Not_Due
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Over_12_Months'
+		dataType: double
+		formatString: #,0
+		lineageTag: b2428757-d027-4a00-b30a-df7f397fca25
+		summarizeBy: sum
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Over_12_Months
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'PSR5_Card14_Actual_Invoicing.Outstanding_Total'
+		dataType: double
+		formatString: #,0
+		lineageTag: c7180b78-b22a-418a-a147-bc2b0b9be783
+		summarizeBy: sum
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Outstanding_Total
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'PSR5_Card14_Actual_Invoicing.P_Key'
+		dataType: string
+		lineageTag: b83a3f32-4a83-4a8a-aeec-47b84e3bc11e
+		summarizeBy: none
+		sourceColumn: PSR5_Card14_Actual_Invoicing.P_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card14_Actual_Invoicing.Paid'
+		dataType: double
+		lineageTag: bd54fb2e-f47d-4299-98fa-8160bf2f3928
+		summarizeBy: sum
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Paid
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR5_Card14_Actual_Invoicing.Remarks'
+		dataType: string
+		lineageTag: c89b7026-ae6a-4d65-bd32-be172d97dcba
+		summarizeBy: none
+		sourceColumn: PSR5_Card14_Actual_Invoicing.Remarks
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_PKey = MID( PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.P_Key], 15, 1 )
+		lineageTag: abea123f-e264-4292-99b5-0d55900dca1a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Fixed_Exchage_Rate = ```
+			
+			
+			LOOKUPVALUE(
+			    'Table Exchange Rate'[PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate],
+			    'Table Exchange Rate'[PSR5_CardER_Currency_Exch_Rates.P_Key], 
+			        PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.P_Key],
+			    'Table Exchange Rate'[PSR5_CardER_Currency_Exch_Rates.Fr_Currency], 
+			        PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.Orig_Currency]
+			)
+			```
+		lineageTag: ff02d967-0fc5-463b-aea1-e64bc82e9e63
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Consolidation_code = LEFT(PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.P_Key], 8)
+		lineageTag: f1d74b26-32b3-4fc3-b822-6560a78009f0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Outstanding_Below_12_month_Fixed_Rate =
+			
+			
+			(PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Below_12_Months] * PSR_Card14_Actual_Invoicing[_Fixed_Exchage_Rate])/1000
+		formatString: #,0
+		lineageTag: adf74aed-255e-4ed4-9cb5-e4ff0a078701
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Outstanding_Overdue_12_month_Fixed_Rate =
+			
+			
+			(PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Over_12_Months] * PSR_Card14_Actual_Invoicing[_Fixed_Exchage_Rate])/1000
+		formatString: #,0
+		lineageTag: 2400424e-857a-4957-bfd8-c98e472d7feb
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Outstanding_Total_Fixed_Rate =
+			
+			
+			(PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.Outstanding_Total] * PSR_Card14_Actual_Invoicing[_Fixed_Exchage_Rate])/1000
+		formatString: #,0
+		lineageTag: 269cb59a-02ad-4933-ac83-668cba4ac3ae
+		summarizeBy: max
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Overdue_Amount_Fixed_Rate =
+			
+			
+			[PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Amount_Total]* PSR_Card14_Actual_Invoicing[_Fixed_Exchage_Rate]
+		formatString: 0
+		lineageTag: d70fbb9b-1433-425c-925f-db0d191402ab
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Overdue_Not_Due_Fixed_Rate =
+			
+			
+			PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Not_Due] * PSR_Card14_Actual_Invoicing[_Fixed_Exchage_Rate]
+		lineageTag: 035d66e6-9267-45e2-80dc-085941ec3f4b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Short_Name =
+			
+			
+			LOOKUPVALUE(
+			    Cons_Proj_Table[_Short_Name_Code],
+			    Cons_Proj_Table[Cons_Proj],
+			    'PSR_Card14_Actual_Invoicing'[_Consolidation_code]
+			)
+		lineageTag: a74ae6fc-a84d-42a5-9984-0a6bc87e460c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Crediti Scaduti' = ((PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Amount_Total])/1000)*PSR_Card14_Actual_Invoicing[_Fixed_Exchage_Rate]
+		formatString: #,0
+		lineageTag: acc8a3fa-2f59-4349-83c3-2af56252f7e3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	partition PSR_Card14_Actual_Invoicing = m
+		mode: import
+		source =
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Data Model", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[PSR5_Card14_Actual_Invoicing]", {"[PSR5_Card14_Actual_Invoicing].[Achieved].[Achieved]", "[PSR5_Card14_Actual_Invoicing].[Date_Upload].[Date_Upload]", "[PSR5_Card14_Actual_Invoicing].[Error_Upload].[Error_Upload]", "[PSR5_Card14_Actual_Invoicing].[ID].[ID]", "[PSR5_Card14_Actual_Invoicing].[Invoiced].[Invoiced]", "[PSR5_Card14_Actual_Invoicing].[Job_Number_Company].[Job_Number_Company]", "[PSR5_Card14_Actual_Invoicing].[Orig_Currency].[Orig_Currency]", "[PSR5_Card14_Actual_Invoicing].[Outstanding_Overdue_Amount_Total].[Outstanding_Overdue_Amount_Total]", "[PSR5_Card14_Actual_Invoicing].[Outstanding_Overdue_Below_12_Months].[Outstanding_Overdue_Below_12_Months]", "[PSR5_Card14_Actual_Invoicing].[Outstanding_Overdue_Not_Due].[Outstanding_Overdue_Not_Due]", "[PSR5_Card14_Actual_Invoicing].[Outstanding_Overdue_Over_12_Months].[Outstanding_Overdue_Over_12_Months]", "[PSR5_Card14_Actual_Invoicing].[Outstanding_Total].[Outstanding_Total]", "[PSR5_Card14_Actual_Invoicing].[P_Key].[P_Key]", "[PSR5_Card14_Actual_Invoicing].[Paid].[Paid]", "[PSR5_Card14_Actual_Invoicing].[Remarks].[Remarks]"}, {"PSR5_Card14_Actual_Invoicing.Achieved", "PSR5_Card14_Actual_Invoicing.Date_Upload", "PSR5_Card14_Actual_Invoicing.Error_Upload", "PSR5_Card14_Actual_Invoicing.ID", "PSR5_Card14_Actual_Invoicing.Invoiced", "PSR5_Card14_Actual_Invoicing.Job_Number_Company", "PSR5_Card14_Actual_Invoicing.Orig_Currency", "PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Amount_Total", "PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Below_12_Months", "PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Not_Due", "PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Over_12_Months", "PSR5_Card14_Actual_Invoicing.Outstanding_Total", "PSR5_Card14_Actual_Invoicing.P_Key", "PSR5_Card14_Actual_Invoicing.Paid", "PSR5_Card14_Actual_Invoicing.Remarks"}}
+				        }),
+				
+				    // Filtro per rimuovere dati prima del 2022 (non essendoci una colonna "anno", il filtro è applicato cercando delle stringhe nella chiave)
+				    #"Filtered Rows_year" = Table.SelectRows(#"Added Items", each not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2010_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2011_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2012_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2013_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2014_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2015_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2016_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2017_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2018_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2019_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2020_") and not Text.Contains([PSR5_Card14_Actual_Invoicing.P_Key], "_2021_")),
+				
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows_year",{{"PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Amount_Total", type number}, {"PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Below_12_Months", type number}, {"PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Not_Due", type number}, {"PSR5_Card14_Actual_Invoicing.Outstanding_Overdue_Over_12_Months", type number}, {"PSR5_Card14_Actual_Invoicing.Outstanding_Total", type number}, {"PSR5_Card14_Actual_Invoicing.Paid", type number}, {"PSR5_Card14_Actual_Invoicing.Achieved", type number}, {"PSR5_Card14_Actual_Invoicing.Invoiced", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

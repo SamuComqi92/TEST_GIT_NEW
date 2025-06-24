@@ -1,0 +1,52 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "9aa8b89f9d3e8026a436",
+  "position": {
+    "x": 17.008004798265244,
+    "y": 141.73337331887703,
+    "z": 6000,
+    "height": 153.07204318438718,
+    "width": 136.06403838612195,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Progetti con ritardo nell’ avanzamento del ",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  },
+                  {
+                    "value": "progress",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontStyle": "italic",
+                      "fontSize": "9pt"
+                    }
+                  },
+                  {
+                    "value": " fisico, che presentano valori invariati o in diminuzione dei rischi e dei costi rispetto al forecast precedente",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,51 @@
+table Z_Distinct_ForecastYearAxis_Details
+	lineageTag: 0cd3fd51-ad0e-4dc7-9f1a-2dd9b66dd151
+
+	column _ForecastYearAxis
+		lineageTag: e9096f4b-2fd4-4215-988a-3051d015da3f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR Group By[_ForecastYearAxis]
+		sortByColumn: _Rank_Prev_Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Prev_Forecast
+		formatString: 0
+		lineageTag: ad2070c2-013b-43e8-82f9-3def35324932
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: PSR Group By[_Rank_Prev_Forecast]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Z_Distinct_ForecastYearAxis_Details = calculated
+		mode: import
+		source =
+				
+				
+				-- Tabella separata nel modello, utilizzata in:
+				--   - Pagine di dettaglio di "Project Data"
+				--   - Pagine di dettaglio del KCI8
+				-- Per ogni progetto ci saranno 6 o 2 righe dinamiche che si aggiorneranno man mano
+				-- Sulla tabella previous, filtrare il campo Previous = SI, per current filtrare Current = SI
+				-- (Nella tabella di dettaglio, per ogni riga dinamica, ci sarà una misura specifica)
+				
+				FILTER(
+				    UNION(
+				        -- Tabella current forecast
+				        SUMMARIZECOLUMNS(
+				            'PSR Group By'[_ForecastYearAxis],
+				            'PSR Group By'[_Rank_Prev_Forecast]
+				        ),
+				        -- Tabella previous forecast
+				        SUMMARIZECOLUMNS(
+				            'PSR Group By'[_ForecastYearAxis],
+				            'PSR Group By'[_Rank_Prev_Forecast]
+				        )
+				    ),
+				    'PSR Group By'[_ForecastYearAxis] <> BLANK()
+				)
+
+	annotation PBI_Id = 7033040784474e0e9892a18cd7bf2a76
+

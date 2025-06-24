@@ -1,0 +1,73 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "a325f24f4d870e966c95",
+  "displayName": "Costi-KCI5 - Storico",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "image": {
+            "image": {
+              "name": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'43 (6).svg'"
+                  }
+                }
+              },
+              "url": {
+                "expr": {
+                  "ResourcePackageItem": {
+                    "PackageName": "RegisteredResources",
+                    "PackageType": 1,
+                    "ItemName": "43_(6)7018286142856969.svg"
+                  }
+                }
+              },
+              "scaling": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Fit'"
+                  }
+                }
+              }
+            }
+          },
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visibility": "HiddenInViewMode",
+  "visualInteractions": [
+    {
+      "source": "162e4d1b905055094d46",
+      "target": "fd0cbaf13ea864c1305b",
+      "type": "DataFilter"
+    },
+    {
+      "source": "162e4d1b905055094d46",
+      "target": "e5a69a5020ce296c1c7a",
+      "type": "NoFilter"
+    },
+    {
+      "source": "59591c57a08877a0d063",
+      "target": "e5a69a5020ce296c1c7a",
+      "type": "NoFilter"
+    },
+    {
+      "source": "fd0cbaf13ea864c1305b",
+      "target": "162e4d1b905055094d46",
+      "type": "NoFilter"
+    }
+  ]
+}

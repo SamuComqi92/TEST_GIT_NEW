@@ -1,0 +1,338 @@
+table PSR_Revenues_Costs
+	lineageTag: 926fb714-a957-4bdf-9781-0edc53e5ccc2
+
+	column 'PSR_Revenues_Costs.ActualToDate_Total_Revenues_Fixed_Rate'
+		dataType: double
+		lineageTag: 51272883-b2c4-45b0-9294-e115779d2fde
+		summarizeBy: sum
+		sourceColumn: PSR_Revenues_Costs.ActualToDate_Total_Revenues_Fixed_Rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 4755ce90-a65f-4632-a2bc-037bb38dd578
+		summarizeBy: sum
+		sourceColumn: PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate'
+		dataType: double
+		lineageTag: 1dcee1b6-2a13-4d63-9c48-117ac86c78d9
+		summarizeBy: sum
+		sourceColumn: PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR_Revenues_Costs.OCB_Total_Revenues_Fixed_Rate'
+		dataType: double
+		lineageTag: 649fca36-50f7-4b34-9020-07b8bed9ca26
+		summarizeBy: sum
+		sourceColumn: PSR_Revenues_Costs.OCB_Total_Revenues_Fixed_Rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR_Revenues_Costs.P_Key'
+		dataType: string
+		lineageTag: a6ff837f-e241-4f8b-9821-538d3e7355c9
+		summarizeBy: none
+		sourceColumn: PSR_Revenues_Costs.P_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR_Revenues_Costs.RCB_Gross_Margin'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2b4c1d47-2569-410b-a1a9-f4dac42627fa
+		summarizeBy: sum
+		sourceColumn: PSR_Revenues_Costs.RCB_Gross_Margin
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR_Revenues_Costs.RCB_Total_Revenues'
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 4256bfae-58b0-421e-b6c1-a2c34f3ffe93
+		summarizeBy: sum
+		sourceColumn: PSR_Revenues_Costs.RCB_Total_Revenues
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate'
+		dataType: double
+		formatString: #,0
+		lineageTag: 0a143b0a-43f0-4342-b4cc-85f5682fe842
+		summarizeBy: sum
+		sourceColumn: PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'CF Contingencies'
+		dataType: double
+		formatString: #,0
+		lineageTag: 6de69ef5-7adc-4082-b424-fb6fe481b4e1
+		summarizeBy: sum
+		sourceColumn: CF Contingencies
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'CF K EL Fixed Rate'
+		dataType: double
+		lineageTag: 15369166-a747-4817-ad83-4b9d3d1595b0
+		summarizeBy: sum
+		sourceColumn: CF K EL Fixed Rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Cluster_Valore_Revenue_ = ```
+			
+			
+			SWITCH(
+			    TRUE(),
+			    PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 1500000,
+			    "> 1500 mln€",
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 750000, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 1500000 
+			    ),
+			    "750 – 1500 mln€",
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 250000, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 750000 
+			    ),
+			    "250 – 750 mln€",
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 0, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 250000 
+			    ),
+			    "0 – 250 mln€"
+			)
+			```
+		lineageTag: 11ca4989-4e92-4f5e-973b-14682c3068f0
+		summarizeBy: none
+		sortByColumn: _Cluster_Valore_Revenue_order
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column _ConsolidationCode = LEFT(PSR_Revenues_Costs[PSR_Revenues_Costs.P_Key], 8)
+		lineageTag: 86b00689-b6fa-461c-a8dc-6f5d390dfad0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Forecast_Period =
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[_ForecastYearAxis],
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project],
+			    PSR_Revenues_Costs[_ConsolidationCode]
+			)
+		lineageTag: 032cd70b-d37b-4ba3-86fb-b7c590b2b688
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Forecast_Period_Year =
+			
+			
+			LOOKUPVALUE(
+			    'PSR Group By'[_ForecastYear],
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project],
+			    PSR_Revenues_Costs[_ConsolidationCode]
+			)
+		lineageTag: f7a0a6dc-d047-4b30-a083-696e7ba09abd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Backlog = PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] - PSR_Revenues_Costs[PSR_Revenues_Costs.ActualToDate_Total_Revenues_Fixed_Rate]
+		dataType: double
+		formatString: #,0
+		lineageTag: 96175456-7c97-4c41-88e2-147ce4c211b7
+		summarizeBy: sum
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Backlog_Value =
+			
+			
+			( PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] - PSR_Revenues_Costs[PSR_Revenues_Costs.ActualToDate_Total_Revenues_Fixed_Rate] ) / 1000
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		lineageTag: 139cedf5-7825-491d-b04b-2d2359bde591
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _CF_Revenue = PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] / 1000
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		lineageTag: d7b77986-74ff-4554-a2d7-7306a44956f7
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _RCB/OCB_Revenues =
+			
+			
+			IF(
+			    PSR_Revenues_Costs[PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate] = 0,
+			    PSR_Revenues_Costs[PSR_Revenues_Costs.OCB_Total_Revenues_Fixed_Rate],
+			    PSR_Revenues_Costs[PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate]
+			)
+		formatString: #,0
+		lineageTag: 51b46754-8aa5-44a3-82b0-ce7b1f525084
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Cluster_Valore_Revenue_order = ```
+			
+			
+			SWITCH(
+			    TRUE(),
+			    PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 1500000,
+			    4,
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 750000, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 1500000 
+			    ),
+			    3,
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 250000, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 750000 
+			    ),
+			    2,
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 0, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 250000 
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		lineageTag: 123dacd9-b95b-4eb8-ac80-c63c1338f4cc
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Cluster_Valore_Revenue_new = ```
+			
+			
+			SWITCH(
+			    TRUE(),
+			    PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 1500000,
+			    "> 1500 mln€",
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 750000, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 1500000 
+			    ),
+			    "750 – 1500 mln€",
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 250000, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 750000 
+			    ),
+			    "250 – 750 mln€",
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 0, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 250000 
+			    ),
+			    "0 – 250 mln€"
+			)
+			```
+		lineageTag: 37cf4999-f9df-4952-bb43-8a2f09bc57af
+		summarizeBy: none
+		sortByColumn: _Cluster_Valore_Revenue_order_new
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Cluster_Valore_Revenue_order_new = ```
+			
+			
+			SWITCH(
+			    TRUE(),
+			    PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 1500000,
+			    4,
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 750000, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 1500000 
+			    ),
+			    3,
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 250000, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 750000 
+			    ),
+			    2,
+			    AND( 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] >= 0, 
+			        PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate] < 250000 
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		lineageTag: 0889fda9-88e0-45e5-8482-555298389da3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PSR_Revenues_Costs = m
+		mode: import
+		source = ```
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Report", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[PSR_Revenues_Costs]", {"[PSR_Revenues_Costs].[ActualToDate_Costs_Construction].[ActualToDate_Costs_Construction]", "[PSR_Revenues_Costs].[ActualToDate_Costs_Fabrication].[ActualToDate_Costs_Fabrication]", "[PSR_Revenues_Costs].[ActualToDate_Costs_HomeOffice].[ActualToDate_Costs_HomeOffice]", "[PSR_Revenues_Costs].[ActualToDate_Costs_Installation].[ActualToDate_Costs_Installation]", "[PSR_Revenues_Costs].[ActualToDate_Costs_Manufacturing].[ActualToDate_Costs_Manufacturing]", "[PSR_Revenues_Costs].[ActualToDate_Costs_SiteSupervision].[ActualToDate_Costs_SiteSupervision]", "[PSR_Revenues_Costs].[ActualToDate_Total_Costs].[ActualToDate_Total_Costs]", "[PSR_Revenues_Costs].[ActualToDate_Total_Costs_Fixed_Rate].[ActualToDate_Total_Costs_Fixed_Rate]", "[PSR_Revenues_Costs].[ActualToDate_Total_Revenues_Fixed_Rate].[ActualToDate_Total_Revenues_Fixed_Rate]", "[PSR_Revenues_Costs].[CF_Gross_Margin].[CF_Gross_Margin]", "[PSR_Revenues_Costs].[CF_Gross_Margin_Fixed_Rate].[CF_Gross_Margin_Fixed_Rate]", "[PSR_Revenues_Costs].[CF_K_Factor].[CF_K_Factor]", "[PSR_Revenues_Costs].[CF_Management_Contingencies].[CF_Management_Contingencies]", "[PSR_Revenues_Costs].[CF_Project_Contingencies].[CF_Project_Contingencies]", "[PSR_Revenues_Costs].[CF_Subtot_Construction].[CF_Subtot_Construction]", "[PSR_Revenues_Costs].[CF_Subtot_Contingencies].[CF_Subtot_Contingencies]", "[PSR_Revenues_Costs].[CF_Subtot_Costs_ExchRate_Diff].[CF_Subtot_Costs_ExchRate_Diff]", "[PSR_Revenues_Costs].[CF_Subtot_Fabrication].[CF_Subtot_Fabrication]", "[PSR_Revenues_Costs].[CF_Subtot_Home_Office_Services].[CF_Subtot_Home_Office_Services]", "[PSR_Revenues_Costs].[CF_Subtot_Installation].[CF_Subtot_Installation]", "[PSR_Revenues_Costs].[CF_Subtot_Manufacturing_Delivery].[CF_Subtot_Manufacturing_Delivery]", "[PSR_Revenues_Costs].[CF_Subtot_Site_Supervision_Services].[CF_Subtot_Site_Supervision_Services]", "[PSR_Revenues_Costs].[CF_Total_Costs].[CF_Total_Costs]", "[PSR_Revenues_Costs].[CF_Total_Costs_Fixed_Rate].[CF_Total_Costs_Fixed_Rate]", "[PSR_Revenues_Costs].[CF_Total_Revenues].[CF_Total_Revenues]", "[PSR_Revenues_Costs].[CF_Total_Revenues_Fixed_Rate].[CF_Total_Revenues_Fixed_Rate]", "[PSR_Revenues_Costs].[Committed_To_Date_Total_Costs].[Committed_To_Date_Total_Costs]", "[PSR_Revenues_Costs].[Committed_To_Date_Total_Costs_Fixed_Rate].[Committed_To_Date_Total_Costs_Fixed_Rate]", "[PSR_Revenues_Costs].[Committed_To_Date_Total_Revenues_Fixed_Rate].[Committed_To_Date_Total_Revenues_Fixed_Rate]", "[PSR_Revenues_Costs].[CommittedPerc_Manufacturing].[CommittedPerc_Manufacturing]", "[PSR_Revenues_Costs].[CommittedToDate_Costs_Manufacturing].[CommittedToDate_Costs_Manufacturing]", "[PSR_Revenues_Costs].[Error_Upload].[Error_Upload]", "[PSR_Revenues_Costs].[ID].[ID]", "[PSR_Revenues_Costs].[Net_Margin_ActualToDate].[Net_Margin_ActualToDate]", "[PSR_Revenues_Costs].[Net_Margin_CF].[Net_Margin_CF]", "[PSR_Revenues_Costs].[Net_Margin_OCB].[Net_Margin_OCB]", "[PSR_Revenues_Costs].[Net_Margin_PF].[Net_Margin_PF]", "[PSR_Revenues_Costs].[Net_Margin_RCB].[Net_Margin_RCB]", "[PSR_Revenues_Costs].[OCB_Gross_Margin].[OCB_Gross_Margin]", "[PSR_Revenues_Costs].[OCB_K_Factor].[OCB_K_Factor]", "[PSR_Revenues_Costs].[OCB_Management_Contingencies].[OCB_Management_Contingencies]", "[PSR_Revenues_Costs].[OCB_Project_Contingencies].[OCB_Project_Contingencies]", "[PSR_Revenues_Costs].[OCB_Subtot_Construction].[OCB_Subtot_Construction]", "[PSR_Revenues_Costs].[OCB_Subtot_Fabrication].[OCB_Subtot_Fabrication]", "[PSR_Revenues_Costs].[OCB_Subtot_Home_Office_Services].[OCB_Subtot_Home_Office_Services]", "[PSR_Revenues_Costs].[OCB_Subtot_Installation].[OCB_Subtot_Installation]", "[PSR_Revenues_Costs].[OCB_Subtot_Manufacturing_Delivery].[OCB_Subtot_Manufacturing_Delivery]", "[PSR_Revenues_Costs].[OCB_Subtot_Site_Supervision_Services].[OCB_Subtot_Site_Supervision_Services]", "[PSR_Revenues_Costs].[OCB_Total_Costs].[OCB_Total_Costs]", "[PSR_Revenues_Costs].[OCB_Total_Costs_Fixed_Rate].[OCB_Total_Costs_Fixed_Rate]", "[PSR_Revenues_Costs].[OCB_Total_Revenues].[OCB_Total_Revenues]", "[PSR_Revenues_Costs].[OCB_Total_Revenues_Fixed_Rate].[OCB_Total_Revenues_Fixed_Rate]", "[PSR_Revenues_Costs].[P_Key].[P_Key]", "[PSR_Revenues_Costs].[RCB_Gross_Margin].[RCB_Gross_Margin]", "[PSR_Revenues_Costs].[RCB_K_Factor].[RCB_K_Factor]", "[PSR_Revenues_Costs].[RCB_Management_Contingencies].[RCB_Management_Contingencies]", "[PSR_Revenues_Costs].[RCB_Project_Contingencies].[RCB_Project_Contingencies]", "[PSR_Revenues_Costs].[RCB_Subtot_Construction].[RCB_Subtot_Construction]", "[PSR_Revenues_Costs].[RCB_Subtot_Fabrication].[RCB_Subtot_Fabrication]", "[PSR_Revenues_Costs].[RCB_Subtot_Home_Office_Services].[RCB_Subtot_Home_Office_Services]", "[PSR_Revenues_Costs].[RCB_Subtot_Installation].[RCB_Subtot_Installation]", "[PSR_Revenues_Costs].[RCB_Subtot_Manufacturing_Delivery].[RCB_Subtot_Manufacturing_Delivery]", "[PSR_Revenues_Costs].[RCB_Subtot_Site_Supervision_Services].[RCB_Subtot_Site_Supervision_Services]", "[PSR_Revenues_Costs].[RCB_Total_Costs].[RCB_Total_Costs]", "[PSR_Revenues_Costs].[RCB_Total_Costs_Fixed_Rate].[RCB_Total_Costs_Fixed_Rate]", "[PSR_Revenues_Costs].[RCB_Total_Revenues].[RCB_Total_Revenues]", "[PSR_Revenues_Costs].[RCB_Total_Revenues_Fixed_Rate].[RCB_Total_Revenues_Fixed_Rate]"}, {"PSR_Revenues_Costs.ActualToDate_Costs_Construction", "PSR_Revenues_Costs.ActualToDate_Costs_Fabrication", "PSR_Revenues_Costs.ActualToDate_Costs_HomeOffice", "PSR_Revenues_Costs.ActualToDate_Costs_Installation", "PSR_Revenues_Costs.ActualToDate_Costs_Manufacturing", "PSR_Revenues_Costs.ActualToDate_Costs_SiteSupervision", "PSR_Revenues_Costs.ActualToDate_Total_Costs", "PSR_Revenues_Costs.ActualToDate_Total_Costs_Fixed_Rate", "PSR_Revenues_Costs.ActualToDate_Total_Revenues_Fixed_Rate", "PSR_Revenues_Costs.CF_Gross_Margin", "PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate", "PSR_Revenues_Costs.CF_K_Factor", "PSR_Revenues_Costs.CF_Management_Contingencies", "PSR_Revenues_Costs.CF_Project_Contingencies", "PSR_Revenues_Costs.CF_Subtot_Construction", "PSR_Revenues_Costs.CF_Subtot_Contingencies", "PSR_Revenues_Costs.CF_Subtot_Costs_ExchRate_Diff", "PSR_Revenues_Costs.CF_Subtot_Fabrication", "PSR_Revenues_Costs.CF_Subtot_Home_Office_Services", "PSR_Revenues_Costs.CF_Subtot_Installation", "PSR_Revenues_Costs.CF_Subtot_Manufacturing_Delivery", "PSR_Revenues_Costs.CF_Subtot_Site_Supervision_Services", "PSR_Revenues_Costs.CF_Total_Costs", "PSR_Revenues_Costs.CF_Total_Costs_Fixed_Rate", "PSR_Revenues_Costs.CF_Total_Revenues", "PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate", "PSR_Revenues_Costs.Committed_To_Date_Total_Costs", "PSR_Revenues_Costs.Committed_To_Date_Total_Costs_Fixed_Rate", "PSR_Revenues_Costs.Committed_To_Date_Total_Revenues_Fixed_Rate", "PSR_Revenues_Costs.CommittedPerc_Manufacturing", "PSR_Revenues_Costs.CommittedToDate_Costs_Manufacturing", "PSR_Revenues_Costs.Error_Upload", "PSR_Revenues_Costs.ID", "PSR_Revenues_Costs.Net_Margin_ActualToDate", "PSR_Revenues_Costs.Net_Margin_CF", "PSR_Revenues_Costs.Net_Margin_OCB", "PSR_Revenues_Costs.Net_Margin_PF", "PSR_Revenues_Costs.Net_Margin_RCB", "PSR_Revenues_Costs.OCB_Gross_Margin", "PSR_Revenues_Costs.OCB_K_Factor", "PSR_Revenues_Costs.OCB_Management_Contingencies", "PSR_Revenues_Costs.OCB_Project_Contingencies", "PSR_Revenues_Costs.OCB_Subtot_Construction", "PSR_Revenues_Costs.OCB_Subtot_Fabrication", "PSR_Revenues_Costs.OCB_Subtot_Home_Office_Services", "PSR_Revenues_Costs.OCB_Subtot_Installation", "PSR_Revenues_Costs.OCB_Subtot_Manufacturing_Delivery", "PSR_Revenues_Costs.OCB_Subtot_Site_Supervision_Services", "PSR_Revenues_Costs.OCB_Total_Costs", "PSR_Revenues_Costs.OCB_Total_Costs_Fixed_Rate", "PSR_Revenues_Costs.OCB_Total_Revenues", "PSR_Revenues_Costs.OCB_Total_Revenues_Fixed_Rate", "PSR_Revenues_Costs.P_Key", "PSR_Revenues_Costs.RCB_Gross_Margin", "PSR_Revenues_Costs.RCB_K_Factor", "PSR_Revenues_Costs.RCB_Management_Contingencies", "PSR_Revenues_Costs.RCB_Project_Contingencies", "PSR_Revenues_Costs.RCB_Subtot_Construction", "PSR_Revenues_Costs.RCB_Subtot_Fabrication", "PSR_Revenues_Costs.RCB_Subtot_Home_Office_Services", "PSR_Revenues_Costs.RCB_Subtot_Installation", "PSR_Revenues_Costs.RCB_Subtot_Manufacturing_Delivery", "PSR_Revenues_Costs.RCB_Subtot_Site_Supervision_Services", "PSR_Revenues_Costs.RCB_Total_Costs", "PSR_Revenues_Costs.RCB_Total_Costs_Fixed_Rate", "PSR_Revenues_Costs.RCB_Total_Revenues", "PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate"}},
+				            {Cube.AddMeasureColumn, "CF Contingencies", "[Measures].[CF Contingencies]"},
+				            {Cube.AddMeasureColumn, "CF K EL", "[Measures].[CF K EL]"},
+				            {Cube.AddMeasureColumn, "CF K EL Fixed Rate", "[Measures].[CF K EL Fixed Rate]"},
+				            {Cube.AddMeasureColumn, "Cont New Acquisition - Cont Executive Projects", "[Measures].[Cont New Acquisition - Cont Executive Projects]"},
+				            {Cube.AddMeasureColumn, "Cont New Acquisition / Cont Executive Projects", "[Measures].[Cont New Acquisition / Cont Executive Projects]"},
+				            {Cube.AddMeasureColumn, "OCB Contingencies", "[Measures].[OCB Contingencies]"},
+				            {Cube.AddMeasureColumn, "OCB K EL", "[Measures].[OCB K EL]"},
+				            {Cube.AddMeasureColumn, "OCB Margin - Current Forecast Margin", "[Measures].[OCB Margin - Current Forecast Margin]"},
+				            {Cube.AddMeasureColumn, "OCB Margin - Current Forecast Margin (-Var 75)", "[Measures].[OCB Margin - Current Forecast Margin (-Var 75)]"},
+				            {Cube.AddMeasureColumn, "OCB Margin / Current Forecast Margin", "[Measures].[OCB Margin / Current Forecast Margin]"},
+				            {Cube.AddMeasureColumn, "OCB Margin / Current Forecast Margin (-Var 75)", "[Measures].[OCB Margin / Current Forecast Margin (-Var 75)]"},
+				            {Cube.AddMeasureColumn, "RCB Contingencies", "[Measures].[RCB Contingencies]"},
+				            {Cube.AddMeasureColumn, "RCB K EL", "[Measures].[RCB K EL]"}
+				        }),
+				    
+				    // Filtro per rimuovere dati prima del 2022 (non essendoci una colonna "anno", il filtro è applicato cercando delle stringhe nella chiave)
+				    #"Filtered Rows" = Table.SelectRows(#"Added Items", each not Text.Contains([PSR_Revenues_Costs.P_Key], "_2010_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2011_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2012_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2013_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2014_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2015_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2016_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2017_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2018_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2019_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2020_") and not Text.Contains([PSR_Revenues_Costs.P_Key], "_2021_")),
+				    #"Removed Columns" = Table.RemoveColumns(#"Filtered Rows",{"PSR_Revenues_Costs.CF_Gross_Margin", "PSR_Revenues_Costs.ID", "PSR_Revenues_Costs.CF_K_Factor", "PSR_Revenues_Costs.CF_Subtot_Costs_ExchRate_Diff", "OCB Margin - Current Forecast Margin (-Var 75)", "OCB Margin - Current Forecast Margin", "PSR_Revenues_Costs.CF_Total_Costs_Fixed_Rate", "CF K EL", "OCB Margin / Current Forecast Margin (-Var 75)", "OCB Margin / Current Forecast Margin", "PSR_Revenues_Costs.ActualToDate_Total_Costs", "PSR_Revenues_Costs.Committed_To_Date_Total_Costs", "PSR_Revenues_Costs.CF_Total_Revenues", "PSR_Revenues_Costs.ActualToDate_Total_Costs_Fixed_Rate", "PSR_Revenues_Costs.Committed_To_Date_Total_Costs_Fixed_Rate", "PSR_Revenues_Costs.CF_Subtot_Home_Office_Services", "PSR_Revenues_Costs.CF_Subtot_Manufacturing_Delivery", "PSR_Revenues_Costs.RCB_K_Factor", "RCB K EL", "Cont New Acquisition - Cont Executive Projects", "Cont New Acquisition / Cont Executive Projects", "PSR_Revenues_Costs.RCB_Total_Costs", "PSR_Revenues_Costs.Net_Margin_CF", "PSR_Revenues_Costs.CF_Subtot_Construction", "PSR_Revenues_Costs.RCB_Total_Costs_Fixed_Rate", "PSR_Revenues_Costs.CF_Subtot_Installation", "PSR_Revenues_Costs.CF_Subtot_Contingencies", "PSR_Revenues_Costs.ActualToDate_Costs_HomeOffice", "PSR_Revenues_Costs.CommittedPerc_Manufacturing", "PSR_Revenues_Costs.Net_Margin_ActualToDate", "PSR_Revenues_Costs.CommittedToDate_Costs_Manufacturing", "PSR_Revenues_Costs.ActualToDate_Costs_Manufacturing", "PSR_Revenues_Costs.CF_Project_Contingencies", "PSR_Revenues_Costs.CF_Total_Costs", "RCB Contingencies", "PSR_Revenues_Costs.RCB_Subtot_Manufacturing_Delivery", "PSR_Revenues_Costs.CF_Subtot_Site_Supervision_Services", "PSR_Revenues_Costs.RCB_Project_Contingencies", "PSR_Revenues_Costs.RCB_Subtot_Home_Office_Services", "PSR_Revenues_Costs.OCB_Total_Costs_Fixed_Rate", "PSR_Revenues_Costs.CF_Subtot_Fabrication", "PSR_Revenues_Costs.CF_Management_Contingencies", "PSR_Revenues_Costs.Net_Margin_PF", "PSR_Revenues_Costs.OCB_K_Factor", "PSR_Revenues_Costs.OCB_Total_Costs", "PSR_Revenues_Costs.RCB_Management_Contingencies", "PSR_Revenues_Costs.OCB_Gross_Margin", "PSR_Revenues_Costs.OCB_Subtot_Home_Office_Services", "PSR_Revenues_Costs.Net_Margin_RCB", "PSR_Revenues_Costs.OCB_Project_Contingencies", "PSR_Revenues_Costs.OCB_Subtot_Manufacturing_Delivery", "PSR_Revenues_Costs.ActualToDate_Costs_Installation", "PSR_Revenues_Costs.ActualToDate_Costs_Fabrication", "PSR_Revenues_Costs.RCB_Subtot_Construction", "OCB K EL", "PSR_Revenues_Costs.ActualToDate_Costs_Construction", "PSR_Revenues_Costs.OCB_Total_Revenues", "PSR_Revenues_Costs.RCB_Subtot_Site_Supervision_Services", "PSR_Revenues_Costs.RCB_Subtot_Fabrication", "PSR_Revenues_Costs.RCB_Subtot_Installation", "PSR_Revenues_Costs.OCB_Management_Contingencies", "PSR_Revenues_Costs.ActualToDate_Costs_SiteSupervision", "PSR_Revenues_Costs.OCB_Subtot_Installation", "PSR_Revenues_Costs.Net_Margin_OCB", "PSR_Revenues_Costs.OCB_Subtot_Construction", "OCB Contingencies", "PSR_Revenues_Costs.OCB_Subtot_Fabrication", "PSR_Revenues_Costs.OCB_Subtot_Site_Supervision_Services", "PSR_Revenues_Costs.Committed_To_Date_Total_Revenues_Fixed_Rate", "PSR_Revenues_Costs.Error_Upload"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate", type number}, {"PSR_Revenues_Costs.RCB_Total_Revenues", type number}, {"PSR_Revenues_Costs.OCB_Total_Revenues_Fixed_Rate", type number}, {"PSR_Revenues_Costs.RCB_Gross_Margin", Int64.Type}, {"PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate", type number}, {"PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate", type number}, {"PSR_Revenues_Costs.ActualToDate_Total_Revenues_Fixed_Rate", type number}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

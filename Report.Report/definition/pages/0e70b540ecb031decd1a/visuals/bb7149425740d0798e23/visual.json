@@ -1,0 +1,45 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "bb7149425740d0798e23",
+  "position": {
+    "x": 13.317149297728456,
+    "y": 143.82521241546732,
+    "z": 7000,
+    "height": 170.45951101092425,
+    "width": 137.16663776660309,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Progetti che presentano ",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  },
+                  {
+                    "value": "per 3 Forecast/PSR consecutivi, un ammontare di opportunità e pending revenues superiore al 15% del valore dei ricavi del Revised Control Budget",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt",
+                      "color": "black"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

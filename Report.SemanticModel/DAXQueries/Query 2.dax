@@ -1,0 +1,7 @@
+EVALUATE    
+
+SUMMARIZECOLUMNS(
+	'PSR Group By'[_ForecastYearAxis],
+	'PSR Group By'[_Rank_Prev_Forecast]
+)
+order by 'PSR Group By'[_Rank_Prev_Forecast]

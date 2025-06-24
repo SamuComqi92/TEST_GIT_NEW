@@ -1,0 +1,132 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "0e70b540ecb031decd1a",
+  "displayName": "Ricavi-KCI3 - Storico",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "image": {
+            "image": {
+              "name": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'41 (1).svg'"
+                  }
+                }
+              },
+              "url": {
+                "expr": {
+                  "ResourcePackageItem": {
+                    "PackageName": "RegisteredResources",
+                    "PackageType": 1,
+                    "ItemName": "41_(1)6820873460025272.svg"
+                  }
+                }
+              },
+              "scaling": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Fit'"
+                  }
+                }
+              }
+            }
+          },
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspace": [
+      {
+        "properties": {
+          "image": {
+            "image": {
+              "name": {
+                "expr": {
+                  "Literal": {
+                    "Value": "''"
+                  }
+                }
+              },
+              "url": {
+                "expr": {
+                  "Literal": {
+                    "Value": "''"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visibility": "HiddenInViewMode",
+  "visualInteractions": [
+    {
+      "source": "e82f858d171807c39d04",
+      "target": "bf2a648c8be3da4ea840",
+      "type": "NoFilter"
+    },
+    {
+      "source": "7f933a753a96dd79a174",
+      "target": "bf2a648c8be3da4ea840",
+      "type": "NoFilter"
+    },
+    {
+      "source": "d8a8119747d24dd19883",
+      "target": "0f4c07d517504953d0c9",
+      "type": "NoFilter"
+    },
+    {
+      "source": "d8a8119747d24dd19883",
+      "target": "bf2a648c8be3da4ea840",
+      "type": "NoFilter"
+    },
+    {
+      "source": "d8a8119747d24dd19883",
+      "target": "7f933a753a96dd79a174",
+      "type": "NoFilter"
+    },
+    {
+      "source": "32ba801185a10e0a3b76",
+      "target": "bf2a648c8be3da4ea840",
+      "type": "NoFilter"
+    },
+    {
+      "source": "32ba801185a10e0a3b76",
+      "target": "7f933a753a96dd79a174",
+      "type": "NoFilter"
+    },
+    {
+      "source": "32ba801185a10e0a3b76",
+      "target": "d8a8119747d24dd19883",
+      "type": "NoFilter"
+    },
+    {
+      "source": "e806170f23bd35a2ecb4",
+      "target": "bf2a648c8be3da4ea840",
+      "type": "NoFilter"
+    },
+    {
+      "source": "e806170f23bd35a2ecb4",
+      "target": "7f933a753a96dd79a174",
+      "type": "NoFilter"
+    },
+    {
+      "source": "e806170f23bd35a2ecb4",
+      "target": "d8a8119747d24dd19883",
+      "type": "NoFilter"
+    }
+  ]
+}

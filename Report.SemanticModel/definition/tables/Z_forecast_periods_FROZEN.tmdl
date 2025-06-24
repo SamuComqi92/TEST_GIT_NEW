@@ -1,0 +1,69 @@
+table Z_forecast_periods_FROZEN
+	lineageTag: cfa8b63e-9b2e-4101-8436-d7752233ccef
+
+	column key
+		isHidden
+		lineageTag: 905f04d0-112e-47fb-9433-63100eb3c8e3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [key]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Period_froz_sort
+		lineageTag: 72378499-4f63-47e4-b17b-f46b21ecef3e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Frozen EV[_Period_froz_sort]
+		sortByColumn: sort_period
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort_period
+		formatString: 0
+		lineageTag: f37b8bd6-ac81-46d3-ae05-92be8c9d95a3
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [sort_period]
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort_period_group_by
+		lineageTag: 318a6e39-07bc-4ce6-9af0-776596c204e0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [sort_period_group_by]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Z_forecast_periods_FROZEN = calculated
+		mode: import
+		source =
+				
+				
+				-- Misura creata per gestire la visualizzazione di più periodi in base ad una selezione (per il KCI2)
+				
+				VAR _first = SELECTCOLUMNS( SUMMARIZECOLUMNS( 'Frozen EV'[_Period_froz_sort] ), "key", 'Frozen EV'[_Period_froz_sort] )
+				
+				RETURN
+				ADDCOLUMNS(
+				    CROSSJOIN(
+				        _first,
+				        DISTINCT('Frozen EV'[_Period_froz_sort])
+				    ),
+				    "sort_period",
+				    LOOKUPVALUE(
+				        'Frozen EV'[_Rank_Sort_Forecast],
+				        'Frozen EV'[_Period_froz_sort],
+				        [_Period_froz_sort]
+				    ),
+				    "sort_period_group_by",
+				    LOOKUPVALUE(
+				        'PSR Group By'[_ForecastYearAxis],
+				        'PSR Group By'[_ForecastYearAxis],
+				        [key]
+				    )
+				)
+
+	annotation PBI_Id = 3b4083d4b993409798dca242ba43617f
+

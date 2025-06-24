@@ -1,0 +1,56 @@
+table Z_Project_PSR
+	lineageTag: 9b3b900d-8e56-4556-8d22-3a54f7a53a2e
+
+	column Cons_Proj
+		lineageTag: 4dc40fc2-88bd-45a2-9378-467968e039f0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Cons_Proj_Table[Cons_Proj]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Short_Name_Code
+		lineageTag: a99150b5-b8f8-4497-a800-8ec7cf25d5f5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Cons_Proj_Table[_Short_Name_Code]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Business_Organization_T1_Code
+		lineageTag: 669de3bf-000b-4676-8391-d4cf3158b50c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Cons_Proj_Table[Business_Organization_T1_Code]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		lineageTag: 2f730edd-6f5f-49ea-965a-18f372bc886e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Cons_Proj_Table[Country]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Z_Project_PSR = calculated
+		mode: import
+		source = ```
+				
+				
+				-- Tabella che riporta solo i progetti che devono fare PSR (dalla tabella Cons_Proj_Table e con PSR = TRUE)
+				SUMMARIZE(
+					CALCULATETABLE(
+						'Cons_Proj_Table',
+						Cons_Proj_Table[PSR] = "TRUE", 
+				        Cons_Proj_Table[Business_Organization_T3] <> "OPERATIONS & MAINTENANCE"
+					),
+					Cons_Proj_Table[Cons_Proj],
+				    Cons_Proj_Table[Business_Organization_T1_Code],
+				    Cons_Proj_Table[Country],
+				    Cons_Proj_Table[_Short_Name_Code]
+				)
+				```
+
+	annotation PBI_Id = 95dac58127dd4b99bed2652eb6ae706a
+

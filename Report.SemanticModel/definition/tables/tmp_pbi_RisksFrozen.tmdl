@@ -1,0 +1,440 @@
+table tmp_pbi_RisksFrozen
+	lineageTag: fc316697-4abd-4002-b6ae-81efd344673e
+
+	column Period
+		dataType: string
+		lineageTag: 4a2e8838-2452-4592-b98e-c4a2523eea1b
+		summarizeBy: none
+		sourceColumn: Period
+		sortByColumn: _ForecastYear1
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column FreezingDate
+		dataType: string
+		lineageTag: 09d5edf5-260e-4dc2-8ba5-30d213525e16
+		summarizeBy: none
+		sourceColumn: FreezingDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column ConsolidationCode
+		dataType: string
+		lineageTag: 817226bf-13db-4bec-a28c-8c7f0a64fdf4
+		summarizeBy: none
+		sourceColumn: ConsolidationCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Currency
+		dataType: string
+		lineageTag: fafec43a-d5e2-4708-9b9d-39f777ecc498
+		summarizeBy: none
+		sourceColumn: Currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column CurrencyToEuro
+		dataType: double
+		lineageTag: 9ead56b8-7700-4f9c-8151-280fd6c25bfb
+		summarizeBy: sum
+		sourceColumn: CurrencyToEuro
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SaipemShare
+		dataType: string
+		lineageTag: 92b3c1ba-3e95-4e95-b738-ba08ab85b25d
+		summarizeBy: none
+		sourceColumn: SaipemShare
+
+		annotation SummarizationSetBy = Automatic
+
+	column RRPhase
+		dataType: string
+		lineageTag: a2113cc6-18fd-472c-bc76-32ffc3295f9c
+		summarizeBy: none
+		sourceColumn: RRPhase
+
+		annotation SummarizationSetBy = Automatic
+
+	column IdRisk
+		dataType: string
+		lineageTag: 167ca004-fab8-48e7-9fbc-2f9623bdf85f
+		summarizeBy: none
+		sourceColumn: IdRisk
+
+		annotation SummarizationSetBy = Automatic
+
+	column RO
+		dataType: string
+		lineageTag: c5e22eeb-ffc9-431e-a4af-4f06c281acf7
+		summarizeBy: none
+		sourceColumn: RO
+
+		annotation SummarizationSetBy = Automatic
+
+	column RiskStatus
+		dataType: string
+		lineageTag: 24b3428d-536f-414a-ba5d-6899fc3625ff
+		summarizeBy: none
+		sourceColumn: RiskStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROBSDescriptionTwo
+		dataType: string
+		lineageTag: 0b0fc2fd-cdc1-4f04-942d-bf9d8de44f01
+		summarizeBy: none
+		sourceColumn: ROBSDescriptionTwo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Probability
+		dataType: double
+		lineageTag: 796d6e33-e12b-43af-a72e-7cfe80ebef7b
+		summarizeBy: sum
+		sourceColumn: Probability
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Max
+		dataType: double
+		lineageTag: d5ba6dad-5332-4427-a3f6-863f97821386
+		summarizeBy: sum
+		sourceColumn: Max
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ExpectedValue
+		dataType: double
+		lineageTag: 17cd7927-65b6-4bd1-9ab0-6f94c9a4cfbc
+		summarizeBy: sum
+		sourceColumn: ExpectedValue
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _I_ExpectedValue = ```
+			
+			
+			IF(
+			    tmp_pbi_RisksFrozen[FreezingDate] = tmp_pbi_RisksFrozen[_MaxFreezinDate], 
+			    IF(
+			        tmp_pbi_RisksFrozen[RiskStatus] IN {"Active", "Partially occurred"}, 
+			        tmp_pbi_RisksFrozen[ExpectedValue] * (tmp_pbi_RisksFrozen[SaipemShare] / 100) * tmp_pbi_RisksFrozen[_I_Currency_NEW], //tmp_pbi_RisksFrozen[_I_Currency], 
+			        0
+			    )*1000,
+			    0
+			)
+			```
+		lineageTag: 76500752-4e9c-4e28-b937-3f837b091606
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Year
+		dataType: string
+		lineageTag: f54b44f3-a66d-4958-92e0-b3d9111d4914
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Forecast
+		dataType: string
+		lineageTag: 3efc8e28-5e35-4983-8ace-640f43aff6f5
+		summarizeBy: none
+		sourceColumn: Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Year_Value = LEFT(tmp_pbi_RisksFrozen[Year], 4)
+		dataType: string
+		lineageTag: 9b918823-8af5-44ea-938d-8f9fe867e0e6
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Forecast_Order = ```
+			
+			
+			SWITCH(
+			    'tmp_pbi_RisksFrozen'[Forecast],
+			    "1 Forecast", "1",
+			    "2 Forecast", "2",
+			    "3 Forecast", "3",
+			    "Preliminary Balance", "4",
+			    "Official Balance", "5",
+			    "0"
+			)    
+			```
+		lineageTag: e10780d7-6f62-4778-94de-80f70d686899
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Ranking_Forecast =
+			
+			
+			IF(
+			    tmp_pbi_RisksFrozen[_Forecast_Order] <> "0",
+			    'tmp_pbi_RisksFrozen'[_Year_Value] & 'tmp_pbi_RisksFrozen'[_Forecast_Order]
+			)
+		lineageTag: 29c9e5a5-4abe-4988-8181-9213eb374d20
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Prev_Forecast =
+			
+			
+			RANKX(
+			    'tmp_pbi_RisksFrozen',
+			    'tmp_pbi_RisksFrozen'[_Ranking_Forecast],
+			    'tmp_pbi_RisksFrozen'[_Ranking_Forecast],
+			    ASC,
+			    Dense
+			)
+		formatString: 0
+		lineageTag: 4a8c2221-17e5-439e-a8ac-338847f764d4
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _ForecastYear1 = 'tmp_pbi_RisksFrozen'[_Rank_Prev_Forecast] & "-" & 'tmp_pbi_RisksFrozen'[Forecast]
+		lineageTag: fc37c9f1-b998-4c04-9417-952324aa18af
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _I_EV = tmp_pbi_RisksFrozen[_I_ExpectedValue]/1000
+		formatString: 0.00
+		lineageTag: a5a9f59e-8dc5-4de8-ac0a-993b6efc603b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _I_Max = ```
+			
+			
+			IF(
+			    tmp_pbi_RisksFrozen[FreezingDate] = tmp_pbi_RisksFrozen[_MaxFreezinDate], 
+			    tmp_pbi_RisksFrozen[Max] * (tmp_pbi_RisksFrozen[SaipemShare] / 100) * tmp_pbi_RisksFrozen[_I_Currency_NEW] //tmp_pbi_RisksFrozen[_I_Currency]
+			)
+			```
+		lineageTag: 073dede6-8a13-4b7b-af98-12b301db1705
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Period_Froz =
+			
+			
+			SWITCH(
+			    tmp_pbi_RisksFrozen[Forecast],
+			    "1 Forecast", "I Forecast",
+			    "2 Forecast", "II Forecast",
+			    "3 Forecast", "III Forecast",
+			    tmp_pbi_RisksFrozen[Forecast]
+			)
+			
+			/*
+			IF(
+			    tmp_pbi_RisksFrozen[Forecast] = "1 Forecast",
+			        "I Forecast",
+			    IF(
+			        tmp_pbi_RisksFrozen[Forecast] = "2 Forecast",
+			        "II Forecast",
+			        IF(
+			            tmp_pbi_RisksFrozen[Forecast] = "3 Forecast",
+			            "III Forecast",
+			            tmp_pbi_RisksFrozen[Forecast]
+			        )
+			    )
+			)
+			*/
+		lineageTag: 0dd59bac-dac4-4218-a4e0-d32cd3008f9f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Period_froz_def = tmp_pbi_RisksFrozen[_Year_Value] & "-" & tmp_pbi_RisksFrozen[_Period_Froz]
+		lineageTag: 31233f9c-bbbc-4968-a20b-ad08ce59c98a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _MaxFreezinDate = ```
+			
+			
+			CALCULATE(
+			    MAX(tmp_pbi_RisksFrozen[FreezingDate]), 
+			    ALLEXCEPT(
+			        tmp_pbi_RisksFrozen,
+			        tmp_pbi_RisksFrozen[ConsolidationCode], 
+			        tmp_pbi_RisksFrozen[_Period_froz_def]
+			    )
+			)
+			```
+		lineageTag: 909d3b5e-d623-4f4f-aeff-2ec9ac58ff30
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Period_froz_sort = tmp_pbi_RisksFrozen[_Year_Value] & "-" & tmp_pbi_RisksFrozen[_Period_Froz]
+		lineageTag: 122a5f0e-29b0-44c5-be11-d6d57d436537
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Sort_Forecast =
+			
+			
+			RANKX(
+			    'tmp_pbi_RisksFrozen',
+			    'tmp_pbi_RisksFrozen'[_Ranking_Forecast],
+			    'tmp_pbi_RisksFrozen'[_Ranking_Forecast],
+			    DESC,
+			    Dense
+			)
+		formatString: 0
+		lineageTag: dad9f380-cc9d-4510-80e3-3e2be6a732d6
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flagprevmaxfor_froz = ```
+			
+			
+			VAR max_period = [Max_Periodo_GroupBy]
+			VAR max_rank = 
+			CALCULATE(
+			    MAX('PSR Group By'[_Rank_Prev_Forecast]),
+			    'PSR Group By'[_Period_def] = max_period
+			)
+			
+			RETURN 
+			IF(
+			    tmp_pbi_RisksFrozen[_Rank_Sort_Forecast] > 1,
+			    "SI",   // Previous forecast rispetto al massimo possibile
+			    "NO"    // Current forecast
+			)
+			
+			/* OLD DEFINITION 
+			VAR max_rank = 
+			CALCULATE(
+			    MAX(tmp_pbi_RisksFrozen[_Rank_Prev_Forecast]),
+			    tmp_pbi_RisksFrozen[_Period_froz_def] = max_period,
+			    ALLEXCEPT(
+			        tmp_pbi_RisksFrozen,
+			        tmp_pbi_RisksFrozen[ConsolidationCode]
+			    )
+			)
+			
+			IF(
+			    AND(
+			        'tmp_pbi_RisksFrozen'[Rank Prev Forecast] >= MAX( tmp_pbi_RisksFrozen[Rank Prev Forecast] ) - 1,
+			        'tmp_pbi_RisksFrozen'[Rank Prev Forecast] < MAX( tmp_pbi_RisksFrozen[Rank Prev Forecast] )
+			    ),
+			    "SI",
+			    "NO"
+			)
+			*/
+			```
+		lineageTag: 0656bd95-c55e-4523-95b4-6bc55807ce77
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column NEW_FORECAST_SLICER
+		dataType: string
+		lineageTag: fdc2cb8a-469a-48a4-8502-13fe9a3085a3
+		summarizeBy: none
+		sourceColumn: NEW_FORECAST_SLICER
+
+		annotation SummarizationSetBy = Automatic
+
+	column _I_Currency_NEW = ```
+			
+			
+			IF(
+			    tmp_pbi_RisksFrozen[Currency] = "EUR - Euro", 
+			    1, 
+			    IF(
+			        ISBLANK(tmp_pbi_RisksFrozen[CurrencyToEuro]),
+			        ROUNDDOWN(
+			            LOOKUPVALUE(
+			                'Table Exchange Rate'[PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate],
+			                'Table Exchange Rate'[_Key_Exchange],
+			                tmp_pbi_RisksFrozen[ConsolidationCode] & "_" & LEFT(tmp_pbi_RisksFrozen[Currency], 3) & "_EUR_" & tmp_pbi_RisksFrozen[_Period_froz_sort]
+			            ),
+			            5
+			        ),
+			        ROUNDDOWN( tmp_pbi_RisksFrozen[CurrencyToEuro], 5 )
+			    )
+			)
+			```
+		lineageTag: 7e8828d4-46d2-4e50-8508-5c9846ca6201
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition tmp_pbi_RisksFrozen = m
+		mode: import
+		source = ```
+				let
+				    Source = Sql.Database("we-sqldbserver-pr-irm01.database.windows.net", "we-sqldb-pr-irm01"),
+				    dbo_tmp_pbi_RisksFrozen = Source{[Schema="dbo",Item="tmp_pbi_RisksFrozen"]}[Data],
+				    
+				    // Creazione colonne temporali
+				    #"Duplicated Column" = Table.DuplicateColumn(dbo_tmp_pbi_RisksFrozen, "Period", "Period - Copy"),
+				    #"Extracted Text Before Delimiter" = Table.TransformColumns(#"Duplicated Column", {{"Period - Copy", each Text.BeforeDelimiter(_, "-"), type text}}),
+				    #"Duplicated Column1" = Table.DuplicateColumn(#"Extracted Text Before Delimiter", "Period", "Period - Copy.1"),
+				    #"Extracted Text After Delimiter" = Table.TransformColumns(#"Duplicated Column1", {{"Period - Copy.1", each Text.AfterDelimiter(_, "-"), type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Extracted Text After Delimiter",{{"Period - Copy", "Year"}, {"Period - Copy.1", "Forecast"}}),
+				    
+				    // Filtro dati dal 2022 in poi (2022 incluso)
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Year] >= "2022")),
+				    #"Replaced Value" = Table.ReplaceValue(#"Filtered Rows",".",",",Replacer.ReplaceText,{"Probability"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Replaced Value",{{"Probability", type number}}),
+				
+				    // Rimozione colonne non utilizate
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"ActionDescription", "ActionExist", "ActionId", "ActionOwner", "ActionStatus", "Area", "BasisOfEstimate", "BasisOfEstimateOfCostOfRiskOccured", "BCI", "Businessline", "BusinessSegment", "Cause", "Client", "ClientSharableAction", "ClientSharabledRisk", "CompletionDueDate", "CostLevel", "CostOfRiskOppOccurred", "Country", "Covid", "CurrencyRisk", "Description", "Effect", "EmergingRisk", "EventType", "ExpectedOccurrencePeriod", "Id", "IdRR", "ImpactCostLevelAfterAction", "ImpactedSystem", "ImpactScheduleLevelAfterAction", "InitiativeNumber", "LastRiskUpdate", "LastRRUpdate", "Min", "MostLikely", "Name", "NoteKnowledgeBase", "NotesForQuantitativeSchedule", "OccurredDate", "OppOccursOnlyIfRiskOccurs", "PartiallyOccurredDate", "Partner", "PartnerSharableRisk", "ProbabilityLevel", "ProbilityLevelAfterAction", "PSR", "QualitativeOverallAssessmentAfterAction", "QuantitativeAssessment", "Revenue", "RiskNotes", "RiskOpp", "RiskOwner", "RiskResponseStrategy", "ROBS", "ROBSDescriptionOne", "ROBSLevelOne", "ROBSLevelThree", "ROBSLevelTwo", "RRName", "ROBSDescriptionThree", "SaipemSharePartnership", "ScheduleLevel", "TimeImpactOnly", "Title", "ToBeAddedInKnowledgeArea", "WasCommercial"}),
+				    
+				    // Transcodifica e creazione colonna per gestire filtro dinamico in pagina
+				    #"Added Custom" = Table.AddColumn(#"Removed Columns", "New_forecast", each if [Forecast] = "1 Forecast" then "I Forecast" else ( if[Forecast] = "2 Forecast" then "II Forecast" else (if [Forecast] = "3 Forecast" then "III Forecast" else [Forecast]))),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "NEW_FORECAST_SLICER", each if ([Year] & "-" & [New_forecast]) = Max_Forecast then "Last available forecast" else ([Year] & "-" & [New_forecast])),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Added Custom1",{"New_forecast"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Removed Columns1",{{"NEW_FORECAST_SLICER", type text}})
+				in
+				    #"Changed Type1"
+				```
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

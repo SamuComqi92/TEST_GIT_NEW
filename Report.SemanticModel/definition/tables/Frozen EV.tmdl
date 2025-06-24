@@ -1,0 +1,269 @@
+table 'Frozen EV'
+	lineageTag: c03cb130-5d6c-4399-89d3-dea25470114b
+
+	column 'Exepcted Value'
+		formatString: #,0
+		lineageTag: 20470eb0-44c0-4671-97f8-2320e1cec2b6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Exepcted Value]
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column ConsolidationCode
+		lineageTag: 422aa413-2bff-4246-b753-6914ec33b86f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[ConsolidationCode]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Period
+		lineageTag: 35dee249-d292-4c41-80ec-a625347143ff
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[Period]
+
+		annotation SummarizationSetBy = Automatic
+
+	column RiskStatus
+		lineageTag: e81bedcf-25af-4a17-9cc0-4bfb9f2dfa92
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[RiskStatus]
+
+		annotation SummarizationSetBy = Automatic
+
+	column RO
+		lineageTag: d9449a9b-a95c-419b-8ce1-3989596805f0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[RO]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Period_Subs =
+			
+			
+			SUBSTITUTE(
+			    SUBSTITUTE(
+			        SUBSTITUTE(
+			            'Frozen EV'[Period],
+			            "1", "I"
+			        ),
+			        "2","II",
+			        3
+			    ),
+			    "3","III",
+			    2
+			)
+		lineageTag: ae56ab35-46e7-4ffb-90d3-7b631c3bbcc0
+		summarizeBy: none
+		sortByColumn: _Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Key_Primary = 'Frozen EV'[ConsolidationCode] & "-" & 'Frozen EV'[_Period_froz_def]
+		lineageTag: 6548eae6-d874-44c7-998f-b6854f557d61
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Probability
+		lineageTag: 817483a9-db43-4d92-8c0a-764362f6fa79
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Probability]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column IdRisk
+		lineageTag: 7126917c-417c-469c-9b83-0f4ac11eec83
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[IdRisk]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Value_5000 =
+			
+			
+			IF(
+			    AND(
+			        'Frozen EV'[Exepcted Value Risk] > 5000,
+			        'Frozen EV'[Exepcted Value Risk] <> 0
+			    ),
+			    "SI",
+			    "NO"
+			)
+		lineageTag: e4414d2b-63dc-4a88-b522-75bfc42f8cf3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column I_Max
+		formatString: #,0.00
+		lineageTag: 4e02379b-4bc9-41cc-bff7-df477d9222b4
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [I_Max]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Year = LEFT('Frozen EV'[Period], 4)
+		lineageTag: fe77b1eb-71b8-4a65-9d89-4a1fc47363b6
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _IdRisk-ROBOS = 'Frozen EV'[IdRisk] & " - " & 'Frozen EV'[ROBSDescriptionTwo]
+		lineageTag: 29d8c5bc-9ddb-49d7-8d64-44be779a4072
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROBSDescriptionTwo
+		lineageTag: 9e5e1a71-c47e-4690-8630-ffc364e2faec
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[ROBSDescriptionTwo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Exepcted Value Risk'
+		lineageTag: 93580784-1594-4a75-a55a-8a7812de5a5c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Exepcted Value Risk]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Period_froz_def
+		lineageTag: e81923bf-2d16-4f9e-a90a-3939fed7b928
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[_Period_froz_def]
+		sortByColumn: _Rank_Sort_Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Ranking_Forecast
+		dataType: int64
+		formatString: 0
+		lineageTag: eca12ee0-a273-439d-9b9f-200a7d33a1bf
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[_Ranking_Forecast]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Sort_Forecast
+		formatString: 0
+		lineageTag: c0b2f24e-8bbc-4fd1-94aa-00d2a08a38b3
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[_Rank_Sort_Forecast]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Period_froz_sort
+		lineageTag: 26f56407-4dba-4806-8295-a373199ec5cb
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[_Period_froz_sort]
+		sortByColumn: _Rank_Sort_Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flagprevmaxfor_froz
+		lineageTag: bf092e99-73a2-4c29-8e51-8fd28678afb0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[_Flagprevmaxfor_froz]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Probab = ('Frozen EV'[Probability])
+		formatString: 0%;-0%;0%
+		lineageTag: c84ca16f-d1d1-4f80-a622-bf5ee2bdf0b7
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column NEW_FORECAST_SLICER
+		lineageTag: eaffd57a-5a1b-49ad-8097-5005893009b6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: tmp_pbi_RisksFrozen[NEW_FORECAST_SLICER]
+		sortByColumn: _Rank_Sort_Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column _flag_forecast_in_psr_group_by =
+			
+			
+			-- Flag creato per escludere i forecast presenti nella Frozen ma non presenti in PSR Group By
+			-- Può capitare che la Frozen abbia dei forecast in più (che portano anche a disallineamenti con la PSR - questi disallineamenti sono gestiti nelle diverse misure)
+			-- La colonna-flag esclude quei forecast
+			IF(
+			    'Frozen EV'[NEW_FORECAST_SLICER] IN DISTINCT('PSR Group By'[NEW_FORECAST_SLICER]),
+			    1,
+			    0
+			)
+		formatString: 0
+		lineageTag: f5f5ef6b-9dcd-4c3d-83a1-daf393ef4454
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Frozen EV' = calculated
+		mode: import
+		source = ```
+				
+				
+				-- Tabella di supporto costruita per alcuni KCI
+				-- E' una tabella che era stata creata per gestire solo due forecast (ultimo e precedente)
+				-- In seguito è stata modificata e adattata ai nuovi sviluppi
+				
+				CALCULATETABLE(
+				    SUMMARIZE(
+				        tmp_pbi_RisksFrozen,
+				        tmp_pbi_RisksFrozen[ConsolidationCode],
+				        tmp_pbi_RisksFrozen[Period],
+				        tmp_pbi_RisksFrozen[_Period_froz_def],
+				        tmp_pbi_RisksFrozen[RiskStatus],
+				        tmp_pbi_RisksFrozen[RO],
+				        tmp_pbi_RisksFrozen[_Flagprevmaxfor_froz],
+				        tmp_pbi_RisksFrozen[IdRisk],
+				        tmp_pbi_RisksFrozen[ROBSDescriptionTwo],
+				        tmp_pbi_RisksFrozen[_Ranking_Forecast],
+				        tmp_pbi_RisksFrozen[_Rank_Sort_Forecast],
+				        tmp_pbi_RisksFrozen[NEW_FORECAST_SLICER],  -- Per gestire filtro in pagina
+				        tmp_pbi_RisksFrozen[_Period_froz_sort],
+				        "Exepcted Value Risk", 
+				            COALESCE(
+				                CALCULATE(MAX(tmp_pbi_RisksFrozen[_I_EV]),tmp_pbi_RisksFrozen[RRPhase] = "Execution"), 
+				                0
+				            ),
+				        "Exepcted Value", 
+				            COALESCE(
+				                CALCULATE(SUM(tmp_pbi_RisksFrozen[_I_EV]),tmp_pbi_RisksFrozen[RRPhase] = "Execution"), 
+				                0
+				            ),
+				        "Probability", 
+				            CALCULATE(MAX(tmp_pbi_RisksFrozen[Probability]),tmp_pbi_RisksFrozen[RRPhase] = "Execution"),
+				        "I_Max", 
+				            CALCULATE(MAX(tmp_pbi_RisksFrozen[_I_Max]), tmp_pbi_RisksFrozen[RRPhase] = "Execution")
+				    ) ,
+				    tmp_pbi_RisksFrozen[ConsolidationCode] <> BLANK()
+				)
+				```
+
+	annotation PBI_Id = 37be65b5f2874e67aaf90b729fbd892f
+

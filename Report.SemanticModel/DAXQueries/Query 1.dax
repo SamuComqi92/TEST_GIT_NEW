@@ -1,0 +1,44 @@
+// Learn more about DAX queries at https://aka.ms/dax-queries
+
+// Here is a sample DAX query from your model, click 'Run'
+// Try other DAX queries by right clicking a table, column, or measure in the data pane and choosing one from 'Quick queries'
+EVALUATE
+    SUMMARIZE(
+        Cons_Proj_Table,
+        Cons_Proj_Table[Short Name Code],
+		Cons_Proj_Table[Client],
+        "value1", 
+			CALCULATE(
+				SUM(PSR_Card08_Revenues_Details[Variation Pending Included]),
+				PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = BLANK() || PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = "Submitted",
+				PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type] IN {"Amendment", "Bonus/Incentive included within Contract", "Change Orders", "Claims", "Insurance Coverage"},
+				PSR_Card04_Revenue_Cost[Flagprevmaxfor] = "NO",
+				Cons_Proj_Table[Business_Organization_T3] <> "OPERATIONS & MAINTENANCE"
+			),
+		"value2",
+			CALCULATE(
+				SUM(PSR_Revenues_Costs[RCB/OCB Revenues]),
+				PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = BLANK() || PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = "Submitted",
+				PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type] IN {"Amendment", "Bonus/Incentive included within Contract", "Change Orders", "Claims", "Insurance Coverage"},
+				PSR_Card04_Revenue_Cost[Flagprevmaxfor] = "NO",
+				Cons_Proj_Table[Business_Organization_T3] <> "OPERATIONS & MAINTENANCE"
+			),
+		"divide",
+		DIVIDE(
+			CALCULATE(
+				SUM(PSR_Card08_Revenues_Details[Variation Pending Included]),
+				PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = BLANK() || PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = "Submitted",
+				PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type] IN {"Amendment", "Bonus/Incentive included within Contract", "Change Orders", "Claims", "Insurance Coverage"},
+				PSR_Card04_Revenue_Cost[Flagprevmaxfor] = "NO",
+				Cons_Proj_Table[Business_Organization_T3] <> "OPERATIONS & MAINTENANCE"
+			),
+			CALCULATE(
+				SUM(PSR_Revenues_Costs[RCB/OCB Revenues]),
+				PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = BLANK() || PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = "Submitted",
+				PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type] IN {"Amendment", "Bonus/Incentive included within Contract", "Change Orders", "Claims", "Insurance Coverage"},
+				PSR_Card04_Revenue_Cost[Flagprevmaxfor] = "NO",
+				Cons_Proj_Table[Business_Organization_T3] <> "OPERATIONS & MAINTENANCE"
+			)*1000
+		)
+	)
+	order by [Short Name Code] ASC

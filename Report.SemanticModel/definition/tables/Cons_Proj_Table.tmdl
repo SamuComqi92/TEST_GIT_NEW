@@ -1,0 +1,88 @@
+table Cons_Proj_Table
+	lineageTag: d9f2f029-1c8e-43d2-973a-238fcd7856ab
+
+	column Business_Organization_T1_Code
+		dataType: string
+		lineageTag: 6c96faed-1a34-4d30-bc8b-59d4bf07a7af
+		summarizeBy: none
+		sourceColumn: Business_Organization_T1_Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column Client
+		dataType: string
+		lineageTag: 0e2818d2-4777-4972-9171-4f420dff3458
+		summarizeBy: none
+		sourceColumn: Client
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cons_Proj
+		dataType: string
+		lineageTag: fb89ee97-0e01-4ce0-8ea8-6e0db76a2368
+		summarizeBy: none
+		sourceColumn: Cons_Proj
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 041be514-ef5e-4c33-afc0-1491cc7989eb
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column PSR
+		dataType: string
+		lineageTag: 393ea029-a474-4b91-b347-800193dae82a
+		summarizeBy: none
+		sourceColumn: PSR
+
+		annotation SummarizationSetBy = Automatic
+
+	column ShortName
+		dataType: string
+		lineageTag: 18d82656-0d67-4e5c-9e59-99fb1d81bfa8
+		summarizeBy: none
+		sourceColumn: ShortName
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Short_Name_Code = Cons_Proj_Table[ShortName] & " - " & Cons_Proj_Table[Cons_Proj]
+		lineageTag: 0ade135e-5621-41db-bd8a-2940bba10473
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Business_Organization_T3
+		dataType: string
+		lineageTag: 2e566903-a2a1-484a-8f70-8067b2eefd95
+		summarizeBy: none
+		sourceColumn: Business_Organization_T3
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Cons_Proj_Table = m
+		mode: import
+		source =
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Report", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[Cons_Proj_Table]", {"[Cons_Proj_Table].[AdjustmentFilter].[AdjustmentFilter]", "[Cons_Proj_Table].[ApproverPSR].[ApproverPSR]", "[Cons_Proj_Table].[ApproverPSR_Code].[ApproverPSR_Code]", "[Cons_Proj_Table].[ArbitrationLaw].[ArbitrationLaw]", "[Cons_Proj_Table].[AREA_Code].[AREA_Code]", "[Cons_Proj_Table].[AREA_G].[AREA_G]", "[Cons_Proj_Table].[BaseFilter].[BaseFilter]", "[Cons_Proj_Table].[BidInitiativeNumber].[BidInitiativeNumber]", "[Cons_Proj_Table].[BU].[BU]", "[Cons_Proj_Table].[Business_Organization_T1].[Business_Organization_T1]", "[Cons_Proj_Table].[Business_Organization_T1_Code].[Business_Organization_T1_Code]", "[Cons_Proj_Table].[Business_Organization_T2].[Business_Organization_T2]", "[Cons_Proj_Table].[Business_Organization_T2_Code].[Business_Organization_T2_Code]", "[Cons_Proj_Table].[Business_Organization_T3].[Business_Organization_T3]", "[Cons_Proj_Table].[Business_Organization_T3_Code].[Business_Organization_T3_Code]", "[Cons_Proj_Table].[BusinessLine].[BusinessLine]", "[Cons_Proj_Table].[BusinessLine_Code].[BusinessLine_Code]", "[Cons_Proj_Table].[ClassPjt_COGE].[ClassPjt_COGE]", "[Cons_Proj_Table].[ClassPjt_L0].[ClassPjt_L0]", "[Cons_Proj_Table].[ClassPjt_L1].[ClassPjt_L1]", "[Cons_Proj_Table].[ClassPjt_L2].[ClassPjt_L2]", "[Cons_Proj_Table].[Client].[Client]", "[Cons_Proj_Table].[Client_Flag].[Client_Flag]", "[Cons_Proj_Table].[ClientPMConsultant].[ClientPMConsultant]", "[Cons_Proj_Table].[Commercial_ID].[Commercial_ID]", "[Cons_Proj_Table].[Comp1].[Comp1]", "[Cons_Proj_Table].[Comp2].[Comp2]", "[Cons_Proj_Table].[Comp3].[Comp3]", "[Cons_Proj_Table].[Comp4].[Comp4]", "[Cons_Proj_Table].[Comp5].[Comp5]", "[Cons_Proj_Table].[Cons Project Full Name].[Cons Project Full Name]", "[Cons_Proj_Table].[Cons Project Short Name].[Cons Project Short Name]", "[Cons_Proj_Table].[Cons_Proj].[Cons_Proj]", "[Cons_Proj_Table].[Cons_Proj2].[Cons_Proj2]", "[Cons_Proj_Table].[ContractDuration].[ContractDuration]", "[Cons_Proj_Table].[ContractManager].[ContractManager]", "[Cons_Proj_Table].[ContractType].[ContractType]", "[Cons_Proj_Table].[Contribute].[Contribute]", "[Cons_Proj_Table].[ContributeName].[ContributeName]", "[Cons_Proj_Table].[Country].[Country]", "[Cons_Proj_Table].[Country_Code].[Country_Code]", "[Cons_Proj_Table].[Country_Flag].[Country_Flag]", "[Cons_Proj_Table].[CountryManager].[CountryManager]", "[Cons_Proj_Table].[Description].[Description]", "[Cons_Proj_Table].[Division].[Division]", "[Cons_Proj_Table].[DMSJobNumber].[DMSJobNumber]", "[Cons_Proj_Table].[Documentation].[Documentation]", "[Cons_Proj_Table].[EL].[EL]", "[Cons_Proj_Table].[HUB].[HUB]", "[Cons_Proj_Table].[ID].[ID]", "[Cons_Proj_Table].[isAdjustment].[isAdjustment]", "[Cons_Proj_Table].[Latitude].[Latitude]", "[Cons_Proj_Table].[LeadCostController].[LeadCostController]", "[Cons_Proj_Table].[LeadPlanner].[LeadPlanner]", "[Cons_Proj_Table].[LogicRelevant].[LogicRelevant]", "[Cons_Proj_Table].[Longitude].[Longitude]", "[Cons_Proj_Table].[Margin_Level].[Margin_Level]", "[Cons_Proj_Table].[NonOIL_Product].[NonOIL_Product]", "[Cons_Proj_Table].[OIL_NonOIL].[OIL_NonOIL]", "[Cons_Proj_Table].[Partnership].[Partnership]", "[Cons_Proj_Table].[Planner].[Planner]", "[Cons_Proj_Table].[PlannerName].[PlannerName]", "[Cons_Proj_Table].[Portfolio_Cash].[Portfolio_Cash]", "[Cons_Proj_Table].[Product].[Product]", "[Cons_Proj_Table].[Product_Code].[Product_Code]", "[Cons_Proj_Table].[ProductCommercialClassification].[ProductCommercialClassification]", "[Cons_Proj_Table].[ProjectControlManager].[ProjectControlManager]", "[Cons_Proj_Table].[ProjectDirector].[ProjectDirector]", "[Cons_Proj_Table].[ProjectManager].[ProjectManager]", "[Cons_Proj_Table].[PSR].[PSR]", "[Cons_Proj_Table].[Region].[Region]", "[Cons_Proj_Table].[Region_Code].[Region_Code]", "[Cons_Proj_Table].[Reporting].[Reporting]", "[Cons_Proj_Table].[ReportingName].[ReportingName]", "[Cons_Proj_Table].[RiskManager].[RiskManager]", "[Cons_Proj_Table].[RollingProgress].[RollingProgress]", "[Cons_Proj_Table].[Sales].[Sales]", "[Cons_Proj_Table].[SBL].[SBL]", "[Cons_Proj_Table].[SBL_Code].[SBL_Code]", "[Cons_Proj_Table].[Sector_Code].[Sector_Code]", "[Cons_Proj_Table].[ShortName].[ShortName]", "[Cons_Proj_Table].[Size].[Size]", "[Cons_Proj_Table].[SOA_CONTROL].[SOA_CONTROL]", "[Cons_Proj_Table].[SOACheck].[SOACheck]", "[Cons_Proj_Table].[SoW].[SoW]", "[Cons_Proj_Table].[Special_Item].[Special_Item]", "[Cons_Proj_Table].[Sponsor].[Sponsor]", "[Cons_Proj_Table].[StartDate].[StartDate]", "[Cons_Proj_Table].[Status].[Status]", "[Cons_Proj_Table].[SuperProduct].[SuperProduct]", "[Cons_Proj_Table].[TechnicalManager].[TechnicalManager]"}, {"Cons_Proj_Table.AdjustmentFilter", "Cons_Proj_Table.ApproverPSR", "Cons_Proj_Table.ApproverPSR_Code", "Cons_Proj_Table.ArbitrationLaw", "Cons_Proj_Table.AREA_Code", "Cons_Proj_Table.AREA_G", "Cons_Proj_Table.BaseFilter", "Cons_Proj_Table.BidInitiativeNumber", "Cons_Proj_Table.BU", "Cons_Proj_Table.Business_Organization_T1", "Cons_Proj_Table.Business_Organization_T1_Code", "Cons_Proj_Table.Business_Organization_T2", "Cons_Proj_Table.Business_Organization_T2_Code", "Cons_Proj_Table.Business_Organization_T3", "Cons_Proj_Table.Business_Organization_T3_Code", "Cons_Proj_Table.BusinessLine", "Cons_Proj_Table.BusinessLine_Code", "Cons_Proj_Table.ClassPjt_COGE", "Cons_Proj_Table.ClassPjt_L0", "Cons_Proj_Table.ClassPjt_L1", "Cons_Proj_Table.ClassPjt_L2", "Cons_Proj_Table.Client", "Cons_Proj_Table.Client_Flag", "Cons_Proj_Table.ClientPMConsultant", "Cons_Proj_Table.Commercial_ID", "Cons_Proj_Table.Comp1", "Cons_Proj_Table.Comp2", "Cons_Proj_Table.Comp3", "Cons_Proj_Table.Comp4", "Cons_Proj_Table.Comp5", "Cons_Proj_Table.Cons Project Full Name", "Cons_Proj_Table.Cons Project Short Name", "Cons_Proj_Table.Cons_Proj", "Cons_Proj_Table.Cons_Proj2", "Cons_Proj_Table.ContractDuration", "Cons_Proj_Table.ContractManager", "Cons_Proj_Table.ContractType", "Cons_Proj_Table.Contribute", "Cons_Proj_Table.ContributeName", "Cons_Proj_Table.Country", "Cons_Proj_Table.Country_Code", "Cons_Proj_Table.Country_Flag", "Cons_Proj_Table.CountryManager", "Cons_Proj_Table.Description", "Cons_Proj_Table.Division", "Cons_Proj_Table.DMSJobNumber", "Cons_Proj_Table.Documentation", "Cons_Proj_Table.EL", "Cons_Proj_Table.HUB", "Cons_Proj_Table.ID", "Cons_Proj_Table.isAdjustment", "Cons_Proj_Table.Latitude", "Cons_Proj_Table.LeadCostController", "Cons_Proj_Table.LeadPlanner", "Cons_Proj_Table.LogicRelevant", "Cons_Proj_Table.Longitude", "Cons_Proj_Table.Margin_Level", "Cons_Proj_Table.NonOIL_Product", "Cons_Proj_Table.OIL_NonOIL", "Cons_Proj_Table.Partnership", "Cons_Proj_Table.Planner", "Cons_Proj_Table.PlannerName", "Cons_Proj_Table.Portfolio_Cash", "Cons_Proj_Table.Product", "Cons_Proj_Table.Product_Code", "Cons_Proj_Table.ProductCommercialClassification", "Cons_Proj_Table.ProjectControlManager", "Cons_Proj_Table.ProjectDirector", "Cons_Proj_Table.ProjectManager", "Cons_Proj_Table.PSR", "Cons_Proj_Table.Region", "Cons_Proj_Table.Region_Code", "Cons_Proj_Table.Reporting", "Cons_Proj_Table.ReportingName", "Cons_Proj_Table.RiskManager", "Cons_Proj_Table.RollingProgress", "Cons_Proj_Table.Sales", "Cons_Proj_Table.SBL", "Cons_Proj_Table.SBL_Code", "Cons_Proj_Table.Sector_Code", "Cons_Proj_Table.ShortName", "Cons_Proj_Table.Size", "Cons_Proj_Table.SOA_CONTROL", "Cons_Proj_Table.SOACheck", "Cons_Proj_Table.SoW", "Cons_Proj_Table.Special_Item", "Cons_Proj_Table.Sponsor", "Cons_Proj_Table.StartDate", "Cons_Proj_Table.Status", "Cons_Proj_Table.SuperProduct", "Cons_Proj_Table.TechnicalManager"}},
+				            {Cube.AddMeasureColumn, "NR Projects", "[Measures].[NR Projects]"}
+				        }),
+				    #"Removed Blank Rows" = Table.SelectRows(#"Added Items", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),#"Rinomina colonne" = Table.TransformColumnNames(#"Removed Blank Rows",each Text.Replace(_,"Cons_Proj_Table.","")),
+				    #"Removed Columns" = Table.RemoveColumns(#"Rinomina colonne",{"AdjustmentFilter", "ApproverPSR", "ApproverPSR_Code", "ArbitrationLaw", "AREA_Code", "AREA_G", "BaseFilter", "BidInitiativeNumber", "BU", "Business_Organization_T1", "Business_Organization_T2", "Business_Organization_T2_Code", "Business_Organization_T3_Code", "BusinessLine", "BusinessLine_Code", "ClassPjt_COGE", "ClassPjt_L0", "ClassPjt_L1", "ClassPjt_L2", "Client_Flag", "ClientPMConsultant", "Commercial_ID", "Comp1", "Comp2", "Comp3", "Comp4", "Comp5", "Cons Project Full Name", "Cons Project Short Name", "Cons_Proj2", "ContractDuration", "ContractManager", "ContractType", "Contribute", "ContributeName", "Country_Code", "Country_Flag", "CountryManager", "Description", "Division", "DMSJobNumber", "Documentation", "EL", "HUB", "ID", "isAdjustment", "Latitude", "LeadCostController", "LeadPlanner", "LogicRelevant", "Longitude", "Margin_Level", "NonOIL_Product", "OIL_NonOIL", "NR Projects", "Partnership", "Planner", "PlannerName", "Portfolio_Cash", "Product", "Product_Code", "ProductCommercialClassification", "ProjectControlManager", "ProjectDirector", "ProjectManager", "Region", "Region_Code", "Reporting", "ReportingName", "RiskManager", "RollingProgress", "Sales", "SBL", "SBL_Code", "Sector_Code", "Size", "SOA_CONTROL", "SOACheck", "SoW", "Special_Item", "Sponsor", "StartDate", "Status", "SuperProduct", "TechnicalManager"}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Removed Columns","UNITED STATES OF AMERICA (THE)","UNITED STATES OF AMERICA",Replacer.ReplaceText,{"Country"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","LYBIA","LIBIA",Replacer.ReplaceText,{"Country"})
+				in
+				    #"Replaced Value1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

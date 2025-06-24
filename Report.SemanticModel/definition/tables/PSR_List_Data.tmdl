@@ -1,0 +1,51 @@
+table PSR_List_Data
+	lineageTag: 1379358a-5510-47f2-a75b-0a1e2111da17
+
+	column P_Key
+		dataType: string
+		lineageTag: e1425e85-9850-467d-9107-ea3e77a100b3
+		summarizeBy: none
+		sourceColumn: P_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column WF_Status
+		dataType: string
+		lineageTag: d5581437-7c9a-4a34-86e0-df22dbd5b35b
+		summarizeBy: none
+		sourceColumn: WF_Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Report_N
+		dataType: string
+		lineageTag: 6e6971ec-e634-4a74-aea1-1553366b4601
+		summarizeBy: none
+		sourceColumn: Report_N
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PSR_List_Data = m
+		mode: import
+		source =
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Report", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[PSR_List_Data]", {"[PSR_List_Data].[AFC].[AFC]", "[PSR_List_Data].[ApprovalDate].[ApprovalDate]", "[PSR_List_Data].[ApprovalMngDate].[ApprovalMngDate]", "[PSR_List_Data].[Cons_Project].[Cons_Project]", "[PSR_List_Data].[Correlation_ID].[Correlation_ID]", "[PSR_List_Data].[Created].[Created]", "[PSR_List_Data].[Created By].[Created By]", "[PSR_List_Data].[Disclosed].[Disclosed]", "[PSR_List_Data].[Error_Upload].[Error_Upload]", "[PSR_List_Data].[Esito].[Esito]", "[PSR_List_Data].[Forecast].[Forecast]", "[PSR_List_Data].[ID].[ID]", "[PSR_List_Data].[Internal_Use].[Internal_Use]", "[PSR_List_Data].[Macro_Version].[Macro_Version]", "[PSR_List_Data].[Modified].[Modified]", "[PSR_List_Data].[Modified By].[Modified By]", "[PSR_List_Data].[P_Key].[P_Key]", "[PSR_List_Data].[Project_Name].[Project_Name]", "[PSR_List_Data].[PSR_Type].[PSR_Type]", "[PSR_List_Data].[Report_N].[Report_N]", "[PSR_List_Data].[Rev].[Rev]", "[PSR_List_Data].[SOA].[SOA]", "[PSR_List_Data].[Template_Version].[Template_Version]", "[PSR_List_Data].[Title].[Title]", "[PSR_List_Data].[UserID].[UserID]", "[PSR_List_Data].[VerificationDate].[VerificationDate]", "[PSR_List_Data].[WF_Status].[WF_Status]", "[PSR_List_Data].[Year].[Year]"}, {"PSR_List_Data.AFC", "PSR_List_Data.ApprovalDate", "PSR_List_Data.ApprovalMngDate", "PSR_List_Data.Cons_Project", "PSR_List_Data.Correlation_ID", "PSR_List_Data.Created", "PSR_List_Data.Created By", "PSR_List_Data.Disclosed", "PSR_List_Data.Error_Upload", "PSR_List_Data.Esito", "PSR_List_Data.Forecast", "PSR_List_Data.ID", "PSR_List_Data.Internal_Use", "PSR_List_Data.Macro_Version", "PSR_List_Data.Modified", "PSR_List_Data.Modified By", "PSR_List_Data.P_Key", "PSR_List_Data.Project_Name", "PSR_List_Data.PSR_Type", "PSR_List_Data.Report_N", "PSR_List_Data.Rev", "PSR_List_Data.SOA", "PSR_List_Data.Template_Version", "PSR_List_Data.Title", "PSR_List_Data.UserID", "PSR_List_Data.VerificationDate", "PSR_List_Data.WF_Status", "PSR_List_Data.Year"}}
+				        }),
+				
+				    // Filtro per rimuovere dati prima del 2022 (non essendoci una colonna "anno", il filtro è applicato cercando delle stringhe nella chiave)
+				    #"Filtered Rows_year" = Table.SelectRows(#"Added Items", each not Text.Contains([PSR_List_Data.P_Key], "_2010_") and not Text.Contains([PSR_List_Data.P_Key], "_2011_") and not Text.Contains([PSR_List_Data.P_Key], "_2012_") and not Text.Contains([PSR_List_Data.P_Key], "_2013_") and not Text.Contains([PSR_List_Data.P_Key], "_2014_") and not Text.Contains([PSR_List_Data.P_Key], "_2015_") and not Text.Contains([PSR_List_Data.P_Key], "_2016_") and not Text.Contains([PSR_List_Data.P_Key], "_2017_") and not Text.Contains([PSR_List_Data.P_Key], "_2018_") and not Text.Contains([PSR_List_Data.P_Key], "_2019_") and not Text.Contains([PSR_List_Data.P_Key], "_2020_") and not Text.Contains([PSR_List_Data.P_Key], "_2021_")),
+				
+				    #"Removed Blank Rows" = Table.SelectRows(#"Filtered Rows_year", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),#"Rinomina colonne" = Table.TransformColumnNames(#"Removed Blank Rows",each Text.Replace(_,"PSR_List_Data.","")),
+				    #"Removed Columns" = Table.RemoveColumns(#"Rinomina colonne",{"AFC", "ApprovalDate", "ApprovalMngDate", "Correlation_ID", "Created", "Created By", "Disclosed", "Error_Upload", "Esito", "Forecast", "ID", "Internal_Use", "Macro_Version", "Modified", "Modified By", "Project_Name", "PSR_Type", "Rev", "SOA", "Template_Version", "Title", "UserID", "VerificationDate", "Year", "Cons_Project"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

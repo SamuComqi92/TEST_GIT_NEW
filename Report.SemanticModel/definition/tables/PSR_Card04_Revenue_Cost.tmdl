@@ -1,0 +1,290 @@
+table PSR_Card04_Revenue_Cost
+	lineageTag: f5f704a9-8929-4c9f-9914-e5e3856d2e91
+
+	column 'PSR5_Card04_Revenues_Costs.ActualToDate'
+		dataType: double
+		formatString: #,0
+		lineageTag: 9234fcc2-d05e-4cbe-a64d-685848a4cb89
+		summarizeBy: sum
+		sourceColumn: PSR5_Card04_Revenues_Costs.ActualToDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'PSR5_Card04_Revenues_Costs.CBS_Code'
+		dataType: string
+		lineageTag: 7636e7cc-edd3-48bc-963b-07ff45324cf6
+		summarizeBy: none
+		sourceColumn: PSR5_Card04_Revenues_Costs.CBS_Code
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card04_Revenues_Costs.CBS_Description'
+		dataType: string
+		lineageTag: 65078930-05c7-44b2-8c0d-8ea8a11e01ea
+		summarizeBy: none
+		sourceColumn: PSR5_Card04_Revenues_Costs.CBS_Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card04_Revenues_Costs.CBS_Level'
+		dataType: string
+		lineageTag: d0352ae8-c911-448b-b4b9-b849729dca5a
+		summarizeBy: none
+		sourceColumn: PSR5_Card04_Revenues_Costs.CBS_Level
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card04_Revenues_Costs.Committed_perc'
+		dataType: double
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: f6b47a14-fbe5-484b-83fb-5cd19e5b287b
+		summarizeBy: sum
+		sourceColumn: PSR5_Card04_Revenues_Costs.Committed_perc
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card04_Revenues_Costs.CommittedToDate'
+		dataType: double
+		formatString: #,0
+		lineageTag: c96bea4e-37c2-47c3-8446-828e2843314d
+		summarizeBy: sum
+		sourceColumn: PSR5_Card04_Revenues_Costs.CommittedToDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'PSR5_Card04_Revenues_Costs.Current_Forecast'
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 669b9162-5475-4235-84bb-4ac452744555
+		summarizeBy: sum
+		sourceColumn: PSR5_Card04_Revenues_Costs.Current_Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card04_Revenues_Costs.ID'
+		dataType: string
+		lineageTag: f315b871-fb1b-4824-b616-3df905abc59d
+		summarizeBy: none
+		sourceColumn: PSR5_Card04_Revenues_Costs.ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card04_Revenues_Costs.IsConsProjectLevel'
+		dataType: string
+		lineageTag: eaf63d25-e3c1-47c2-be0e-f3c6025c166e
+		summarizeBy: none
+		sourceColumn: PSR5_Card04_Revenues_Costs.IsConsProjectLevel
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card04_Revenues_Costs.P_Key'
+		dataType: string
+		lineageTag: dd0f6b8f-397a-4d76-b713-3715252fcb98
+		summarizeBy: none
+		sourceColumn: PSR5_Card04_Revenues_Costs.P_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card04_Revenues_Costs.Previous_Forecast'
+		dataType: double
+		lineageTag: 00615c4d-54ae-4efd-943c-2b93a95a98ae
+		summarizeBy: sum
+		sourceColumn: PSR5_Card04_Revenues_Costs.Previous_Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR5_Card04_Revenues_Costs.RCB'
+		dataType: double
+		lineageTag: 26592169-eac8-4722-a623-66d9ae9611f7
+		summarizeBy: sum
+		sourceColumn: PSR5_Card04_Revenues_Costs.RCB
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Min_costID = ```
+			
+			
+			CALCULATE(
+			    MIN(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.ID]), 
+			    ALLEXCEPT(
+			        PSR_Card04_Revenue_Cost,
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.P_Key],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code]
+			    )
+			)
+			```
+		lineageTag: 77ca2834-1743-4cda-86f9-ce9ae1870d60
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _FlagmincostID =
+			
+			
+			IF(
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.ID] = PSR_Card04_Revenue_Cost[_Min_costID],
+			    1,
+			    0
+			)
+		formatString: 0
+		lineageTag: 749e8aaf-e4a7-46bc-a4be-a6a24252584c
+		summarizeBy: count
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Curr_Forecast = ```
+			
+			
+			LOOKUPVALUE(
+			    'PSR_Card_Consolidated'[_Rank_Forecast_Curr], 
+			    'PSR_Card_Consolidated'[PSR_Card_Consolidated.P_Key], 
+			    'PSR_Card04_Revenue_Cost'[PSR5_Card04_Revenues_Costs.P_Key]
+			)
+			```
+		formatString: 0
+		lineageTag: e4fcde82-0caa-4dee-8167-c5e86dd74660
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Previous_Forecast = ```
+			
+			
+			LOOKUPVALUE(
+			    'PSR_Card_Consolidated'[_Rank_Forecast_Prev], 
+			    'PSR_Card_Consolidated'[_ConsolidationCode], 
+			    'PSR_Card04_Revenue_Cost'[_ConsolidationCode]
+			)
+			```
+		formatString: 0
+		lineageTag: 43fc2cb3-10b0-4b66-b8d4-afae850cf4f5
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _ConsolidationCode = LEFT( PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.P_Key], 8 )
+		lineageTag: 4b9fa673-e084-47d6-8db2-69713ff9f7f2
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flag_Alert_KCI7 = ```
+			
+			
+			-- Flag utilizzato nel KCI7
+			
+			IF(
+			    ROUND(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast], 0) = ROUND(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Previous_Forecast], 0)  
+			    &&
+			    ROUND(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast], 0) = ROUND(PSR_Card04_Revenue_Cost[_RCB_Prev], 0)                                      
+			    &&
+			    ROUND(PSR_Card04_Revenue_Cost[_RCB_Prev], 0) = ROUND(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.RCB], 0),
+			    "ALERT",
+			    ""
+			)
+			```
+		lineageTag: 7d99f863-8513-47c9-92ae-2ad6720c6d6c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Flagprevmaxfor =
+			
+			
+			IF(
+			    'PSR_Card04_Revenue_Cost'[_Rank_Previous_Forecast] = MAX('PSR_Card04_Revenue_Cost'[_Rank_Previous_Forecast]) - 1,
+			    "SI",
+			    "NO"
+			)
+		lineageTag: ffb3d7b9-844c-464b-869b-0cd66de24624
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _RCB_Prev = ```
+			
+			
+			CALCULATE(
+			    MAX(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.RCB]), 
+			    PSR_Card04_Revenue_Cost[_FlagmincostID] = 1, 
+			    PSR_Card04_Revenue_Cost[_Rank_Curr_Forecast] = EARLIER( PSR_Card04_Revenue_Cost[_Rank_Previous_Forecast] ),
+			    ALLEXCEPT(
+			        PSR_Card04_Revenue_Cost, 
+			        PSR_Card04_Revenue_Cost[_ConsolidationCode],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code], 
+			        PSR_Card04_Revenue_Cost[_Rank_Curr_Forecast]
+			    )
+			)
+			```
+		lineageTag: 0becf860-269b-4232-a857-45f9228fc556
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Total_Cost = ```
+			
+			
+			CALCULATE(
+			    SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] = "C", 
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] = "COSTS", 
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			    ALLEXCEPT(
+			        PSR_Card04_Revenue_Cost,
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.P_Key]
+			    )
+			)
+			```
+		formatString: #,0
+		lineageTag: ce6e1b31-a1fc-4a44-8748-de8a65bf7495
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column Committed_perc_actual
+		dataType: double
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: b1e45493-3dac-4d4b-b5a9-135d378310e2
+		summarizeBy: sum
+		sourceColumn: Committed_perc_actual
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PSR_Card04_Revenue_Cost = m
+		mode: import
+		source =
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Data Model", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[PSR5_Card04_Revenues_Costs]", {"[PSR5_Card04_Revenues_Costs].[ActualToDate].[ActualToDate]", "[PSR5_Card04_Revenues_Costs].[BID_Commercial].[BID_Commercial]", "[PSR5_Card04_Revenues_Costs].[CBS_Code].[CBS_Code]", "[PSR5_Card04_Revenues_Costs].[CBS_Description].[CBS_Description]", "[PSR5_Card04_Revenues_Costs].[CBS_Level].[CBS_Level]", "[PSR5_Card04_Revenues_Costs].[CBS_Values_Latest_Updating].[CBS_Values_Latest_Updating]", "[PSR5_Card04_Revenues_Costs].[Committed_perc].[Committed_perc]", "[PSR5_Card04_Revenues_Costs].[CommittedToDate].[CommittedToDate]", "[PSR5_Card04_Revenues_Costs].[Company_Currency].[Company_Currency]", "[PSR5_Card04_Revenues_Costs].[Current_Forecast].[Current_Forecast]", "[PSR5_Card04_Revenues_Costs].[Date_Upload].[Date_Upload]", "[PSR5_Card04_Revenues_Costs].[Deviation_vs_PF].[Deviation_vs_PF]", "[PSR5_Card04_Revenues_Costs].[Deviation_vs_RCB].[Deviation_vs_RCB]", "[PSR5_Card04_Revenues_Costs].[Error_Upload].[Error_Upload]", "[PSR5_Card04_Revenues_Costs].[Extent_of_Updating].[Extent_of_Updating]", "[PSR5_Card04_Revenues_Costs].[ID].[ID]", "[PSR5_Card04_Revenues_Costs].[IsConsProjectLevel].[IsConsProjectLevel]", "[PSR5_Card04_Revenues_Costs].[Job_Number].[Job_Number]", "[PSR5_Card04_Revenues_Costs].[OCB].[OCB]", "[PSR5_Card04_Revenues_Costs].[P_Key].[P_Key]", "[PSR5_Card04_Revenues_Costs].[Previous_Forecast].[Previous_Forecast]", "[PSR5_Card04_Revenues_Costs].[Quantities_Updated].[Quantities_Updated]", "[PSR5_Card04_Revenues_Costs].[RCB].[RCB]", "[PSR5_Card04_Revenues_Costs].[Unit_Prices_Rate_Updated].[Unit_Prices_Rate_Updated]"}, {"PSR5_Card04_Revenues_Costs.ActualToDate", "PSR5_Card04_Revenues_Costs.BID_Commercial", "PSR5_Card04_Revenues_Costs.CBS_Code", "PSR5_Card04_Revenues_Costs.CBS_Description", "PSR5_Card04_Revenues_Costs.CBS_Level", "PSR5_Card04_Revenues_Costs.CBS_Values_Latest_Updating", "PSR5_Card04_Revenues_Costs.Committed_perc", "PSR5_Card04_Revenues_Costs.CommittedToDate", "PSR5_Card04_Revenues_Costs.Company_Currency", "PSR5_Card04_Revenues_Costs.Current_Forecast", "PSR5_Card04_Revenues_Costs.Date_Upload", "PSR5_Card04_Revenues_Costs.Deviation_vs_PF", "PSR5_Card04_Revenues_Costs.Deviation_vs_RCB", "PSR5_Card04_Revenues_Costs.Error_Upload", "PSR5_Card04_Revenues_Costs.Extent_of_Updating", "PSR5_Card04_Revenues_Costs.ID", "PSR5_Card04_Revenues_Costs.IsConsProjectLevel", "PSR5_Card04_Revenues_Costs.Job_Number", "PSR5_Card04_Revenues_Costs.OCB", "PSR5_Card04_Revenues_Costs.P_Key", "PSR5_Card04_Revenues_Costs.Previous_Forecast", "PSR5_Card04_Revenues_Costs.Quantities_Updated", "PSR5_Card04_Revenues_Costs.RCB", "PSR5_Card04_Revenues_Costs.Unit_Prices_Rate_Updated"}}
+				        }),
+				
+				    // Filtro per rimuovere dati prima del 2022 (non essendoci una colonna "anno", il filtro è applicato cercando delle stringhe nella chiave)
+				    #"Filtered Rows_year" = Table.SelectRows(#"Added Items", each not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2010_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2011_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2012_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2013_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2014_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2015_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2016_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2017_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2018_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2019_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2020_") and not Text.Contains([PSR5_Card04_Revenues_Costs.P_Key], "_2021_")),
+				
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows_year",{{"PSR5_Card04_Revenues_Costs.ActualToDate", type number},{"PSR5_Card04_Revenues_Costs.Committed_perc", type number}, {"PSR5_Card04_Revenues_Costs.CommittedToDate", type number}, {"PSR5_Card04_Revenues_Costs.RCB", type number}, {"PSR5_Card04_Revenues_Costs.Current_Forecast", type number}, {"PSR5_Card04_Revenues_Costs.Previous_Forecast", type number}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"PSR5_Card04_Revenues_Costs.BID_Commercial", "PSR5_Card04_Revenues_Costs.CBS_Values_Latest_Updating", "PSR5_Card04_Revenues_Costs.Company_Currency", "PSR5_Card04_Revenues_Costs.Date_Upload", "PSR5_Card04_Revenues_Costs.Deviation_vs_PF", "PSR5_Card04_Revenues_Costs.Deviation_vs_RCB", "PSR5_Card04_Revenues_Costs.Error_Upload", "PSR5_Card04_Revenues_Costs.Extent_of_Updating", "PSR5_Card04_Revenues_Costs.Job_Number", "PSR5_Card04_Revenues_Costs.OCB", "PSR5_Card04_Revenues_Costs.Quantities_Updated", "PSR5_Card04_Revenues_Costs.Unit_Prices_Rate_Updated"}),
+				    #"Added Custom" = Table.AddColumn(#"Removed Columns", "Committed_perc_actual", each [PSR5_Card04_Revenues_Costs.ActualToDate] / [PSR5_Card04_Revenues_Costs.Current_Forecast]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Committed_perc_actual", type number}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,176 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "cab4c13170a285083d59",
+  "displayName": "Rischi-KCI1 - Storico",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "image": {
+            "image": {
+              "name": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'40 (3).svg'"
+                  }
+                }
+              },
+              "url": {
+                "expr": {
+                  "ResourcePackageItem": {
+                    "PackageName": "RegisteredResources",
+                    "PackageType": 1,
+                    "ItemName": "40_(3)4602750504544111.svg"
+                  }
+                }
+              },
+              "scaling": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Fit'"
+                  }
+                }
+              }
+            }
+          },
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "width": {
+            "expr": {
+              "Literal": {
+                "Value": "299L"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visibility": "HiddenInViewMode",
+  "visualInteractions": [
+    {
+      "source": "8019728cca6d416a55db",
+      "target": "583f988452d298824d12",
+      "type": "NoFilter"
+    },
+    {
+      "source": "b492dff445d603a3d947",
+      "target": "7f88765019a01481956b",
+      "type": "NoFilter"
+    },
+    {
+      "source": "f3334205b4b295900a40",
+      "target": "7f88765019a01481956b",
+      "type": "NoFilter"
+    },
+    {
+      "source": "8019728cca6d416a55db",
+      "target": "7f88765019a01481956b",
+      "type": "NoFilter"
+    },
+    {
+      "source": "583f988452d298824d12",
+      "target": "7f88765019a01481956b",
+      "type": "NoFilter"
+    },
+    {
+      "source": "b492dff445d603a3d947",
+      "target": "f3334205b4b295900a40",
+      "type": "DataFilter"
+    },
+    {
+      "source": "a35648c0d77c4dd5e43c",
+      "target": "7f88765019a01481956b",
+      "type": "NoFilter"
+    },
+    {
+      "source": "f3334205b4b295900a40",
+      "target": "845e4e403472a30975b6",
+      "type": "NoFilter"
+    },
+    {
+      "source": "f3334205b4b295900a40",
+      "target": "b492dff445d603a3d947",
+      "type": "NoFilter"
+    },
+    {
+      "source": "229f65b884a4d7d7c381",
+      "target": "845e4e403472a30975b6",
+      "type": "NoFilter"
+    },
+    {
+      "source": "229f65b884a4d7d7c381",
+      "target": "7f88765019a01481956b",
+      "type": "NoFilter"
+    },
+    {
+      "source": "229f65b884a4d7d7c381",
+      "target": "b492dff445d603a3d947",
+      "type": "NoFilter"
+    },
+    {
+      "source": "229f65b884a4d7d7c381",
+      "target": "f3334205b4b295900a40",
+      "type": "NoFilter"
+    },
+    {
+      "source": "8019728cca6d416a55db",
+      "target": "845e4e403472a30975b6",
+      "type": "NoFilter"
+    },
+    {
+      "source": "8019728cca6d416a55db",
+      "target": "b492dff445d603a3d947",
+      "type": "NoFilter"
+    },
+    {
+      "source": "8019728cca6d416a55db",
+      "target": "f3334205b4b295900a40",
+      "type": "NoFilter"
+    },
+    {
+      "source": "8019728cca6d416a55db",
+      "target": "229f65b884a4d7d7c381",
+      "type": "NoFilter"
+    },
+    {
+      "source": "583f988452d298824d12",
+      "target": "845e4e403472a30975b6",
+      "type": "NoFilter"
+    },
+    {
+      "source": "583f988452d298824d12",
+      "target": "b492dff445d603a3d947",
+      "type": "NoFilter"
+    },
+    {
+      "source": "583f988452d298824d12",
+      "target": "f3334205b4b295900a40",
+      "type": "NoFilter"
+    },
+    {
+      "source": "583f988452d298824d12",
+      "target": "229f65b884a4d7d7c381",
+      "type": "NoFilter"
+    },
+    {
+      "source": "583f988452d298824d12",
+      "target": "8019728cca6d416a55db",
+      "type": "NoFilter"
+    }
+  ]
+}

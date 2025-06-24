@@ -1,0 +1,61 @@
+table PSR_CardER_Currency_Exch_Rates
+	lineageTag: 3e78e30c-824d-43df-96ca-36c788bc8e09
+
+	column 'PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate'
+		dataType: double
+		lineageTag: 2220a909-9d85-4a91-8a80-ef3595f707b1
+		summarizeBy: sum
+		sourceColumn: PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR5_CardER_Currency_Exch_Rates.Fr_Currency'
+		dataType: string
+		lineageTag: 6a1dd60a-a064-4301-a864-31a8f22c11ec
+		summarizeBy: none
+		sourceColumn: PSR5_CardER_Currency_Exch_Rates.Fr_Currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_CardER_Currency_Exch_Rates.P_Key'
+		dataType: string
+		lineageTag: 79c3815f-599e-4585-8250-ae74550f403e
+		summarizeBy: none
+		sourceColumn: PSR5_CardER_Currency_Exch_Rates.P_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_CardER_Currency_Exch_Rates.To_Currency'
+		dataType: string
+		lineageTag: 85a067fb-c6b5-45d8-b2d9-0594f4ebff5d
+		summarizeBy: none
+		sourceColumn: PSR5_CardER_Currency_Exch_Rates.To_Currency
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PSR_CardER_Currency_Exch_Rates = m
+		mode: import
+		source =
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Data Model", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[PSR5_CardER_Currency_Exch_Rates]", {"[PSR5_CardER_Currency_Exch_Rates].[Curr_Year_Exch_Rate].[Curr_Year_Exch_Rate]", "[PSR5_CardER_Currency_Exch_Rates].[Date_Upload].[Date_Upload]", "[PSR5_CardER_Currency_Exch_Rates].[Error_Upload].[Error_Upload]", "[PSR5_CardER_Currency_Exch_Rates].[Fixed_Exch_Rate].[Fixed_Exch_Rate]", "[PSR5_CardER_Currency_Exch_Rates].[Fr_Currency].[Fr_Currency]", "[PSR5_CardER_Currency_Exch_Rates].[ID].[ID]", "[PSR5_CardER_Currency_Exch_Rates].[Next_Year_Exch_Rate].[Next_Year_Exch_Rate]", "[PSR5_CardER_Currency_Exch_Rates].[P_Key].[P_Key]", "[PSR5_CardER_Currency_Exch_Rates].[Remarks].[Remarks]", "[PSR5_CardER_Currency_Exch_Rates].[To_Currency].[To_Currency]"}, {"PSR5_CardER_Currency_Exch_Rates.Curr_Year_Exch_Rate", "PSR5_CardER_Currency_Exch_Rates.Date_Upload", "PSR5_CardER_Currency_Exch_Rates.Error_Upload", "PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate", "PSR5_CardER_Currency_Exch_Rates.Fr_Currency", "PSR5_CardER_Currency_Exch_Rates.ID", "PSR5_CardER_Currency_Exch_Rates.Next_Year_Exch_Rate", "PSR5_CardER_Currency_Exch_Rates.P_Key", "PSR5_CardER_Currency_Exch_Rates.Remarks", "PSR5_CardER_Currency_Exch_Rates.To_Currency"}}
+				        }),
+				
+				    // Filtro per rimuovere dati prima del 2022 (non essendoci una colonna "anno", il filtro è applicato cercando delle stringhe nella chiave)
+				    #"Filtered Rows_year" = Table.SelectRows(#"Added Items", each not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2010_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2011_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2012_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2013_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2014_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2015_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2016_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2017_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2018_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2019_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2020_") and not Text.Contains([PSR5_CardER_Currency_Exch_Rates.P_Key], "_2021_")),
+				
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows_year",{{"PSR5_CardER_Currency_Exch_Rates.Curr_Year_Exch_Rate", type number}, {"PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate", type number}, {"PSR5_CardER_Currency_Exch_Rates.Next_Year_Exch_Rate", type number}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"PSR5_CardER_Currency_Exch_Rates.Curr_Year_Exch_Rate", "PSR5_CardER_Currency_Exch_Rates.Date_Upload", "PSR5_CardER_Currency_Exch_Rates.Error_Upload", "PSR5_CardER_Currency_Exch_Rates.ID", "PSR5_CardER_Currency_Exch_Rates.Next_Year_Exch_Rate", "PSR5_CardER_Currency_Exch_Rates.Remarks"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+

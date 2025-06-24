@@ -1,0 +1,85 @@
+table 'Calculation group'
+	lineageTag: aa2c5163-8943-46a6-a756-6ca1f32870a9
+
+	calculationGroup
+
+		calculationItem _Ultimo_forecast = ```
+				
+				
+				-- Calculation Group utilizzato per filtrare i visual con il campo PSR = TRUE solo se il forecast selezionato è l'ultimo disponibile
+				-- Il filtro PSR = TRUE indica quali progetti devono fare PSR: la presenza o meno di dati nella PSR Group By lo può confermare o meno
+				-- Per le altre casistiche, il filtro PSR non serve
+				
+				IF(
+				    -- Controllo che i periodi selezionati siano NON BLANK
+				    NOT ISBLANK(SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]))   && 
+				    NOT ISBLANK(SELECTEDVALUE('Frozen EV'[_Period_froz_sort]))      && 
+				    NOT ISBLANK(SELECTEDVALUE(PSR_Card_Consolidated[_ForecastYearAxis])),
+				    
+				    IF(
+				        -- Se sto selezionando il massimo periodo
+				        OR(
+				            OR(
+				                SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+				                SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = [Max_Periodo_GroupBy]
+				            ),
+				            SELECTEDVALUE(PSR_Card_Consolidated[_ForecastYearAxis]) = [Max_Periodo_GroupBy]
+				        ),
+				        CALCULATE( SELECTEDMEASURE(), Cons_Proj_Table[PSR] = "TRUE" ),
+				        SELECTEDMEASURE()
+				    ),
+				    SELECTEDMEASURE()
+				)
+				```
+
+		calculationItem _Ultimo_forecast_dettaglio_overview = ```
+				
+				
+				IF(
+				    -- Se sto selezionando il massimo periodo
+				    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+				    CALCULATE( 
+				        SELECTEDMEASURE(), 
+				        'PSR Group By'[_Flag_MaxIDPKEY] = 1,
+				        'PSR Group By'[_Flagprevmaxfor] = "NO",
+				        Cons_Proj_Table[PSR] = "TRUE"
+				    ), 
+				    CALCULATE(
+				        SELECTEDMEASURE(),
+				        'PSR Group By'[_Flagprevmaxfor] = "SI",
+				        Cons_Proj_Table[PSR] = "TRUE"
+				    )
+				)
+				```
+
+		calculationItem _Ultimo_forecast_PSR_Details_Overview =
+				
+				
+				-- Calculation Group utilizzato per filtrare i visual con il campo PSR = TRUE nella pagina di dettaglio del Project Portfolio
+				-- Per le altre casistiche, il filtro PSR non serve
+				
+				IF(
+				    -- Se sto selezionando il massimo periodo
+				    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+				    CALCULATE( SELECTEDMEASURE(), Cons_Proj_Table[PSR] = "TRUE" ),
+				    SELECTEDMEASURE()
+				)
+
+	column 'Calculation group column'
+		dataType: string
+		lineageTag: a8b5798d-416a-40ce-99a0-b5060442be0c
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: 2584071b-90a1-4911-a030-fdfb18ec4a2e
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

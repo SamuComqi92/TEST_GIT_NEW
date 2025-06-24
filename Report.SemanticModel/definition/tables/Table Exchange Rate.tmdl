@@ -1,0 +1,81 @@
+table 'Table Exchange Rate'
+	lineageTag: cf6fc450-d91e-4b9d-a2db-bd0027fe8861
+
+	column 'PSR5_CardER_Currency_Exch_Rates.P_Key'
+		lineageTag: 836e3c70-560c-47be-8338-e9bf4359be79
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.P_Key]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_CardER_Currency_Exch_Rates.Fr_Currency'
+		lineageTag: 01957504-80de-44b6-8e25-c9f25fb95597
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.Fr_Currency]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_CardER_Currency_Exch_Rates.To_Currency'
+		isHidden
+		lineageTag: d5ce1dcc-3a8c-40bd-8ead-df9cd9accba3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.To_Currency]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate'
+		lineageTag: 3248a582-c3fe-4dbf-9f3d-0c0ee0611e7b
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Key_Exchange
+		lineageTag: 4426075d-378a-4cc2-9094-81596bac815f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_Key_Exchange]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Table Exchange Rate' = calculated
+		mode: import
+		source = ```
+				
+				
+				FILTER(
+				    SUMMARIZE(
+				        PSR_CardER_Currency_Exch_Rates,
+				        PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.P_Key],
+				        PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.Fr_Currency],
+				
+				        -- Non utilizzata nel modello ma utile per il filtro
+				        PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.To_Currency], 
+				        PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate],
+				
+				        -- La chiave è utilizzata per recuperare la conversione giusta utilizzata successivamente nella tmp_pbi_RisksFrozen
+				        -- La chiave prende in considerazione il progetto, le valute di conversione e il forecast (dalla Group By)
+				        -- Il forecast viene considerato perché il valore di conversione può cambiare da un forecast all'altro
+				        "_Key_Exchange", 
+				        LEFT( PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.P_Key], 8 )    & "_" & 
+				        PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.Fr_Currency]         & "_" & 
+				        PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.To_Currency]         & "_" & 
+				        LOOKUPVALUE( 
+				            'PSR Group By'[_ForecastYearAxis], 
+				            'PSR Group By'[List_Data_GroupBy.List_Data.P_Key], 
+				            PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.P_Key]
+				        )
+				    ),
+				    -- Considero solo le conversioni in EURO
+				    PSR_CardER_Currency_Exch_Rates[PSR5_CardER_Currency_Exch_Rates.To_Currency] = "EUR" 
+				)
+				```
+
+	annotation PBI_Id = 542d3320761e4e0aa918dd53726e43a9
+

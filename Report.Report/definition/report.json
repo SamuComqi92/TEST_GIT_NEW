@@ -1,0 +1,345 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/2.1.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY23SU08",
+      "reportVersionAtImport": "5.48",
+      "type": "SharedResources"
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "837747913b747b173c2d",
+        "ordinal": 0,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Cons_Proj_Table"
+              }
+            },
+            "Property": "Business_Organization_T3"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "c",
+              "Entity": "Cons_Proj_Table",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "Not": {
+                  "Expression": {
+                    "In": {
+                      "Expressions": [
+                        {
+                          "Column": {
+                            "Expression": {
+                              "SourceRef": {
+                                "Source": "c"
+                              }
+                            },
+                            "Property": "Business_Organization_T3"
+                          }
+                        }
+                      ],
+                      "Values": [
+                        [
+                          {
+                            "Literal": {
+                              "Value": "'OPERATIONS & MAINTENANCE'"
+                            }
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true,
+        "objects": {
+          "general": [
+            {
+              "properties": {
+                "isInvertedSelectionMode": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "true"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "7f3d5739aabd9ed05040",
+        "ordinal": 1,
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR_List_Data"
+              }
+            },
+            "Property": "WF_Status"
+          }
+        },
+        "type": "Categorical",
+        "filter": {
+          "Version": 2,
+          "From": [
+            {
+              "Name": "p",
+              "Entity": "PSR_List_Data",
+              "Type": 0
+            }
+          ],
+          "Where": [
+            {
+              "Condition": {
+                "In": {
+                  "Expressions": [
+                    {
+                      "Column": {
+                        "Expression": {
+                          "SourceRef": {
+                            "Source": "p"
+                          }
+                        },
+                        "Property": "WF_Status"
+                      }
+                    }
+                  ],
+                  "Values": [
+                    [
+                      {
+                        "Literal": {
+                          "Value": "'Official PSR'"
+                        }
+                      }
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "howCreated": "User",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      }
+    ],
+    "filterSortOrder": "Custom"
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "AdvancedLinearGaugeDA0D695483C84EDAA6A55149E2DS37",
+    "LinearGauge1450736844786",
+    "linearGauge2EBA8C0A99F94BF297BCCB1CF5427E68",
+    "Tachometer1474636471549"
+  ],
+  "resourcePackages": [
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "36_(16)30868435434548935.svg",
+          "path": "36_(16)30868435434548935.svg",
+          "type": "Image"
+        },
+        {
+          "name": "378779311434796235.svg",
+          "path": "378779311434796235.svg",
+          "type": "Image"
+        },
+        {
+          "name": "37_(1)267343491997561.svg",
+          "path": "37_(1)267343491997561.svg",
+          "type": "Image"
+        },
+        {
+          "name": "40_(3)4602750504544111.svg",
+          "path": "40_(3)4602750504544111.svg",
+          "type": "Image"
+        },
+        {
+          "name": "40_(4)1621675658811721.svg",
+          "path": "40_(4)1621675658811721.svg",
+          "type": "Image"
+        },
+        {
+          "name": "41_(1)6820873460025272.svg",
+          "path": "41_(1)6820873460025272.svg",
+          "type": "Image"
+        },
+        {
+          "name": "42_(1)27932828540056986.svg",
+          "path": "42_(1)27932828540056986.svg",
+          "type": "Image"
+        },
+        {
+          "name": "43_(3)18523791710894089.svg",
+          "path": "43_(3)18523791710894089.svg",
+          "type": "Image"
+        },
+        {
+          "name": "43_(4)4686642516683117.svg",
+          "path": "43_(4)4686642516683117.svg",
+          "type": "Image"
+        },
+        {
+          "name": "43_(5)021094427519386283.svg",
+          "path": "43_(5)021094427519386283.svg",
+          "type": "Image"
+        },
+        {
+          "name": "43_(6)7018286142856969.svg",
+          "path": "43_(6)7018286142856969.svg",
+          "type": "Image"
+        },
+        {
+          "name": "43_(7)706097204078808.svg",
+          "path": "43_(7)706097204078808.svg",
+          "type": "Image"
+        },
+        {
+          "name": "43_(8)5716095123930705.svg",
+          "path": "43_(8)5716095123930705.svg",
+          "type": "Image"
+        },
+        {
+          "name": "Background_LandingPage_SAIPEM11218997962631372.svg",
+          "path": "Background_LandingPage_SAIPEM11218997962631372.svg",
+          "type": "Image"
+        },
+        {
+          "name": "Background_overview_SAIPEM_exe45396053991126273.png",
+          "path": "Background_overview_SAIPEM_exe45396053991126273.png",
+          "type": "Image"
+        },
+        {
+          "name": "Backgroup_saipem_details1298717292315057.png",
+          "path": "Backgroup_saipem_details1298717292315057.png",
+          "type": "Image"
+        },
+        {
+          "name": "Backgroup_saipem_details5084456613058725.png",
+          "path": "Backgroup_saipem_details5084456613058725.png",
+          "type": "Image"
+        },
+        {
+          "name": "Backgroup_saipem_details6028478873697407.png",
+          "path": "Backgroup_saipem_details6028478873697407.png",
+          "type": "Image"
+        },
+        {
+          "name": "Backgroup_saipem_details6640684240951844.png",
+          "path": "Backgroup_saipem_details6640684240951844.png",
+          "type": "Image"
+        },
+        {
+          "name": "Backgroup_saipem_details7340501876714722.png",
+          "path": "Backgroup_saipem_details7340501876714722.png",
+          "type": "Image"
+        },
+        {
+          "name": "Backgroup_saipem_details7955083163184355.png",
+          "path": "Backgroup_saipem_details7955083163184355.png",
+          "type": "Image"
+        },
+        {
+          "name": "Backgroup_saipem_details8092478300913728.png",
+          "path": "Backgroup_saipem_details8092478300913728.png",
+          "type": "Image"
+        },
+        {
+          "name": "Backgroup_saipem_details847867118316729.png",
+          "path": "Backgroup_saipem_details847867118316729.png",
+          "type": "Image"
+        },
+        {
+          "name": "Backgroup_saipem_details9298656390530189.png",
+          "path": "Backgroup_saipem_details9298656390530189.png",
+          "type": "Image"
+        },
+        {
+          "name": "icona_export6760351684161581.PNG",
+          "path": "icona_export6760351684161581.PNG",
+          "type": "Image"
+        },
+        {
+          "name": "info05414170927141515.png",
+          "path": "info05414170927141515.png",
+          "type": "Image"
+        }
+      ]
+    },
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY23SU08",
+          "path": "BaseThemes/CY23SU08.json",
+          "type": "BaseTheme"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  },
+  "slowDataSourceSettings": {
+    "isCrossHighlightingDisabled": false,
+    "isSlicerSelectionsButtonEnabled": false,
+    "isFilterSelectionsButtonEnabled": false,
+    "isFieldWellButtonEnabled": false,
+    "isApplyAllButtonEnabled": false
+  }
+}

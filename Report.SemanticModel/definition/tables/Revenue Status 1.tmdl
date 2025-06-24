@@ -1,0 +1,60 @@
+table 'Revenue Status 1'
+	lineageTag: 3801c2fa-4e6b-4d4c-8d30-13648065e5fb
+
+	column _ConsolidationCode
+		isHidden
+		lineageTag: d0090518-15a4-4c10-a46e-8b8d2767415f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR_Revenues_status[_ConsolidationCode]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Forecast_Period
+		isHidden
+		lineageTag: e826d4a3-34b3-449f-9a46-cb6fe9c69eb4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR_Revenues_status[_Forecast_Period]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Pending Revenues'
+		formatString: #,0
+		lineageTag: 5edee369-1842-4104-949e-80950d0d0182
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Pending Revenues]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'Key Primary'
+		lineageTag: 4849009b-ba3c-4d76-9a60-6ae149837dbd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Key Primary]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Revenue Status 1' = calculated
+		mode: import
+		source =
+				
+				
+				ADDCOLUMNS(
+				    CALCULATETABLE(
+				        SUMMARIZE(
+				            PSR_Revenues_status,
+				            PSR_Revenues_status[_ConsolidationCode], -- Non utilizzata nel modello ma utile per filtro e chiave
+				            PSR_Revenues_status[_Forecast_Period],   -- Non utilizzata nel modello ma utile per chiave
+				            "Pending Revenues", CALCULATE( SUM(PSR_Revenues_status[PSR_Revenues_Status.EL Pending CF]) )
+				        ),
+				        PSR_Revenues_status[_ConsolidationCode] <> blank()
+				    ),
+				    "Key Primary", PSR_Revenues_status[_ConsolidationCode] & "-" & PSR_Revenues_status[_Forecast_Period]
+				)
+
+	annotation PBI_Id = 9c7cbf4169254b43976a8910580d8d5b
+

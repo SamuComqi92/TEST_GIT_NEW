@@ -1,0 +1,90 @@
+table 'PHI Index'
+	lineageTag: 7adc3186-7775-460c-aef9-9b321d1289e8
+
+	column Cons_Proj
+		dataType: string
+		lineageTag: aa897e28-7131-4fd0-92c1-54a088cc0039
+		summarizeBy: none
+		sourceColumn: Cons_Proj
+
+		annotation SummarizationSetBy = Automatic
+
+	column Forecast
+		dataType: string
+		lineageTag: 087ab059-1a9b-4f1e-b6ae-0db379e3ba29
+		summarizeBy: none
+		sourceColumn: Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sort Desc'
+		dataType: int64
+		formatString: 0
+		lineageTag: d49581e2-e79d-4389-b54f-8b6a8e761fae
+		summarizeBy: sum
+		sourceColumn: Sort Desc
+
+		annotation SummarizationSetBy = Automatic
+
+	column [PHI_Index]
+		dataType: double
+		lineageTag: a5d8cb29-35a9-4bc0-a688-3f246702c559
+		summarizeBy: sum
+		sourceColumn: [PHI_Index]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _FlagMinFor =
+			
+			
+			IF(
+			    'PHI Index'[Sort Desc] = [MinForecast],
+			    1,
+			    0
+			)
+		formatString: 0
+		lineageTag: d58aaa0b-beb9-4cbd-b120-a7a78aa10f45
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _ColumnName =
+			
+			
+			IF(
+				ISERROR(
+					SEARCH("Forecast (June Rate)", 'PHI Index'[Forecast])
+				),
+				"true",
+				"false"
+			)
+		lineageTag: 128d0bf5-43ce-414f-9d28-37dcd0c7ef67
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Forecast_new =
+			
+			
+			RIGHT('PHI Index'[Forecast], 4) & "-" & LEFT( 'PHI Index'[Forecast], LEN('PHI Index'[Forecast])-5 )
+		lineageTag: c8e3f88f-9114-4695-8865-894170f411a3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'PHI Index' = m
+		mode: import
+		source =
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Report", [Implementation="2.0", Query="#(lf)DEFINE#(lf)    VAR __DS0Core =#(lf)        SUMMARIZECOLUMNS(#(lf)            'Cons_Proj_Table'[Cons_Proj],#(lf)            'Forecast Session DIP'[Session],#(lf)            'Forecast Session DIP'[Sort Desc],#(lf)            ""PHI_Index"", 'PSR_Revenues_Status Internal Use'[PHI Index]#(lf)        )#(lf) #(lf)EVALUATE __DS0Core#(lf)"]),
+				    #"Filtered Rows" = Table.SelectRows(Source, each not Text.Contains([#"Forecast Session DIP[Session]"], "2010") and not Text.Contains([#"Forecast Session DIP[Session]"], "2011") and not Text.Contains([#"Forecast Session DIP[Session]"], "2012") and not Text.Contains([#"Forecast Session DIP[Session]"], "2013") and not Text.Contains([#"Forecast Session DIP[Session]"], "2014") and not Text.Contains([#"Forecast Session DIP[Session]"], "2015") and not Text.Contains([#"Forecast Session DIP[Session]"], "2016") and not Text.Contains([#"Forecast Session DIP[Session]"], "2017") and not Text.Contains([#"Forecast Session DIP[Session]"], "2018") and not Text.Contains([#"Forecast Session DIP[Session]"], "2019") and not Text.Contains([#"Forecast Session DIP[Session]"], "2020") and not Text.Contains([#"Forecast Session DIP[Session]"], "2021")),
+				    #"Renamed Columns" = Table.RenameColumns(#"Filtered Rows",{{"Forecast Session DIP[Session]", "Forecast"}, {"Forecast Session DIP[Sort Desc]", "Sort Desc"}, {"Cons_Proj_Table[Cons_Proj]", "Cons_Proj"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

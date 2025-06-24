@@ -1,0 +1,114 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "d72866ebd7e3d0c03538",
+  "displayName": "Rischi-KCI 2 - Storico",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "c31a0b7081cdd6b0790b",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Frozen EV"
+              }
+            },
+            "Property": "_flag_forecast_in_psr_group_by"
+          }
+        },
+        "type": "Categorical",
+        "howCreated": "User",
+        "isHiddenInViewMode": true,
+        "isLockedInViewMode": true
+      }
+    ]
+  },
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "image": {
+            "image": {
+              "name": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'40 (4).svg'"
+                  }
+                }
+              },
+              "url": {
+                "expr": {
+                  "ResourcePackageItem": {
+                    "PackageName": "RegisteredResources",
+                    "PackageType": 1,
+                    "ItemName": "40_(4)1621675658811721.svg"
+                  }
+                }
+              },
+              "scaling": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Fit'"
+                  }
+                }
+              }
+            }
+          },
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visibility": "HiddenInViewMode",
+  "visualInteractions": [
+    {
+      "source": "b39625d0299d30223748",
+      "target": "d578d89c0cd6b1163055",
+      "type": "NoFilter"
+    },
+    {
+      "source": "b39625d0299d30223748",
+      "target": "4dd36e7a07d0d2210c51",
+      "type": "DataFilter"
+    },
+    {
+      "source": "df1fae4146a6d2d50440",
+      "target": "4dd36e7a07d0d2210c51",
+      "type": "DataFilter"
+    },
+    {
+      "source": "df1fae4146a6d2d50440",
+      "target": "3141db449d098397c16b",
+      "type": "DataFilter"
+    },
+    {
+      "source": "df1fae4146a6d2d50440",
+      "target": "5e7ed84c08b000322623",
+      "type": "DataFilter"
+    },
+    {
+      "source": "7ff3d226a0539073c32b",
+      "target": "5e7ed84c08b000322623",
+      "type": "NoFilter"
+    },
+    {
+      "source": "b39625d0299d30223748",
+      "target": "5e7ed84c08b000322623",
+      "type": "NoFilter"
+    },
+    {
+      "source": "8a90ed7cbc20ac8700bb",
+      "target": "5e7ed84c08b000322623",
+      "type": "NoFilter"
+    }
+  ]
+}

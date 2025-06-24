@@ -1,0 +1,89 @@
+table 'Revenue Costs 1'
+	lineageTag: 2e56056e-ed80-49d9-95dc-18195a973cc5
+
+	column _ConsolidationCode
+		lineageTag: 370519e2-08f1-464f-a967-5fc3b2efc262
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR_Revenues_Costs[_ConsolidationCode]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Forecast_Period
+		lineageTag: ddd77858-4081-40b1-a4a0-d95392fe8aff
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR_Revenues_Costs[_Forecast_Period]
+		sortByColumn: _Forecast_Period_Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Contingencies
+		formatString: #,0
+		lineageTag: 70108d8b-58e7-405a-9af3-7640db44de21
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Contingencies]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column Margine
+		formatString: #,0
+		lineageTag: bebbbf96-3c1a-4580-a5c5-ff058009280f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Margine]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column _Key_Primary =
+			
+			
+			// Necessario il calcolo in questo modo per evitare referenze circolari
+			'Revenue Costs 1'[_ConsolidationCode] & "-" & 'Revenue Costs 1'[_Forecast_Period]
+		lineageTag: b8298240-de29-405d-8191-a6eaf8ad9361
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Revenues'
+		formatString: #,0
+		lineageTag: 85a8e627-e19d-4c3d-9700-3542294790c8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Total Revenues]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Forecast_Period_Year
+		lineageTag: b02753d9-9fa0-450a-ac62-6bddea7ea422
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR_Revenues_Costs[_Forecast_Period_Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Revenue Costs 1' = calculated
+		mode: import
+		source =
+				
+				
+				CALCULATETABLE(
+				    SUMMARIZE(
+				        PSR_Revenues_Costs,
+				        PSR_Revenues_Costs[_ConsolidationCode],
+				        PSR_Revenues_Costs[_Forecast_Period],
+				        PSR_Revenues_Costs[_Forecast_Period_Year],
+				        "Contingencies", SUM(PSR_Revenues_Costs[CF Contingencies]),
+				        "Margine", SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate]),
+				        "Total Revenues", SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.RCB_Total_Revenues])
+				    ),
+				    PSR_Revenues_Costs[_ConsolidationCode] <> blank()
+				)
+
+	annotation PBI_Id = 68a318b4d28f4ec68138d898b3de49a6
+

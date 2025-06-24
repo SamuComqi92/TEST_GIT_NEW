@@ -1,0 +1,94 @@
+relationship b81e7912-a97c-cb80-2fa8-e515fc3600a2
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+	toColumn: PSR_Card_Consolidated.'PSR_Card_Consolidated.P_Key'
+
+relationship 22d7503c-1b70-ca3f-89af-30dce8c29304
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: PSR_Revenues_Costs.'PSR_Revenues_Costs.P_Key'
+	toColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+
+relationship dde261fb-d155-adb0-9e97-45873873b193
+	crossFilteringBehavior: bothDirections
+	fromColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+	toColumn: PSR_Progress.'PSR_Progress.P_Key'
+
+relationship a1a59620-3613-9fd4-40e5-b9e71164beaf
+	crossFilteringBehavior: bothDirections
+	fromColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+	toColumn: PSR_Risks_Opportunity.'PSR_Risks_Opportunities.P_Key'
+
+relationship 54652fd1-580d-7718-5ceb-c3ad1ccd01ca
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: 'PHI Index'.Cons_Proj
+	toColumn: 'PSR Group By'.'List_Data_GroupBy.Cons_Project'
+
+relationship 557745b3-1cac-8b98-1931-8edd077d4f92
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: 'PSR Group By'.'List_Data_GroupBy.Cons_Project'
+	toColumn: tmp_pbi_RisksFrozen.ConsolidationCode
+
+relationship 575a2f1e-3827-01fa-d674-cafa17bcc30d
+	crossFilteringBehavior: bothDirections
+	fromColumn: 'Frozen EV'._Key_Primary
+	toColumn: 'Revenue Costs 1'._Key_Primary
+
+relationship c8d53f8b-b18f-1d6d-d7dc-4e4a88ea032a
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+	toColumn: PSR_Revenues_status.'PSR_Revenues_Status.P_Key'
+
+relationship AutoDetected_b3a15f50-f5f3-4427-852d-5480ba283ad6
+	fromColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+	toColumn: PSR_List_Data.P_Key
+
+relationship 8110859f-4c66-2efc-3c8a-88defdf2345c
+	crossFilteringBehavior: bothDirections
+	fromColumn: PSR_Card11_Progress.'PSR5_Card11_Progress.P_Key'
+	toColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+
+relationship fdcf884e-53e7-c339-3bcb-fa04122c4f1b
+	crossFilteringBehavior: bothDirections
+	fromColumn: PSR_Card04_Revenue_Cost.'PSR5_Card04_Revenues_Costs.P_Key'
+	toColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+
+relationship d578e34d-9adc-9af5-853d-7e4799c1c09f
+	crossFilteringBehavior: bothDirections
+	fromColumn: 'PSR Group By'.'List_Data_GroupBy.Cons_Project'
+	toColumn: Cons_Proj_Table.Cons_Proj
+
+relationship 9f7ec54c-207c-3ee7-2f79-fc6b34fd76e5
+	crossFilteringBehavior: bothDirections
+	fromColumn: PSR_Card14_Actual_Invoicing.'PSR5_Card14_Actual_Invoicing.P_Key'
+	toColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+
+relationship 9d82cc5c-2aed-8ef8-143f-9a3021c511dc
+	crossFilteringBehavior: bothDirections
+	fromColumn: PSR_CardER_Currency_Exch_Rates.'PSR5_CardER_Currency_Exch_Rates.P_Key'
+	toColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+
+relationship f2d7e4eb-b58d-216f-68ed-b84fe0836127
+	fromColumn: PSR_Card08_Revenues_Details.'PSR5_Card08_Revenues_Details.P_Key'
+	toColumn: 'PSR Group By'.'List_Data_GroupBy.List_Data.P_Key'
+
+relationship 9348eddd-14f5-e856-2cd9-938ed1727a3e
+	fromColumn: 'PSR Group By'._ForecastYearAxis
+	toColumn: Z_Distinct_ForecastYearAxis._ForecastYearAxis
+
+relationship 92305d23-a0e4-4dc1-fe82-e031371db0b4
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'Revenue Status 1'.'Key Primary'
+	toColumn: 'Revenue Costs 1'._Key_Primary
+
+relationship 8ce3a97e-994a-6fda-ba4e-bd45f8caf578
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: 'PSR Group By'.'List_Data_GroupBy.Cons_Project'
+	toColumn: 'Frozen EV'.ConsolidationCode
+

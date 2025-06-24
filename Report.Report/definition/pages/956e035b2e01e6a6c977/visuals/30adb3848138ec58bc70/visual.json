@@ -1,0 +1,45 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "30adb3848138ec58bc70",
+  "position": {
+    "x": 17.312294087046993,
+    "y": 141.16178255592163,
+    "z": 5000,
+    "height": 150.48378706433155,
+    "width": 134.5032079070574,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Progetti che presentano ",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt"
+                    }
+                  },
+                  {
+                    "value": "per 3 Forecast/PSR consecutivi un ritardo nel progress delle attività senza una variazione significativa del margine",
+                    "textStyle": {
+                      "fontFamily": "DIN Light",
+                      "fontSize": "9pt",
+                      "color": "black"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,53 @@
+table Z_Distinct_ForecastYearAxis_separated
+	lineageTag: 023f40be-6adf-4801-a615-7702563f2988
+
+	column _ForecastYearAxis
+		lineageTag: bd0c0183-46b2-4c3c-b896-c50aa3085053
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR Group By[_ForecastYearAxis]
+		sortByColumn: _Rank_Prev_Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Prev_Forecast
+		formatString: 0
+		lineageTag: 0ae23f95-c0e3-40ba-9c18-2afa41ef0641
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: PSR Group By[_Rank_Prev_Forecast]
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_Desc_Forecast
+		formatString: 0
+		lineageTag: 550bb85d-66e3-4677-b378-ce72a599b1b8
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: PSR Group By[_Rank_Desc_Forecast]
+
+		annotation SummarizationSetBy = Automatic
+
+	column NEW_FORECAST_SLICER
+		lineageTag: 14b49845-c45b-4706-af99-4ca2d8ab9a0e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: PSR Group By[NEW_FORECAST_SLICER]
+		sortByColumn: _Rank_Desc_Forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Z_Distinct_ForecastYearAxis_separated = calculated
+		mode: import
+		source =
+				
+				
+				SUMMARIZECOLUMNS(
+				    'PSR Group By'[_ForecastYearAxis],
+				    'PSR Group By'[NEW_FORECAST_SLICER],
+				    'PSR Group By'[_Rank_Prev_Forecast],
+				    'PSR Group By'[_Rank_Desc_Forecast]
+				)
+
+	annotation PBI_Id = a89e47e6987a408fad7d16d855288e32
+

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "ec51a53fa420cae60a71",
+  "displayName": "Costi-KCI6 - Storico",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "32bb9b3fedb94ca0140d",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "PSR Group By"
+              }
+            },
+            "Property": "_Flagprevmaxfor"
+          }
+        },
+        "type": "Categorical",
+        "howCreated": "User"
+      }
+    ]
+  },
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "image": {
+            "image": {
+              "name": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'43 (5).svg'"
+                  }
+                }
+              },
+              "url": {
+                "expr": {
+                  "ResourcePackageItem": {
+                    "PackageName": "RegisteredResources",
+                    "PackageType": 1,
+                    "ItemName": "43_(5)021094427519386283.svg"
+                  }
+                }
+              },
+              "scaling": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Fit'"
+                  }
+                }
+              }
+            }
+          },
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "width": {
+            "expr": {
+              "Literal": {
+                "Value": "215L"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visibility": "HiddenInViewMode",
+  "visualInteractions": [
+    {
+      "source": "129cc516608e12b5ca19",
+      "target": "0816719bda809e8c470b",
+      "type": "NoFilter"
+    },
+    {
+      "source": "129cc516608e12b5ca19",
+      "target": "5762253626d004ae218a",
+      "type": "DataFilter"
+    },
+    {
+      "source": "09de9e1379a9d8e02310",
+      "target": "0816719bda809e8c470b",
+      "type": "NoFilter"
+    },
+    {
+      "source": "5762253626d004ae218a",
+      "target": "129cc516608e12b5ca19",
+      "type": "NoFilter"
+    },
+    {
+      "source": "5762253626d004ae218a",
+      "target": "87fde119a40084057db1",
+      "type": "NoFilter"
+    },
+    {
+      "source": "5762253626d004ae218a",
+      "target": "72aaff00a18520e8e474",
+      "type": "NoFilter"
+    },
+    {
+      "source": "5762253626d004ae218a",
+      "target": "9eccedc61877477315dd",
+      "type": "NoFilter"
+    },
+    {
+      "source": "5762253626d004ae218a",
+      "target": "e5dc0742705b8a3e4060",
+      "type": "NoFilter"
+    },
+    {
+      "source": "5762253626d004ae218a",
+      "target": "0816719bda809e8c470b",
+      "type": "NoFilter"
+    }
+  ]
+}

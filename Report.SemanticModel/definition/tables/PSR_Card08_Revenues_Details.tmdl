@@ -1,0 +1,122 @@
+table PSR_Card08_Revenues_Details
+	lineageTag: 9444073b-3fc4-44df-9349-99ee4e9cfdb1
+
+	column 'PSR5_Card08_Revenues_Details.Currency'
+		dataType: string
+		lineageTag: 7d508432-2f15-4e55-9453-1d989081551f
+		summarizeBy: none
+		sourceColumn: PSR5_Card08_Revenues_Details.Currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card08_Revenues_Details.P_Key'
+		dataType: string
+		lineageTag: cc5078c5-4bf2-4561-a484-fb7dea548b3a
+		summarizeBy: none
+		sourceColumn: PSR5_Card08_Revenues_Details.P_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card08_Revenues_Details.Status'
+		dataType: string
+		lineageTag: e875099e-e4c1-4642-b2fc-05d8eeaacd3e
+		summarizeBy: none
+		sourceColumn: PSR5_Card08_Revenues_Details.Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card08_Revenues_Details.Type'
+		dataType: string
+		lineageTag: dbfe9df1-7729-4235-8052-f9ab704e8ff4
+		summarizeBy: none
+		sourceColumn: PSR5_Card08_Revenues_Details.Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card08_Revenues_Details.Variation_Pending_Included'
+		dataType: double
+		lineageTag: 0f16186d-8ab3-49c9-b805-4e41b2c2cf09
+		summarizeBy: sum
+		sourceColumn: PSR5_Card08_Revenues_Details.Variation_Pending_Included
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _Fixed_Exchage_Rate =
+			
+			
+			LOOKUPVALUE(
+			    'Table Exchange Rate'[PSR5_CardER_Currency_Exch_Rates.Fixed_Exch_Rate],
+			    'Table Exchange Rate'[PSR5_CardER_Currency_Exch_Rates.P_Key],
+			        PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.P_Key],
+			    'Table Exchange Rate'[PSR5_CardER_Currency_Exch_Rates.Fr_Currency],
+			        PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Currency]
+			)
+		lineageTag: d4494a82-a56b-4634-a3a3-95dd43b4d0e6
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR5_Card08_Revenues_Details.Client'
+		dataType: string
+		lineageTag: ca9d6e7e-6c8d-4ecf-8084-1354cfe74e03
+		summarizeBy: none
+		sourceColumn: PSR5_Card08_Revenues_Details.Client
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Variation_Pending_Included =
+			
+			PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Variation_Pending_Included] * PSR_Card08_Revenues_Details[_Fixed_Exchage_Rate]
+		formatString: #,0
+		lineageTag: 9d120af3-a322-437f-8e3e-453ecddc70ce
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'Variation migliaia' = ((PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Variation_Pending_Included])/1000)*PSR_Card08_Revenues_Details[_Fixed_Exchage_Rate]
+		formatString: #,0
+		lineageTag: b83e782a-7949-4eae-a4f0-651f32894bc1
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column 'PSR5_Card08_Revenues_Details.Description'
+		dataType: string
+		lineageTag: 89bd7277-36e2-46ce-b507-9ecb8f1d425b
+		summarizeBy: none
+		sourceColumn: PSR5_Card08_Revenues_Details.Description
+
+		annotation SummarizationSetBy = Automatic
+
+	partition PSR_Card08_Revenues_Details = m
+		mode: import
+		source =
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Data Model", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[PSR5_Card08_Revenues_Details]", {"[PSR5_Card08_Revenues_Details].[Approval_Date].[Approval_Date]", "[PSR5_Card08_Revenues_Details].[Approved_Amount].[Approved_Amount]", "[PSR5_Card08_Revenues_Details].[Change_Order_Number].[Change_Order_Number]", "[PSR5_Card08_Revenues_Details].[Client].[Client]", "[PSR5_Card08_Revenues_Details].[Contract_Number].[Contract_Number]", "[PSR5_Card08_Revenues_Details].[Currency].[Currency]", "[PSR5_Card08_Revenues_Details].[Current_Forecast].[Current_Forecast]", "[PSR5_Card08_Revenues_Details].[Date_Upload].[Date_Upload]", "[PSR5_Card08_Revenues_Details].[Delta].[Delta]", "[PSR5_Card08_Revenues_Details].[Description].[Description]", "[PSR5_Card08_Revenues_Details].[Error_Upload].[Error_Upload]", "[PSR5_Card08_Revenues_Details].[ID].[ID]", "[PSR5_Card08_Revenues_Details].[Job_Number].[Job_Number]", "[PSR5_Card08_Revenues_Details].[P_Key].[P_Key]", "[PSR5_Card08_Revenues_Details].[Previous_Forecast].[Previous_Forecast]", "[PSR5_Card08_Revenues_Details].[Remarks].[Remarks]", "[PSR5_Card08_Revenues_Details].[Saipem_Participation_Current_Forecast].[Saipem_Participation_Current_Forecast]", "[PSR5_Card08_Revenues_Details].[Saipem_Participation_perc].[Saipem_Participation_perc]", "[PSR5_Card08_Revenues_Details].[Saipem_Participation_Variations_Pending_Included].[Saipem_Participation_Variations_Pending_Included]", "[PSR5_Card08_Revenues_Details].[Status].[Status]", "[PSR5_Card08_Revenues_Details].[Submission_Date].[Submission_Date]", "[PSR5_Card08_Revenues_Details].[Type].[Type]", "[PSR5_Card08_Revenues_Details].[Variation_Pending_Included].[Variation_Pending_Included]", "[PSR5_Card08_Revenues_Details].[Variation_Pending_Requested].[Variation_Pending_Requested]"}, {"PSR5_Card08_Revenues_Details.Approval_Date", "PSR5_Card08_Revenues_Details.Approved_Amount", "PSR5_Card08_Revenues_Details.Change_Order_Number", "PSR5_Card08_Revenues_Details.Client", "PSR5_Card08_Revenues_Details.Contract_Number", "PSR5_Card08_Revenues_Details.Currency", "PSR5_Card08_Revenues_Details.Current_Forecast", "PSR5_Card08_Revenues_Details.Date_Upload", "PSR5_Card08_Revenues_Details.Delta", "PSR5_Card08_Revenues_Details.Description", "PSR5_Card08_Revenues_Details.Error_Upload", "PSR5_Card08_Revenues_Details.ID", "PSR5_Card08_Revenues_Details.Job_Number", "PSR5_Card08_Revenues_Details.P_Key", "PSR5_Card08_Revenues_Details.Previous_Forecast", "PSR5_Card08_Revenues_Details.Remarks", "PSR5_Card08_Revenues_Details.Saipem_Participation_Current_Forecast", "PSR5_Card08_Revenues_Details.Saipem_Participation_perc", "PSR5_Card08_Revenues_Details.Saipem_Participation_Variations_Pending_Included", "PSR5_Card08_Revenues_Details.Status", "PSR5_Card08_Revenues_Details.Submission_Date", "PSR5_Card08_Revenues_Details.Type", "PSR5_Card08_Revenues_Details.Variation_Pending_Included", "PSR5_Card08_Revenues_Details.Variation_Pending_Requested"}}
+				        }),
+				
+				    // Filtro per rimuovere dati prima del 2022 (non essendoci una colonna "anno", il filtro è applicato cercando delle stringhe nella chiave)
+				    #"Filtered Rows_year" = Table.SelectRows(#"Added Items", each not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2010_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2011_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2012_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2013_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2014_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2015_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2016_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2017_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2018_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2019_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2020_") and not Text.Contains([PSR5_Card08_Revenues_Details.P_Key], "_2021_")),
+				
+				    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows_year",{{"PSR5_Card08_Revenues_Details.Approved_Amount", type number}, {"PSR5_Card08_Revenues_Details.Current_Forecast", type number}, {"PSR5_Card08_Revenues_Details.Delta", type number}, {"PSR5_Card08_Revenues_Details.Previous_Forecast", type number}, {"PSR5_Card08_Revenues_Details.Saipem_Participation_Current_Forecast", type number}, {"PSR5_Card08_Revenues_Details.Variation_Pending_Included", type number}, {"PSR5_Card08_Revenues_Details.Variation_Pending_Requested", type number}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"PSR5_Card08_Revenues_Details.Approval_Date", "PSR5_Card08_Revenues_Details.Change_Order_Number", "PSR5_Card08_Revenues_Details.Contract_Number", "PSR5_Card08_Revenues_Details.Current_Forecast", "PSR5_Card08_Revenues_Details.Date_Upload", "PSR5_Card08_Revenues_Details.Delta", "PSR5_Card08_Revenues_Details.Error_Upload", "PSR5_Card08_Revenues_Details.ID", "PSR5_Card08_Revenues_Details.Job_Number", "PSR5_Card08_Revenues_Details.Previous_Forecast", "PSR5_Card08_Revenues_Details.Remarks", "PSR5_Card08_Revenues_Details.Saipem_Participation_Current_Forecast", "PSR5_Card08_Revenues_Details.Saipem_Participation_perc", "PSR5_Card08_Revenues_Details.Saipem_Participation_Variations_Pending_Included", "PSR5_Card08_Revenues_Details.Submission_Date", "PSR5_Card08_Revenues_Details.Approved_Amount", "PSR5_Card08_Revenues_Details.Variation_Pending_Requested"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

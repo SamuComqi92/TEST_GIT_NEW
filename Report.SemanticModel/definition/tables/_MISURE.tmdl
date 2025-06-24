@@ -1,0 +1,5319 @@
+table _MISURE
+	lineageTag: 4e46d814-4c97-4826-aff2-1686de86916e
+
+	measure '%Avanzamento costi 5A' = ```
+			
+			
+			CALCULATE(
+			    MAX(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Committed_perc]),
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] = "C06_01"     // Site supervision
+			)
+			
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: KCI_5\Grafici
+		lineageTag: 6cf0364c-ad99-42fa-9a13-a120e48f8a5a
+
+	measure '%Avanzamento costi 5B' = ```
+			
+			
+			// Controllo valori in Card11
+			VAR Descr11C = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
+			)
+			
+			VAR Descr11F = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
+			)
+			
+			VAR Constr = 
+			IF(
+			    NOT ISBLANK(Descr11C),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        )
+			    )
+			)
+			
+			VAR Fabr = 
+			IF(
+			    NOT ISBLANK(Descr11F),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        )
+			    )
+			)
+			
+			RETURN 
+			SWITCH(
+			    SELECTEDVALUE(Z__Table_phase[Phase]),
+			    "Construction", Constr,
+			    "Fabrication", Fabr,
+			    "Site Supervision", [%Avanzamento costi 5A]
+			)
+			```
+		displayFolder: KCI_5\Grafici
+		lineageTag: 82df2987-0a7e-4193-bee8-915cd9ebe4ea
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Card Description Project' =
+			
+			
+			IF(
+			    ISFILTERED('Cons_Proj_Table'[_Short_Name_Code]), //HASONEVALUE('Cons_Proj_Table'[_Short_Name_Code]),
+			    SELECTEDVALUE('Cons_Proj_Table'[_Short_Name_Code]),
+			    "All"
+			)
+		displayFolder: Altre_misure
+		lineageTag: 3b6ff5b7-c4e5-45e1-a2af-8634428979da
+
+	measure 'Card Description Project Costi' =
+			
+			
+			IF(
+			    OR(
+			        HASONEVALUE(Cons_Proj_Table[Business_Organization_T1_Code]),//HASONEVALUE(Cons_Proj_Table[Business_Organization_T1_Code]),
+			        HASONEVALUE('Cons_Proj_Table'[_Short_Name_Code])
+			    ),
+			    1,
+			    0
+			)
+		formatString: 0
+		displayFolder: Altre_misure
+		lineageTag: 4afd44f0-8daa-4788-a05d-246fe6d346dd
+
+	measure CountProgetti =
+			
+			
+			DISTINCTCOUNT('PSR Group By'[List_Data_GroupBy.Cons_Project])
+		formatString: 0
+		displayFolder: Misure_Conteggi
+		lineageTag: 79822570-c560-4fe1-ab7a-eeec106da526
+
+	measure _KCI5_Flag_Alert_Costi = ```
+			
+			
+			-- Misura utilizzata per individuare i progetti in alert per il KCI5
+			
+			-- Calcolo valori per "Construction" e "Fabrication" nella tabella PSR_Card11
+			VAR Descr11C = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
+			)
+			
+			VAR Descr11F = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
+			)
+			
+			-- Se questi valori esistono, devono necessariamente essere ricalcolati
+			-- Per il nuovo calcolo, devono essere utilizzati dei CBS_Code specifici
+			-- Se i valori non esistono, allora non verranno considerati in front-end
+			VAR Constr = 
+			IF(
+			    NOT ISBLANK(Descr11C),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        )
+			    )
+			)
+			
+			VAR Fabr = 
+			IF(
+			    NOT ISBLANK(Descr11F),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        )
+			    )
+			)
+			
+			-- Controllo che i valori calcolati non siano BLANK
+			-- Se non blank, restituisco una percentuale assurda in modo tale da far uscire FALSE nell'IF finale
+			VAR check_contr = IF( NOT ISBLANK(Constr), Constr, 2 )
+			VAR check_fabr = IF( NOT ISBLANK(Fabr), Fabr, 2 )
+			
+			-- Controllo avanzamento (almeno del 10 % )
+			VAR max_contr = IF( Descr11C/100 >= 0.1, 1 )
+			VAR max_fabr = IF( Descr11F/100 >= 0.1, 1 )
+			
+			-- Primo controllo da effettuare per individuare gli ALERT
+			-- Controllo se i costi per Site Supervision sono più alti rispetto a Construction o Fabrication
+			VAR first_check =
+			IF(
+			    [%Avanzamento costi 5A] > check_contr || 
+			    [%Avanzamento costi 5A] > check_fabr,
+			    1
+			)
+			
+			-- Ultimo check finale (sull'avanzamento del 10%)
+			RETURN
+			IF(
+			    max_contr || max_fabr,
+			    first_check
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_5\Grafici
+		lineageTag: 7b6ce715-3e67-4313-acee-4d97f117196f
+
+	measure 'Last Refresh Date' = ```
+			NOW() 
+			```
+		formatString: General Date
+		displayFolder: Altre_misure
+		lineageTag: 1ca25f2e-5d28-4e75-a00c-4ff039e3c6fe
+
+	measure MaxIDPKEY_NUM = ```
+			
+			
+			// Calcolo il massimo IDPKEY per Cons_Project
+			CALCULATE(
+			    MAX('PSR Group By'[List_Data_GroupBy.MaxIDPKEY]), 
+			    PSR_List_Data[WF_Status] = "Official PSR",
+			    'Cons_Proj_Table'[PSR] = "TRUE",
+			    ALLEXCEPT(
+			        'PSR Group By', 
+			        'PSR Group By'[List_Data_GroupBy.Cons_Project]
+			    )
+			)
+			```
+		displayFolder: Altre_misure
+		lineageTag: 6e1cc17a-556e-4a0e-986c-1cb386b67928
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure MaxPeriod = ```
+			
+			
+			CALCULATE(
+			    MAX('tmp_pbi_RisksFrozen'[Period]), 
+			    ALLEXCEPT('tmp_pbi_RisksFrozen', 'tmp_pbi_RisksFrozen'[ConsolidationCode])
+			)
+			```
+		displayFolder: Misure_Periodi
+		lineageTag: 82c1180a-8989-4694-a303-78faaf741b9c
+
+	measure MinForecast = ```
+			
+			
+			CALCULATE(
+			    MIN('PHI Index'[Sort Desc]), 
+			    'PHI Index'[_ColumnName] <> "false",
+			    ALLEXCEPT(
+			        'PHI Index',
+			        'PHI Index'[Cons_Proj]
+			    )
+			)
+			```
+		formatString: 0
+		displayFolder: Misure_Periodi
+		lineageTag: 95b18bae-16ae-45c0-9eb1-1f46f6191e62
+
+	measure 'Flag Alert Costi KCI6' = ```
+			
+			
+			VAR sel_item_04 = SELECTEDVALUE( PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] )
+			VAR misura_04 = MAX(PSR_Card04_Revenue_Cost[Committed_perc_actual]) * 100
+			
+			VAR misura_11 = 
+			CALCULATE( 
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]), 
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = sel_item_04
+			)
+			
+			RETURN 
+			IF(
+			    AND(
+			        NOT OR(
+			            ISBLANK(misura_04),
+			            ISBLANK(misura_11)
+			        ),
+			        AND(
+			            misura_04 > misura_11,                      // C > D
+			            DIVIDE( misura_04, misura_11 ) > 1.1        // Soglia maggiore del 10 % 
+			        )
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_6
+		lineageTag: 2bbd19fa-830b-4af1-9a55-083b775461bd
+
+	measure 'Count Progetti Alert KCI6' = ```
+			
+			
+			COUNTROWS(
+			    SUMMARIZE(                  
+			        FILTER(
+			            SUMMARIZE(
+			                PSR_Card04_Revenue_Cost, 
+			                Cons_Proj_Table[_Short_Name_Code],
+			                PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description],
+			                "value", [Flag Alert Costi KCI6]
+			            ),
+			            [value] = 1      // Solo gli ALERT
+			        ),
+			        Cons_Proj_Table[_Short_Name_Code]
+			    )
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_6
+		lineageTag: 3d26cb1b-518d-4bcf-9c0e-776d779d3ac8
+
+	measure 'Count Fasi Alert KCI6' = ```
+			
+			
+			SUMX(
+			    SUMMARIZE(
+			        PSR_Card04_Revenue_Cost, 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description],
+			        "value", [Flag Alert Costi KCI6]
+			    ),
+			    [value]
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_6
+		lineageTag: 3bb58843-0bed-4069-a1b0-3b23ce8122bb
+
+	measure Previous_Forecast_Card11_KCI8 = ```
+			
+			
+			VAR sel_rank = MAX(PSR_Card11_Progress[_Rank_PKey]) - 1                      // Rank precedente di una data P_Key
+			VAR sel_code = MAX('PSR Group By'[List_Data_GroupBy.Cons_Project])          // Chiave nuova (senza indicazione sul forecast)
+			 
+			VAR prev_value =
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress])
+			    , ALL( PSR_Card11_Progress[_Rank_PKey] )
+			    , 'PSR Group By'[_Flagprevmaxfor] = "SI"                                 // Gestione forecast manuale
+			    , 'PSR Group By'[List_Data_GroupBy.Cons_Project] = sel_code             // Fa riferimento alla nuova P_key
+			    , PSR_Card11_Progress[_Rank_PKey] = sel_rank                             // Rank precedente
+			)
+			 
+			RETURN prev_value
+			```
+		displayFolder: KCI_8\Grafici
+		lineageTag: f3cc92a8-9a39-499a-8aea-8807ac8df8a3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Previous_Forecast_Card04_KCI8 = ```
+			
+			
+			VAR sel_rank = MAX(PSR_Card04_Revenue_Cost[_Rank_Curr_Forecast]) - 1          // Rank precedente di una data P_Key
+			VAR sel_code = MAX('PSR Group By'[List_Data_GroupBy.Cons_Project])           // Chiave nuova (senza indicazione sul forecast)
+			 
+			VAR prev_value =
+			CALCULATE(
+			    MAX(PSR_Card04_Revenue_Cost[_Total_Cost])
+			    , ALL( PSR_Card04_Revenue_Cost[_Rank_Curr_Forecast] )
+			    , REMOVEFILTERS( 'PSR Group By'[_Flagprevmaxfor] )
+			    , 'PSR Group By'[List_Data_GroupBy.Cons_Project] = sel_code              // Fa riferimento alla nuova P_key
+			    , PSR_Card04_Revenue_Cost[_Rank_Curr_Forecast] = sel_rank                 // Rank precedente
+			)
+			 
+			RETURN prev_value
+			```
+		displayFolder: KCI_8\Grafici
+		lineageTag: b092d649-3158-442c-8897-f5b5da763c46
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Previous_Forecast_FrozenEV_KCI8 = ```
+			
+			
+			// Rank corrente di una data P_Key
+			VAR sel_rank = 
+			CALCULATE( 
+			    MAX('Frozen EV'[_Ranking_Forecast]), 
+			    ALLEXCEPT( 'Frozen EV', 'Frozen EV'[_Flagprevmaxfor_froz]) 
+			) - 1
+			
+			VAR sel_code = MAX('PSR Group By'[List_Data_GroupBy.Cons_Project])          // Chiave nuova (senza indicazione sul forecast)
+			 
+			VAR prev_value =
+			CALCULATE(
+			    SUM('Frozen EV'[I_Max])
+			    , ALL( 'Frozen EV'[_Ranking_Forecast] )
+			    , 'PSR Group By'[List_Data_GroupBy.Cons_Project] = sel_code             // Fa riferimento alla nuova P_key
+			    , 'Frozen EV'[_Ranking_Forecast] = sel_rank                              // Rank precedente
+			    , 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"}
+			    , 'Frozen EV'[RO] = "Risk"
+			)
+			 
+			RETURN prev_value
+			```
+		formatString: #,0
+		displayFolder: KCI_8\Grafici
+		lineageTag: 08dfce10-dc36-444e-9e3c-81b22f589cfd
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure Current_Forecast_FrozenEV_KCI8 = ```
+			
+			
+			// Rank corrente di una data P_Key
+			VAR sel_rank = 
+			CALCULATE( 
+			    MAX('Frozen EV'[_Ranking_Forecast]), 
+			    ALLEXCEPT( 'Frozen EV', 'Frozen EV'[_Flagprevmaxfor_froz]) 
+			)
+			
+			VAR sel_code = MAX('PSR Group By'[List_Data_GroupBy.Cons_Project])          // Chiave nuova (senza indicazione sul forecast)
+			 
+			VAR prev_value =
+			CALCULATE(
+			    SUM('Frozen EV'[I_Max])
+			    , ALL( 'Frozen EV'[_Ranking_Forecast] )
+			    , 'PSR Group By'[List_Data_GroupBy.Cons_Project] = sel_code             // Fa riferimento alla nuova P_key
+			    , 'Frozen EV'[_Ranking_Forecast] = sel_rank
+			    , 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"}
+			    , 'Frozen EV'[RO] = "Risk"
+			)
+			 
+			RETURN prev_value
+			```
+		formatString: #,0
+		displayFolder: KCI_8\Grafici
+		lineageTag: c3a2b906-acff-4f67-b9c8-06e236d00965
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Measure_committed_percentage_new = ```
+			
+			
+			SWITCH(
+			    TRUE(),
+			    SELECTEDVALUE(Z__Table_phase[Phase]) IN {"Construction", "Fabrication"}, 
+			        [%Avanzamento costi 5B],
+			    SELECTEDVALUE(Z__Table_phase[Phase]) = "Site Supervision", 
+			        [%Avanzamento costi 5A]
+			)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_5\Grafici
+		lineageTag: 4dcdbd39-9bff-4a35-a6d5-efaa8b6fc2d6
+
+	measure CumulativeActualProgress = ```
+			
+			
+			VAR selectdescr = SELECTEDVALUE(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description])
+			VAR risultato = 
+			CALCULATE(
+			    Max(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = selectdescr
+			)
+			
+			RETURN risultato/100
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_6
+		lineageTag: fb6cacae-924f-453e-8480-7b1a654b46d9
+
+	measure CumulativePlanProgress = ```
+			
+			
+			VAR selectdescr = SELECTEDVALUE(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description])
+			VAR risultato = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Plan_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = selectdescr
+			)
+			
+			RETURN risultato
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_6
+		lineageTag: 79861c82-0c42-4059-b491-83f45468c52f
+
+	measure _Measure_cumulative_committed_value = ```
+			
+			
+			VAR Descr11C = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
+			)
+			
+			VAR Descr11F = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
+			)
+			
+			VAR value_constr = 
+			CALCULATE( 
+			    SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]), 
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] IN {"C06_02", "C06_03", "C06_05"} 
+			)
+			
+			VAR value_fabr = 
+			CALCULATE( 
+			    SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]), 
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] IN {"C05A", "C05B", "C05C", "C05D"}
+			)
+			
+			RETURN
+			SWITCH(
+			    SELECTEDVALUE(Z__Table_phase[Phase]),
+			    "Construction", 
+			    IF( NOT ISBLANK(Descr11C), value_constr ),
+			
+			    "Fabrication", 
+			    IF( NOT ISBLANK(Descr11F), value_fabr ),
+			
+			    "Site Supervision", 
+			    CALCULATE( 
+			        SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]), 
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] = "C06_01" 
+			    )
+			)
+			```
+		formatString: #,0
+		displayFolder: KCI_5\Grafici
+		lineageTag: 62fa2df8-a738-49b6-9a6c-e88d179906ac
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Measure_current_forecast = ```
+			
+			
+			VAR Descr11C = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
+			)
+			
+			VAR Descr11F = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
+			)
+			
+			VAR value_constr = 
+			CALCULATE( 
+			    SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]), 
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] IN {"C06_02", "C06_03", "C06_05"} 
+			)
+			
+			VAR value_fabr = 
+			CALCULATE( 
+			    SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]), 
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] IN {"C05A", "C05B", "C05C", "C05D"}
+			)
+			
+			RETURN
+			SWITCH(
+			    SELECTEDVALUE(Z__Table_phase[Phase]),
+			    "Construction", 
+			    IF( NOT ISBLANK(Descr11C), value_constr ),
+			
+			    "Fabrication", 
+			    IF( NOT ISBLANK(Descr11F), value_fabr ),
+			
+			    "Site Supervision", 
+			    CALCULATE( 
+			        SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]), 
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] = "C06_01" 
+			    )
+			)
+			```
+		formatString: #,0
+		displayFolder: KCI_5\Grafici
+		lineageTag: 9bc44d5e-0fba-45f2-90c3-541b22d14c51
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Measure_barchart_avanzamento_5A =
+			
+			
+			IF(
+			    SELECTEDVALUE(Z__Table_phase[Phase]) = "Site Supervision",
+			    [%Avanzamento costi 5A]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_5\Grafici
+		lineageTag: b2ef479d-d83a-4d20-a2d9-c5753127e3b3
+
+	measure _Measure_barchart_avanzamento_5B =
+			
+			
+			IF(
+			    SELECTEDVALUE(Z__Table_phase[Phase]) IN {"Construction", "Fabrication"},
+			    [%Avanzamento costi 5B]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_5\Grafici
+		lineageTag: d1f5026d-3535-4611-a5f3-fd09da805700
+
+	measure 'Count Progetti Alert KCI8 current' = ```
+			
+			 
+			COUNTROWS(              
+			    FILTER(
+			        SUMMARIZE(
+			            Cons_Proj_Table,
+			            Cons_Proj_Table[_Short_Name_Code],
+			            "value", [Flag Alert Costi KCI8 current],
+			            "delta3", [Delta Pregress fisico]
+			        ),
+			        
+			        // Seleziono solo gli alert e escludo progetti con delta BLANK (perché i valori base sono BLANK)
+			        [value] = "ALERT" && NOT ISBLANK([delta3])
+			    )
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_8\Grafici
+		lineageTag: ac939f96-f72f-4622-8d14-b6798e79282a
+
+	measure 'Delta total cost' = ROUND( [Current_Forecast_Card04_KCI8] - [Previous_Forecast_Card04_KCI8], 0 )
+		formatString: #,0
+		displayFolder: KCI_8\Grafici
+		lineageTag: cf20a757-9315-414f-9619-012d71f63681
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Delta IMAX' = [Current_Forecast_FrozenEV_KCI8] - [Previous_Forecast_FrozenEV_KCI8]
+		formatString: #,0
+		displayFolder: KCI_8\Grafici
+		lineageTag: 66bb4e81-ffb3-43be-9783-a5318eee93b9
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Delta Pregress fisico' = [Current_Forecast_Card11_KCI8] - [Previous_Forecast_Card11_KCI8]
+		displayFolder: KCI_8\Grafici
+		lineageTag: 10290b2d-68d0-4b58-8697-27cde50dbf04
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Flag Alert KCI5 Formatting' = ```
+			
+			
+			-- Misura utilizzata per la formattazione condizionale dei valori in tabella per il KCI5
+			
+			-- Calcolo valori per "Construction" e "Fabrication" nella tabella PSR_Card11
+			VAR Descr11C = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
+			)
+			
+			VAR Descr11F = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
+			)
+			
+			-- Se questi valori esistono, devono necessariamente essere ricalcolati
+			-- Per il nuovo calcolo, devono essere utilizzati dei CBS_Code specifici
+			-- Se i valori non esistono, allora non verranno considerati in front-end
+			VAR Constr = 
+			IF(
+			    NOT ISBLANK(Descr11C),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        )
+			    )
+			)
+			
+			VAR Fabr = 
+			IF(
+			    NOT ISBLANK(Descr11F),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        )
+			    )
+			)
+			
+			-- Controllo che i valori calcolati non siano BLANK
+			-- Se non blank, restituisco una percentuale assurda in modo tale da far uscire FALSE nell'IF finale
+			VAR check_contr = IF( NOT ISBLANK(Constr), Constr, 2 )
+			VAR check_fabr = IF( NOT ISBLANK(Fabr), Fabr, 2 )
+			
+			-- Controllo avanzamento (almeno del 10 % )
+			VAR max_contr = IF( NOT ISBLANK(Constr), Descr11C >= 0.1)
+			VAR max_fabr = IF( NOT ISBLANK(Fabr), Descr11F >= 0.1)
+			
+			-- Primi controlli da effettuare per individuare gli ALERT
+			VAR first_check_constr = 
+			IF(
+			    [%Avanzamento costi 5A] > check_contr && max_contr,
+			    1
+			)
+			
+			VAR first_check_fabbr = 
+			IF(
+			    [%Avanzamento costi 5A] > check_fabr && max_fabr,
+			    1
+			)
+			
+			-- Ultimo controllo (utilizzato per la colorazione condizionale)
+			RETURN
+			    SWITCH (
+			        SELECTEDVALUE(Z__Table_phase[Phase]), 
+			        "Construction", first_check_constr,
+			        "Fabrication", first_check_fabbr
+			    )
+			
+			```
+		formatString: 0
+		displayFolder: KCI_5\Grafici
+		lineageTag: 3d0aa130-b93c-4c52-abfb-8b4a7afc669b
+
+	measure Current_Forecast_Card04_KCI8 = ```
+			
+			
+			VAR sel_rank = MAX(PSR_Card04_Revenue_Cost[_Rank_Curr_Forecast])             // Rank corrente di una data P_Key
+			VAR sel_code = MAX('PSR Group By'[List_Data_GroupBy.Cons_Project])          // Chiave nuova (senza indicazione sul forecast)
+			 
+			VAR prev_value =
+			CALCULATE(
+			    MAX(PSR_Card04_Revenue_Cost[_Total_Cost])
+			    , ALL( PSR_Card04_Revenue_Cost[_Rank_Curr_Forecast] )
+			    , REMOVEFILTERS( 'PSR Group By'[_Flagprevmaxfor])
+			    , 'PSR Group By'[_Flagprevmaxfor] = "NO"                                 // Gestione forecast manuale
+			    , 'PSR Group By'[List_Data_GroupBy.Cons_Project] = sel_code             // Fa riferimento alla nuova P_key
+			    , PSR_Card04_Revenue_Cost[_Rank_Curr_Forecast] = sel_rank
+			)
+			 
+			RETURN prev_value
+			```
+		formatString: #,0
+		displayFolder: KCI_8\Grafici
+		lineageTag: bac6bfb0-c5a7-4885-adf1-800cc313fa3b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Delta Indicatore KCI6' =
+			
+			
+			( MAX(PSR_Card04_Revenue_Cost[Committed_perc_actual]) - [CumulativeActualProgress] ) * 100
+		formatString: 0.00
+		displayFolder: KCI_6
+		lineageTag: ffd14e51-864d-4a14-87cd-d6d6965248e5
+
+	measure 'Indicatore Norm KCI6' = ```
+			
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description],
+			        "value", [Delta Indicatore KCI6]
+			    ),
+			    [value]
+			)
+			    
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description],
+			        "value", [Delta Indicatore KCI6]
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [Delta Indicatore KCI6]
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI_6
+		lineageTag: e15b8988-0b41-4455-bed4-ab5cf0c30b4e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Rapporto Indicatore KCI7' =
+			
+			
+			DIVIDE(
+			    MAX(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),      // La vecchia espressione aveva ROUND(_,0)
+			    MAX(PSR_Card04_Revenue_Cost[_Total_Cost])
+			)
+		displayFolder: KCI_7
+		lineageTag: 54e64a46-0cb3-4aba-9503-235539046ed4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Indicatore Norm KCI7 current' = ```
+			
+			
+			// Indicatore normalizzato per KCI7 current (custom per gestire grafico e misure in modo corretto)
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description],
+			        "value", [Rapporto Indicatore KCI7]
+			    ),
+			    [value]
+			)
+			    
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description],
+			        "value", [Rapporto Indicatore KCI7]
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [Rapporto Indicatore KCI7]
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		formatString: 0.00
+		displayFolder: KCI_7
+		lineageTag: 3a6c3c8d-a06c-4d2e-8d45-5cfa6839a851
+
+	measure Current_Forecast_Card11_KCI8 = ```
+			
+			
+			VAR sel_rank = MAX(PSR_Card11_Progress[_Rank_PKey])                          // Rank precedente di una data P_Key
+			VAR sel_code = MAX('PSR Group By'[List_Data_GroupBy.Cons_Project])          // Chiave nuova (senza indicazione sul forecast)
+			 
+			VAR prev_value =
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress])
+			    , ALL( PSR_Card11_Progress[_Rank_PKey] )
+			    , 'PSR Group By'[_Flagprevmaxfor] = "NO"                                 // Gestione manuale forecast
+			    , 'PSR Group By'[List_Data_GroupBy.Cons_Project] = sel_code             // Fa riferimento alla nuova P_key
+			    , PSR_Card11_Progress[_Rank_PKey] = sel_rank                             // Rank precedente
+			)
+			 
+			RETURN prev_value
+			```
+		displayFolder: KCI_8\Grafici
+		lineageTag: d7ef0150-bc47-4e89-b2b0-a68d99512bec
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Card Description Project new' =
+			
+			
+			IF(
+			    ISFILTERED('Cons_Proj_Table'[_Short_Name_Code]),
+			    1,
+			    0
+			)
+		formatString: 0
+		displayFolder: Altre_misure
+		lineageTag: 36bdd91c-1ce7-45a4-90eb-c1e5e0f37383
+
+	measure 'Value difference Costi KCI5 barre' = ```
+			
+			
+			// Richiamo al Flag Alert KCI 5 (serve per individuare solo i valori in ALERT)
+			VAR _value = [_KCI5_Flag_Alert_Costi]
+			
+			RETURN 
+			IF(
+			    // Faccio in modo di stampare il risultato SOLO nella colonna "Fabrication" (i.e. sulla destra della matrice)
+			    SELECTEDVALUE(Z__Table_phase[Phase]) = "Fabrication",   
+			    [Flag Alert Costi KCI5 Value difference current]
+			)
+			```
+		displayFolder: KCI_5\Grafici
+		lineageTag: f36e529c-f673-4b00-9b8c-973b86d2cb37
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Flag Alert Costi KCI5 Value difference current' = ```
+			
+			
+			// Controllo valori in Card11
+			VAR Descr11C = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
+			)
+			
+			VAR Descr11F = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
+			)
+			
+			// Calcolo 5B per KCI5 per Construction e Fabrication
+			VAR Constr = 
+			IF(
+			    NOT ISBLANK(Descr11C),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        )
+			    )
+			)
+			
+			VAR Fabr = 
+			IF(
+			    NOT ISBLANK(Descr11F),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        )
+			    )
+			)
+			
+			// Controllo che non siano BLANK
+			// Se non blank, restituisco una percentuale assurda in modo tale da far uscire FALSE nell'IF finale
+			VAR check_contr = IF( NOT ISBLANK(Constr), Constr, 2 )
+			VAR check_fabr = IF( NOT ISBLANK(Fabr), Fabr, 2 )
+			
+			// Controllo avanzamento almeno del 10 % 
+			--VAR max_contr = IF( MAX(PSR_Card11_Progress[_MaxActualProgress_Construction]) >= 0.1, 1 )
+			--VAR max_fabr = IF( MAX(PSR_Card11_Progress[_MaxActualProgress_Fabrication]) >= 0.1, 1 )
+			VAR max_contr = IF( Descr11C >= 0.1, 1 )
+			VAR max_fabr = IF( Descr11F >= 0.1, 1 )
+			
+			// Primo controllo da effettuare per individuare gli ALERT
+			VAR first_check =
+			SWITCH(
+			    TRUE(),
+			    [%Avanzamento costi 5A] > check_contr, [%Avanzamento costi 5A] - check_contr,
+			    [%Avanzamento costi 5A] > check_fabr, [%Avanzamento costi 5A] - check_fabr,
+			    [%Avanzamento costi 5A] > check_fabr && [%Avanzamento costi 5A] > check_contr, MIN([%Avanzamento costi 5A] - check_fabr, [%Avanzamento costi 5A] - check_contr)
+			)
+			
+			// Ultimo controllo e risultato finale
+			RETURN
+			IF(
+			    max_contr || max_fabr,
+			    first_check
+			)
+			```
+		formatString: 0.00
+		displayFolder: KCI_5\Grafici
+		lineageTag: 19d048af-0390-4f4e-8d7a-785c4314328c
+
+	measure 'Indicatore KCI8 prev' =
+			
+			
+			// Segno negativo per invertire l'indice di rilevanza
+			- ( [_KCI8_delta_max_rischi_prev] + [_KCI8_delta_total_cost_prev] )
+		formatString: #,0
+		displayFolder: KCI_8\Grafici
+		lineageTag: 1c69f36b-c08f-4d5d-a314-29e13bbf9d85
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Indicatore Norm KCI8 prev' = ```
+			
+			
+			// Indicatore normalizzato per KCI8 previous (custom per gestire grafico e misure in modo corretto)
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", [Indicatore KCI8 prev]
+			    ),
+			    [value]
+			)
+			    
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", [Indicatore KCI8 prev]
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [Indicatore KCI8 prev]
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI_8\Grafici
+		lineageTag: c9e03a6c-da46-4b64-a933-1b43acc7b2c9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Indicatore Norm KCI9' = ```
+			
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(Cons_Proj_Table),
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", CALCULATE( [Indicatore KCI9], ALL(PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Client]) )
+			    ),
+			    [value]
+			)
+			
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(Cons_Proj_Table),
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", CALCULATE( [Indicatore KCI9], ALL(PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Client]) )
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [Indicatore KCI9]
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI_9
+		lineageTag: 844d2900-82bc-4e31-82a2-2c4593d40499
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Indicatore KCI9' =
+			
+			
+			DIVIDE(
+			    [_KCI9_Totale_Crediti],
+			    MAX(PSR_Revenues_Costs[_RCB/OCB_Revenues])
+			)
+		displayFolder: KCI_9
+		lineageTag: e14e604b-9792-41fd-9955-f814385deb2f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Flag Alert Crediti KCI9' =
+			
+			
+			IF(
+			    NOT ISBLANK(SUM(PSR_Card14_Actual_Invoicing[_Outstanding_Total_Fixed_Rate])),
+			    IF(
+			        [_KCI9_Crediti_Scaduti] > MAX(PSR_Revenues_Costs[_RCB/OCB_Revenues])*0.04, // Soglia 4 %
+			        1,
+			        0
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_9
+		lineageTag: a9a86bf7-c2ec-4c3b-89da-df0f910b14e9
+
+	measure 'Count Progetti Alert KCI9' = ```
+			
+			 
+			COUNTROWS(              
+			    FILTER(
+			        SUMMARIZECOLUMNS(
+			            PSR_Card14_Actual_Invoicing[_Short_Name],
+			            "value", [Flag Alert Crediti KCI9]
+			        ),
+			        [value] = 1 // Solo gli ALERT
+			    )
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_9
+		lineageTag: b43ded3e-c2fe-427f-9227-c58e6300b946
+
+	measure 'Count Progetti Alert KCI7' =
+			
+			
+			COUNTROWS(
+			    FILTER(
+			        SUMMARIZE(
+			            ALL(Cons_Proj_Table[ShortName]),
+			            Cons_Proj_Table[ShortName],
+			            "Max_over", MAX(PSR_Card_Consolidated[Overall Progress Actual New]),
+			            "Sum", SUM( PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast] )
+			        ),
+			        [Max_over] >= 0.2 && [Sum] > 0 && NOT ISBLANK([Sum])
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_7
+		lineageTag: e7abd5a4-f28b-4455-a05f-782f203405a9
+
+	measure 'Delta Plan-Actual' =
+			
+			
+			SUM(PSR_Card11_Progress[_MaxPlanProgress_Overall]) - SUM(PSR_Card11_Progress[_MaxActualProgress_Overall])
+		displayFolder: KCI_8\Grafici
+		lineageTag: fa125e5c-e939-44a3-88f5-4ee3fc845dad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Flagprevfor KCI8 graf max rischi' = ```
+			
+			
+			-- La misura fa sì che vengano visualizzati solo due forecast, il corrente (selezionato in pagina) e il precedente
+			-- Inoltre, la misura è costruita in modo tale da evitare discrepanze tra ordinamento forecast di PSR Group By e Frozen
+			VAR _sel_forecast = CALCULATE( MAX('PSR Group By'[_ForecastYearAxis]), ALL('Frozen EV') )
+			VAR _sel_rank = CALCULATE( MAX('PSR Group By'[_Rank_Desc_Forecast]), ALL('Frozen EV') )
+			VAR _prev_forecast = 
+			CALCULATE(
+			    MAX('PSR Group By'[_ForecastYearAxis]),
+			    ALL('Frozen EV'), ALL('PSR Group By'),
+			    'PSR Group By'[_Rank_Desc_Forecast] = _sel_rank + 1
+			)
+			
+			RETURN 
+			IF( 
+			    SELECTEDVALUE(Z_forecast_periods_FROZEN[_Period_froz_sort]) IN {_sel_forecast,_prev_forecast},
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_8\Grafici
+		lineageTag: 4bff8140-a488-4128-8852-bc2f9f3f79f3
+
+	measure 'Flag Alert Costi KCI5 prev' = ```
+			
+			
+			// Controllo valori in Card11
+			VAR Descr11C = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
+			)
+			
+			VAR Descr11F = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
+			)
+			
+			// Calcolo 5B per KCI5 per Construction e Fabrication
+			VAR Constr = 
+			IF(
+			    NOT ISBLANK(Descr11C),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Previous_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        )
+			    )
+			)
+			
+			VAR Fabr = 
+			IF(
+			    NOT ISBLANK(Descr11F),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Previous_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        )
+			    )
+			)
+			
+			// Controllo che non siano BLANK
+			// Se non blank, restituisco una percentuale assurda in modo tale da far uscire FALSE nell'IF finale
+			VAR check_contr = IF( NOT ISBLANK(Constr), Constr, 2 )
+			VAR check_fabr = IF( NOT ISBLANK(Fabr), Fabr, 2 )
+			
+			// Controllo avanzamento almeno del 10 % (sul periodo precedente)
+			--VAR max_contr = IF( MAX(PSR_Card11_Progress[_MaxActualProgress_prev_Construction]) >= 0.1, 1 )
+			--VAR max_fabr = IF( MAX(PSR_Card11_Progress[_MaxActualProgress_prev_Fabrication]) >= 0.1, 1 )
+			VAR max_contr = IF( NOT ISBLANK(Constr), Descr11C/100 >= 0.1)
+			VAR max_fabr = IF( NOT ISBLANK(Fabr), Descr11F/100 >= 0.1)
+			
+			// Primo controllo da effettuare per individuare gli ALERT
+			VAR first_check =
+			IF(
+			    AND( [%Avanzamento costi 5A] > check_contr, max_contr ) || AND( [%Avanzamento costi 5A] > check_fabr, max_fabr ),
+			    1
+			)
+			
+			VAR max_value_check = 
+			MAX(
+			    CALCULATE( [%Avanzamento costi 5B], Z__Table_phase[Phase] = "Construction" ),
+			    CALCULATE( [%Avanzamento costi 5B], Z__Table_phase[Phase] = "Fabrication" )
+			) > 0
+			
+			// Ultimo controllo e risultato finale
+			RETURN 
+			IF(
+			    first_check = 1,
+			    IF(
+			        AND(
+			            max_value_check,
+			            [%Avanzamento costi 5A] >
+			            MAX(
+			                CALCULATE( [%Avanzamento costi 5B], Z__Table_phase[Phase] = "Construction" ),
+			                CALCULATE( [%Avanzamento costi 5B], Z__Table_phase[Phase] = "Fabrication" )
+			            )
+			        ),
+			        1
+			    )
+			)
+			```
+		formatString: 0.0000
+		displayFolder: KCI_5\Grafici
+		lineageTag: 3aee91e1-0aa4-4b1d-a127-fe64d5e5c44b
+
+	measure 'Flag Alert Costi KCI5 Value difference prev' = ```
+			
+			
+			// Controllo valori in Card11
+			VAR Descr11C = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
+			)
+			
+			VAR Descr11F = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
+			)
+			
+			// Calcolo 5B per KCI5 per Construction e Fabrication
+			VAR Constr = 
+			IF(
+			    NOT ISBLANK(Descr11C),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        )
+			    )
+			)
+			
+			VAR Fabr = 
+			IF(
+			    NOT ISBLANK(Descr11F),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        )
+			    )
+			)
+			
+			// Controllo che non siano BLANK
+			// Se non blank, restituisco una percentuale assurda in modo tale da far uscire FALSE nell'IF finale
+			VAR check_contr = IF( NOT ISBLANK(Constr), Constr, 2 )
+			VAR check_fabr = IF( NOT ISBLANK(Fabr), Fabr, 2 )
+			
+			// Controllo avanzamento almeno del 10 % 
+			--VAR max_contr = IF( MAX(PSR_Card11_Progress[_MaxActualProgress_prev_Construction]) >= 0.1, 1 )
+			--VAR max_fabr = IF( MAX(PSR_Card11_Progress[_MaxActualProgress_prev_Fabrication]) >= 0.1, 1 )
+			VAR max_contr = IF( Descr11C >= 0.1, 1 )
+			VAR max_fabr = IF( Descr11F >= 0.1, 1 )
+			
+			// Primo controllo da effettuare per individuare gli ALERT
+			VAR first_check =
+			SWITCH(
+			    TRUE(),
+			    [%Avanzamento costi 5A] > check_contr, [%Avanzamento costi 5A] - check_contr,
+			    [%Avanzamento costi 5A] > check_fabr, [%Avanzamento costi 5A] - check_fabr,
+			    [%Avanzamento costi 5A] > check_fabr && [%Avanzamento costi 5A] > check_contr, MIN([%Avanzamento costi 5A] - check_fabr, [%Avanzamento costi 5A] - check_contr)
+			)
+			
+			// Ultimo controllo e risultato finale
+			RETURN
+			IF(
+			    max_contr || max_fabr,
+			    first_check
+			)
+			```
+		displayFolder: KCI_5\Grafici
+		lineageTag: a0adc771-8629-4940-a468-db090cdac884
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Value difference Costi KCI5 barre prev' = ```
+			
+			
+			// Richiamo al Flag Alert KCI 5 (serve per individuare solo i valori in ALERT)
+			VAR _value = [Flag Alert Costi KCI5 prev]
+			
+			RETURN 
+			IF(
+			    // Faccio in modo di stampare il risultato SOLO nella colonna "Fabrication" (i.e. sulla destra della matrice)
+			    SELECTEDVALUE(Z__Table_phase[Phase]) = "Fabrication",   
+			    [Flag Alert Costi KCI5 Value difference prev]
+			)
+			```
+		displayFolder: KCI_5\Grafici
+		lineageTag: 0730df89-eb34-4046-86e6-4a7ab977ef1d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI8_overall_process_current =
+			
+			
+			// Gestione con misura per non propagare il filtro sugli altri grafici alla selezione dell'utente
+			
+			CALCULATE(
+			    MAX(PSR_Card_Consolidated[_Overall_percentage_simb]),
+			    'PSR Group By'[_Flagprevmaxfor] = "NO"
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: KCI_8\Grafici
+		lineageTag: ca1bd769-89f7-4d33-aa74-3a5897dba5bd
+
+	measure _KCI8_delta_progress_current =
+			
+			
+			// Gestione con misura per non propagare il filtro sugli altri grafici alla selezione dell'utente
+			
+			CALCULATE(
+			    [Delta Plan-Actual],
+			    'PSR Group By'[_Flagprevmaxfor] = "NO"
+			)
+		displayFolder: KCI_8\Grafici
+		lineageTag: d9da3229-1b7e-4769-8566-ba157a2695f2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI8_delta_max_rischi_current =
+			
+			
+			// Gestione con misura per non propagare il filtro sugli altri grafici alla selezione dell'utente
+			
+			CALCULATE(
+			    [Delta IMAX],
+			    'PSR Group By'[_Flagprevmaxfor] = "NO"
+			)
+		formatString: #,0
+		displayFolder: KCI_8\Grafici
+		lineageTag: 10801529-0d6b-45b0-8353-1d8ff69decab
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI8_delta_total_cost_current =
+			
+			
+			// Gestione con misura per non propagare il filtro sugli altri grafici alla selezione dell'utente
+			
+			CALCULATE(
+			    [Delta total cost],
+			    'PSR Group By'[_Flagprevmaxfor] = "NO"
+			)
+		formatString: #,0
+		displayFolder: KCI_8\Grafici
+		lineageTag: 2841e4c9-d08f-4c3a-9bb0-580872ef329d
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Rapporto Indicatore KCI7 prev' =
+			
+			
+			DIVIDE(
+			    MAX(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Previous_Forecast]),      // La vecchia espressione aveva ROUND(_,0)
+			    MAX(PSR_Card04_Revenue_Cost[_Total_Cost])
+			)
+		displayFolder: KCI_7
+		lineageTag: 013fc888-3194-453a-9566-7a431a693ca9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Indicatore Norm KCI7 prev' = ```
+			
+			
+			// Indicatore normalizzato per KCI7 previous (custom per gestire grafico e misure in modo corretto)
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description],
+			        "value", [Rapporto Indicatore KCI7 prev]
+			    ),
+			    [value]
+			)
+			    
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description],
+			        "value", [Rapporto Indicatore KCI7 prev]
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [Rapporto Indicatore KCI7 prev]
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI_7
+		lineageTag: 975f1878-fec7-4800-858d-dbb8b8b80181
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Max_Periodo_GroupBy =
+			
+			
+			// Periodo massimo presente nella tabella PSR Group By
+			// Il valore verrà utilizzato nella tabella tmp_pbi_RisksFrozen per individuare il massimo periodo
+			// Allo stesso tempo, verranno esclusi gli altri periodi non ufficializzati
+			
+			VAR _max_rank = CALCULATE( MAX('PSR Group By'[_Rank_Prev_Forecast]), ALL() )
+			
+			RETURN
+			CALCULATE(
+			    MAX('PSR Group By'[_Period_def]),
+			    ALL('PSR Group By'),
+			    'PSR Group By'[_Rank_Prev_Forecast] = _max_rank,
+			    'PSR Group By'[_Flag_MaxIDPKEY] = 1
+			)
+		displayFolder: Misure_Periodi
+		lineageTag: 837022db-136a-428a-8123-86b94c206280
+
+	measure _Measure_VAR_75 =
+			
+			
+			SUM(PSR_Risks_Opportunity[PSR_Risks_Opportunities.VAR_75]) --/ 1000
+		formatString: #,0
+		displayFolder: Project_Data\Grafici
+		lineageTag: 200606ec-09ce-4473-83f9-388a1a1a4c80
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Flag Alert Crediti KCI10' = ```
+			
+			 
+			// Misura per trovare gli alert con le seguenti condizioni:
+			// - Pending revenues negative
+			// - Rapporto maggiore della soglia fissata al 4 %
+			 
+			VAR _valore =
+			CALCULATE(
+			    SUM(PSR_Card08_Revenues_Details[Variation migliaia]),
+			    PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = BLANK() || PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = "Submitted",
+			    PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type] IN {"Amendment", "Bonus/Incentive included within Contract", "Change Orders", "Claims", "Insurance Coverage"}
+			)
+			 
+			RETURN
+			IF(
+			    NOT ISBLANK(_valore),
+			    IF(
+			        OR(
+			            _valore < 0,
+			            _valore > SUM(PSR_Revenues_Costs[_RCB/OCB_Revenues])*0.04 // Soglia 4 %
+			        ),
+			        1,
+			        0
+			    )
+			)
+			
+			```
+		formatString: 0
+		displayFolder: KCI10
+		lineageTag: fe5c6c5d-fc71-4604-a338-0e84d2c8dee1
+
+	measure 'Count Progetti Alert KCI10' = ```
+			
+			 
+			COUNTROWS(              
+			    FILTER(
+			        SUMMARIZECOLUMNS(
+			            Cons_Proj_Table[_Short_Name_Code],
+			            "value", [Flag Alert Crediti KCI10]
+			        ),
+			        [value] = 1   // Solo gli ALERT
+			    )
+			)
+			```
+		formatString: 0
+		displayFolder: KCI10
+		lineageTag: a183d7f4-679c-45ea-9222-6c8df0dacb47
+
+	measure _Delta_included_Previous_KCI10 = ```
+			
+			
+			VAR prev_rank = MAX('PSR Group By'[_Rank_Prev_Forecast]) - 1
+			VAR cons_project = MAX( 'PSR Group By'[List_Data_GroupBy.Cons_Project])
+			VAR curr_variation = SUM(PSR_Card08_Revenues_Details[Variation migliaia])
+			
+			VAR _value_previous_variation = 
+			CALCULATE(
+			    SUM(PSR_Card08_Revenues_Details[Variation migliaia]),
+			    REMOVEFILTERS( PSR_Card04_Revenue_Cost[_Flagprevmaxfor]),
+			    ALL( 'PSR Group By' ),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = cons_project,
+			    'PSR Group By'[_Rank_Prev_Forecast] = prev_rank
+			)
+			
+			VAR delta = curr_variation - _value_previous_variation
+			
+			RETURN curr_variation - _value_previous_variation
+			```
+		displayFolder: KCI10
+		lineageTag: 3d769d3e-0f63-4364-a254-dd216d678251
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Indicatore Norm KCI10' = ```
+			
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card08_Revenues_Details),
+			        PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type],
+			        Cons_Proj_Table[_Short_Name_Code],
+			        Cons_Proj_Table[Client],
+			        "value", [Indicatore KCI10]
+			    ),
+			    [value]
+			)
+			    
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card08_Revenues_Details),
+			        PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type],
+			        Cons_Proj_Table[_Short_Name_Code],
+			        Cons_Proj_Table[Client],
+			        "value", [Indicatore KCI10]
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [Indicatore KCI10]
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI10
+		lineageTag: 11a84f87-e6a1-4104-8f3e-e144373c02a7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Indicatore KCI10' = ```
+			
+			
+			DIVIDE(
+			    SUM(PSR_Card08_Revenues_Details[_Variation_Pending_Included]), 
+			    SUM(PSR_Revenues_Costs[_RCB/OCB_Revenues])*1000
+			)
+			```
+		displayFolder: KCI10
+		lineageTag: dbf6ee7e-a7f7-40ed-b623-cc57dc46edb4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Indicatore KCI8 current' =
+			
+			
+			// Segno negativo per invertire l'indice di rilevanza
+			- ( [_KCI8_delta_max_rischi_current] + [_KCI8_delta_total_cost_current] )
+		displayFolder: KCI_8\Grafici
+		lineageTag: 563daba8-4971-4e39-9946-f06cd6a823be
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Indicatore Norm KCI8 current' = ```
+			
+			
+			// Indicatore normalizzato per KCI8 current (custom per gestire grafico e misure in modo corretto)
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", [Indicatore KCI8 current]
+			    ),
+			    [value]
+			)
+			    
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(PSR_Card04_Revenue_Cost), 
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", [Indicatore KCI8 current]
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [Indicatore KCI8 current]
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI_8\Grafici
+		lineageTag: 191ab361-6090-4a17-a1ca-4ee22023f62d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI8_delta_max_rischi_prev =
+			
+			
+			// Gestione con misura per non propagare il filtro sugli altri grafici alla selezione dell'utente
+			
+			CALCULATE(
+			    [Delta IMAX]
+			    //, 'PSR Group By'[_Flagprevmaxfor] = "SI"
+			)
+		displayFolder: KCI_8\Grafici
+		lineageTag: 09786381-96ed-4f8e-aa27-357098c21fa4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI8_delta_progress_prev =
+			
+			
+			// Gestione con misura per non propagare il filtro sugli altri grafici alla selezione dell'utente
+			
+			[Delta Plan-Actual_prev]
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_8\Grafici
+		lineageTag: 117133d7-d9c1-4ae5-8899-0b7ac51bcf69
+
+	measure _KCI8_delta_total_cost_prev =
+			
+			
+			// Gestione con misura per non propagare il filtro sugli altri grafici alla selezione dell'utente
+			
+			//CALCULATE(
+			    [Delta total cost prev]
+			//    'PSR Group By'[_Flagprevmaxfor] = "SI"
+			//)
+		displayFolder: KCI_8\Grafici
+		lineageTag: 903e150d-dc7b-4552-a542-3ff8135d0675
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI8_overall_process_prev =
+			
+			
+			// Gestione con misura per non propagare il filtro sugli altri grafici alla selezione dell'utente
+			
+			CALCULATE(
+			    MAX(PSR_Card_Consolidated[_Overall_percentage_simb])
+			    //, 'PSR Group By'[_Flagprevmaxfor] = "SI"
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_8\Grafici
+		lineageTag: 647a27cb-a3ed-40c8-870e-eaabafa13651
+
+	measure 'Flag Alert Costi KCI8 current' = ```
+			
+			
+			// Flag alert per KCI 8 current (custom per gestire bene i grafici e le misure)
+			
+			VAR Soglia = 0.05
+			VAR A_Card11 = [_KCI8_delta_progress_current] > Soglia
+			VAR B_Frozen = [_KCI8_delta_max_rischi_current] <= 0 
+			VAR C_Card2 = [_KCI8_delta_total_cost_current] <= 0
+			
+			RETURN 
+			IF(
+			    A_Card11 && B_Frozen && C_Card2,    // Le condizioni devono essere vere contemporaneamente
+			    "ALERT"
+			)
+			```
+		displayFolder: KCI_8\Grafici
+		lineageTag: e1d52b8e-dc16-4df9-826c-1e194632f016
+
+	measure 'Delta Plan-Actual_prev' =
+			
+			
+			SUM(PSR_Card11_Progress[_MaxPlanProgress_Overall_prev]) - SUM(PSR_Card11_Progress[_MaxActualProgress_Overall_prev])
+		displayFolder: KCI_8\Grafici
+		lineageTag: c17ece91-23d1-470a-a53d-e77cee6d22ad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _ALERT_KCI7_curr = ```
+			
+			
+			IF(
+			    COUNTROWS( Cons_Proj_Table ) > 0,
+			    IF(
+			        CALCULATE( 
+			            [Count Progetti Alert KCI7],
+			            NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] IN {"Contingency", "Intercompany Costs"},
+			            'PSR Group By'[_Flagprevmaxfor] = "NO",
+			            PSR_List_Data[WF_Status] = "Official PSR",
+			            PSR_Card04_Revenue_Cost[_Flag_Alert_KCI7] = "ALERT",
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Level] = "2",
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			            NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] IN {"C05A", "C05B", "C05C", "CTSEM", "MXD01_", "R01_", "R02_", "R04_", "R05_", "R07_", "RTSEM", "RXD01_"}
+			        ) = 1,
+			        1,
+			        0
+			    )
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_7
+		lineageTag: 64f4eca3-1d2e-425d-87aa-3f4511c7fe17
+
+	measure _ALERT_KCI7_prev = ```
+			
+			
+			IF(
+			    COUNTROWS( Cons_Proj_Table ) > 0,
+			    IF(
+			        CALCULATE( 
+			            [Count Progetti Alert KCI7],
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Level] = "2",
+			            'PSR Group By'[_Flagprevmaxfor] = "SI",
+			            PSR_List_Data[WF_Status] = "Official PSR",
+			            NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] IN {"C05A", "C05B", "C05C", "CTSEM", "MXD01_", "R01_", "R02_", "R04_", "R05_", "R07_", "RTSEM", "RXD01_"},
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			            NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] IN {"Contingency", "Intercompany Costs"},
+			            PSR_Card04_Revenue_Cost[_Flag_Alert_KCI7] = "ALERT"
+			        ) = 1,
+			        1,
+			        0
+			    )
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_7
+		lineageTag: 554bd033-c375-4abe-a1c3-855356c11f32
+
+	measure _Details_Project_Data_VAR_75 =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    [_Measure_VAR_75],
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: 0
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 05321177-7ddf-4ef2-838b-e1b13d3b795d
+
+	measure _flag_project_current_forecast =
+			
+			
+			-- Il flag è utilizzato nella tabella di dettaglio di Project Data CF
+			-- Il flag individua i progetti che hanno il current forecast valorizzato e ufficiale
+			-- Se un progetto ha il previous forecast ma non ancora il current, allora non viene considerato
+			-- La misura confronta il massimo periodo globale presente nella group by con il massimo periodo per ogni progetto in tabella
+			-- Se i due coincidono significa che il progetto ha valori nel current forecast altrimento è rimasto ancora al previous
+			
+			IF(
+			    [Max_Periodo_GroupBy] = MAX('PSR Group By'[_Period_def]),
+			    1
+			)
+		formatString: 0
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 96afed25-b6b2-4192-80ca-8227b815bce9
+
+	measure _Details_Project_Data_GMCL =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    SUM(PSR_Risks_Opportunity[_Gross_Margin_Confidence_Level]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 7ebdbd27-7ad0-4ba5-acbb-baf52df7185e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Details_Project_Data_Gross_Margin =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: cbcebf33-c6db-40af-bf52-211132d466f9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Details_Project_Data_Contingencies =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    SUM(PSR_Revenues_Costs[CF Contingencies]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 6a9c8424-8d1c-4a2a-b5d8-3ab435221d60
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Details_Project_Data_K_Factor =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    SUM(PSR_Revenues_Costs[CF K EL Fixed Rate]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: 0.0000
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: f0e1e57d-a080-4da1-baae-1ae9f458e70d
+
+	measure _Details_Project_Data_Progress =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    SUM(PSR_Card_Consolidated[_Overall_percentage]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: 0
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 2a82bcab-8bd6-4685-b1b1-825f3e258aa0
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Dettaglio_Project_Data_Planned =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    MAX(PSR_Card_Consolidated[Overall Progress Planned New]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 552db707-54b7-4254-a45b-a9a22bbc44cb
+
+	measure _Dettaglio_Project_Data_Actual =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    MAX(PSR_Card_Consolidated[_Overall_percentage_simb]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: db4eaf9d-6123-4666-88fd-cac3e7088eb4
+
+	measure _Dettaglio_Project_Data_Baseline =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    LASTDATE(PSR_Progress[PSR_Progress.Miles_Dates_Baseline_Mechanical_Completion_Date]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: Short Date
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 7fa93e86-ba36-44e2-afb9-a5a763164229
+
+	measure _Dettaglio_Project_Data_Forecast =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    FIRSTDATE(PSR_Progress[PSR_Progress.Miles_Dates_Effect_Or_Forecast_Early_Date_Mech_Compl_Date]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: Short Date
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 695aaefd-5be5-4c5d-9657-fe4a348d7e1f
+
+	measure _Dettaglio_Project_Data_Revenues_RCB =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    MIN(PSR_Revenues_Costs[PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: #,0.00
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 5c135b58-c3cf-4ab6-9358-3bb3cff0d9b3
+
+	measure _Dettaglio_Project_Data_Revenues_CF =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    MIN(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: #,0.00
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: 3a5c4336-4ff8-431b-bff7-22b7c6b20f9f
+
+	measure _Dettaglio_Project_Data_Gross_Margin_RCB =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.RCB_Gross_Margin]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: #,0.00
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: a66c6519-69a9-4f73-b6a7-4996e7fb47bb
+
+	measure _Dettaglio_Project_Data_Gross_Margin_CF =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: #,0.00
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: ec6dfb59-c88c-438a-be06-65793629a976
+
+	measure _Dettaglio_Project_Data_Project_Risk_Rate =
+			
+			
+			-- Misura utilizzata nelle pagine di dettaglio di Project Data
+			
+			CALCULATE(
+			    SUM(PSR_Risks_Opportunity[PRR (Project Risk Rate)]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis])
+			)
+		formatString: 0
+		displayFolder: Project_Data\Dettaglio
+		lineageTag: c0249ea0-aa4e-47d8-843b-97f013faf1f6
+
+	measure _Dettaglio_KCI5_ActualToDate =
+			
+			
+			CALCULATE(
+			    SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.ActualToDate]),
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] = SELECTEDVALUE(Z__Table_phase[CBS Description])
+			)
+		displayFolder: KCI_5\Dettaglio
+		lineageTag: 08bb4eb8-0ae3-4cb5-8a74-8ad7a9879096
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Dettaglio_KCI5_CommittedToDate =
+			
+			
+			CALCULATE(
+			    SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] = SELECTEDVALUE(Z__Table_phase[CBS Description])
+			)
+		displayFolder: KCI_5\Dettaglio
+		lineageTag: 28769731-6591-43fa-badb-38535c850543
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Dettaglio_KCI5_Cost_Current_Forecast =
+			
+			
+			CALCULATE(
+			    SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] = SELECTEDVALUE(Z__Table_phase[CBS Description])
+			)
+		displayFolder: KCI_5\Dettaglio
+		lineageTag: c16a9abd-3d79-4929-802b-88abc9947cb7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Dettaglio_KCI9_remarks =
+			
+			
+			MAX(PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.Remarks])
+		displayFolder: KCI_9
+		lineageTag: 456e1227-b7cd-4036-9d51-5f0fda51cbca
+
+	measure _Dashboard_fase_progetto_overview = MAX(PSR_Card_Consolidated[_Cluster_Progress])
+		displayFolder: Misure Dashboard\Altre
+		lineageTag: 5be5df9c-f410-4f69-bfee-fc2c6dc60047
+
+	measure _Project_Portfolio_Revenues =
+			
+			
+			-- Misura utilizzata nella tabella nella pagina Project Portfolio
+			
+			IF(
+			    -- Condizione per mostrare anche i progetti con PSR ma con valori vuoti
+			    [CountProgetti] > 0,
+			    SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate]) + 0
+			)
+		formatString: #,0
+		displayFolder: Project_Portfolio
+		lineageTag: a4895019-cbaa-417f-9718-0290ed6e4b12
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Project_Portfolio_Backlog =
+			
+			
+			-- Misura utilizzata nella tabella nella pagina Project Portfolio
+			
+			IF(
+			    -- Condizione per mostrare anche i progetti con PSR ma con valori vuoti
+			    [CountProgetti] > 0,
+			    SUM(PSR_Revenues_Costs[_Backlog]) + 0
+			)
+		formatString: #,0
+		displayFolder: Project_Portfolio
+		lineageTag: 647bc2d9-98ac-472e-a238-689910708cc3
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _max_y_range_value_KCI9_CF =
+			
+			
+			-- Misura utilizzata per gestire l'altezza massima del grafico a scomparsa
+			-- Al momento una tale misure è implementata solo in questa pagina
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED('PSR Group By'),
+			        'PSR Group By'[_ForecastYearAxis],
+			        "value", [_KCI9_Totale_Crediti]
+			    ),
+			    [value]
+			) * 1.5
+		displayFolder: KCI_9
+		lineageTag: f4168cea-47fd-484f-840a-99410bf180eb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI1_Risk_expected_value =
+			
+			
+			-- Misura per calcolare l'expected value nella tabella del KCI1 per i rischi
+			
+			CALCULATE(
+			    SUM('Frozen EV'[Exepcted Value]),
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"}
+			)
+		formatString: #,0
+		displayFolder: KCI_1
+		lineageTag: 467159cb-de71-4186-b1af-60e7100b97da
+
+	measure _KCI1_Opportunity_expected_value =
+			
+			
+			-- Misura per calcolare l'expected value nella tabella del KCI1 non tenendo conto del filtro sulla tabella (sul campo RO)
+			
+			CALCULATE(
+			    SUM('Frozen EV'[Exepcted Value]),
+			    REMOVEFILTERS('Frozen EV'[RO]),
+			    'Frozen EV'[RO] = "Opportunity"
+			)
+		formatString: #,0
+		displayFolder: KCI_1
+		lineageTag: 8da87a45-85e2-43d0-a866-288f3224768d
+
+	measure _Tooltip_distinct_count_ridotti = ```
+			
+			
+			-- La misura riporta il numero di progetti senza PSR (esclusi quelli rappresentati in tabella, che ne mostra solo 15)
+			
+			-- Forecast selezionato
+			VAR _sel_rank_forecast = SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast])
+			
+			-- Business Line & Country (selezionati in pagina da grafici)
+			VAR _business_lines = CALCULATETABLE( VALUES(Cons_Proj_Table[Business_Organization_T1_Code]), ALL('PSR Group By'[NEW_FORECAST_SLICER]) )
+			VAR _countries = CALCULATETABLE( VALUES(Cons_Proj_Table[Country]), ALL('PSR Group By'[NEW_FORECAST_SLICER]) )
+			
+			VAR _projects_total =
+			CALCULATE(
+			    COUNTROWS(Z_Project_PSR),
+			    Z_Project_PSR[Country] IN _countries,
+			    Z_Project_PSR[Business_Organization_T1_Code] IN _business_lines
+			)
+			
+			VAR _projects_no_psr =
+			COUNTROWS(
+			    FILTER(
+			        SUMMARIZECOLUMNS(
+			            Z_Project_PSR[Cons_Proj],
+			            "value", [_Check_Progetti_senza_PSR]
+			        ),
+			        [value] = 1
+			    )
+			)
+			
+			RETURN 
+			-- La misura deve funzionare solo all'ultimo forecast disponibile
+			IF(
+			    _sel_rank_forecast = 1,
+			    IF(
+			        _projects_no_psr > 15,
+			        "+ " 
+			        & 
+			        _projects_no_psr - 15 
+			        & 
+			        IF(
+			            _projects_no_psr > 1,
+			            " other projects",
+			            " other project"
+			        )
+			    )
+			)
+			```
+		displayFolder: Altre_misure
+		lineageTag: 0597881b-e3ad-4596-bab1-32683026df37
+
+	measure Previous_Forecast_Card04_KCI8_prev =
+			
+			
+			-- Tale misura si differenzia da quella "Previous_Forecast_Card04_KCI8" per via del filtro sul campo flagprevmaxfor
+			-- La misura è utilizzata nella pagina "Previous Forecast" per calcolare bene la differenza tra il previous forecast e il forecast precedente al previous.
+			
+			CALCULATE(
+			    [Previous_Forecast_Card04_KCI8],
+			    'PSR Group By'[_Flagprevmaxfor] = "SI"
+			)
+		displayFolder: KCI_8\Grafici
+		lineageTag: f3ee6400-116c-4d4d-bc05-9be04df3c3f1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Delta total cost prev' = ROUND( [Previous_Forecast_Card04_KCI8] - [Previous_Forecast_Card04_KCI8_prev], 0 )
+		displayFolder: KCI_8\Grafici
+		lineageTag: 92438c58-ffab-42ff-b398-407ac3897a0e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Storico_ProjectData_VAR75 = ```
+			
+			
+			-- Misura utilizzata nella pagina Project Data (grafico a linee per mostrare 6 forecast)
+			
+			VAR _selected_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast])
+			VAR _prev_rank_6 = _selected_rank - 5
+			
+			RETURN 
+			IF( 
+			    AND(
+			        AND(
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) >= _prev_rank_6,
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) <= _selected_rank
+			        ),
+			        NOT ISBLANK(MAX('PSR Group By'[_Rank_Prev_Forecast]))
+			    ),
+			    [_Measure_VAR_75] + 0       -- In modo da mostrare 0 anche nei casi BLANK
+			)
+			```
+		formatString: #,0
+		displayFolder: Project_Data
+		lineageTag: 81553a4e-d7c9-4fc1-9f40-120753cd5ae1
+
+	measure _Storico_ProjectData_GMCL = ```
+			
+			
+			-- Misura utilizzata nella pagina Project Data (grafico a linee per mostrare 6 forecast)
+			
+			VAR _selected_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast])
+			VAR _prev_rank_6 = _selected_rank - 5
+			
+			RETURN 
+			IF( 
+			    AND(
+			        AND(
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) >= _prev_rank_6,
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) <= _selected_rank
+			        ),
+			        NOT ISBLANK(MAX('PSR Group By'[_Rank_Prev_Forecast]))
+			    ),
+			    SUM(PSR_Risks_Opportunity[_Gross_Margin_Confidence_Level]) + 0       -- In modo da mostrare 0 anche nei casi BLANK
+			)
+			```
+		formatString: 0.00
+		displayFolder: Project_Data
+		lineageTag: ddda5ad1-b6e5-4c8d-a3c0-9b23357a4d73
+
+	measure _Storico_ProjectData_Gross_Margin = ```
+			
+			
+			-- Misura utilizzata nella pagina Project Data (grafico a linee per mostrare 6 forecast)
+			
+			VAR _selected_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast])
+			VAR _prev_rank_6 = _selected_rank - 5
+			
+			RETURN 
+			IF( 
+			    AND(
+			        AND(
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) >= _prev_rank_6,
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) <= _selected_rank
+			        ),
+			        NOT ISBLANK(MAX('PSR Group By'[_Rank_Prev_Forecast]))
+			    ),
+			    SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate]) + 0       -- In modo da mostrare 0 anche nei casi BLANK
+			)
+			```
+		formatString: #,0.00
+		displayFolder: Project_Data
+		lineageTag: 3cf42480-e0e2-44cc-ab5d-40cfe7cb13ae
+
+	measure _Storico_ProjectData_Contingencies = ```
+			
+			
+			-- Misura utilizzata nella pagina Project Data (grafico a linee per mostrare 6 forecast)
+			
+			VAR _selected_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast])
+			VAR _prev_rank_6 = _selected_rank - 5
+			
+			RETURN 
+			IF( 
+			    AND(
+			        AND(
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) >= _prev_rank_6,
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) <= _selected_rank
+			        ),
+			        NOT ISBLANK(MAX('PSR Group By'[_Rank_Prev_Forecast]))
+			    ),
+			    SUM(PSR_Revenues_Costs[CF Contingencies]) + 0       -- In modo da mostrare 0 anche nei casi BLANK
+			)
+			```
+		formatString: #,0.00
+		displayFolder: Project_Data
+		lineageTag: 1e5a9bde-932a-40ce-833b-d6c8dec736b4
+
+	measure _Storico_ProjectData_K_Factor = ```
+			
+			
+			-- Misura utilizzata nella pagina Project Data (grafico a linee per mostrare 6 forecast)
+			
+			VAR _selected_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast])
+			VAR _prev_rank_6 = _selected_rank - 5
+			
+			RETURN 
+			IF( 
+			    AND(
+			        AND(
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) >= _prev_rank_6,
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) <= _selected_rank
+			        ),
+			        NOT ISBLANK(MAX('PSR Group By'[_Rank_Prev_Forecast]))
+			    ),
+			    SUM(PSR_Revenues_Costs[CF K EL Fixed Rate]) + 0       -- In modo da mostrare 0 anche nei casi BLANK
+			)
+			```
+		displayFolder: Project_Data
+		lineageTag: 8dfaf5c8-662c-4246-a61f-6461330627e2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Storico_ProjectData_Progress = ```
+			
+			
+			-- Misura utilizzata nella pagina Project Data (grafico a linee per mostrare 6 forecast)
+			
+			VAR _selected_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast])
+			VAR _prev_rank_6 = _selected_rank - 5
+			
+			RETURN 
+			IF( 
+			    AND(
+			        AND(
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) >= _prev_rank_6,
+			            SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) <= _selected_rank
+			        ),
+			        NOT ISBLANK(MAX('PSR Group By'[_Rank_Prev_Forecast]))
+			    ),
+			    SUM(PSR_Card_Consolidated[_Overall_percentage]) + 0       -- In modo da mostrare 0 anche nei casi BLANK
+			)
+			```
+		displayFolder: Project_Data
+		lineageTag: a0ed91df-3f0c-4fb5-bc23-51662ff4ab9c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Storico_ProjectData_overall_progress_planned =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			CALCULATE(
+			    SUM(PSR_Card_Consolidated[Overall Progress Planned New]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Project_Data
+		lineageTag: 1821cb83-14f1-4279-85ed-54322306d5aa
+
+	measure _Storico_ProjectData_overall_progress_actual =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			CALCULATE(
+			    SUM(PSR_Card_Consolidated[Overall Progress Actual New]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Project_Data
+		lineageTag: 6ef7f147-6b0f-495d-a483-ecb0c8ec1f5f
+
+	measure _Storico_ProjectData_completion_baseline =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			CALCULATE(
+			    LASTDATE(PSR_Progress[PSR_Progress.Miles_Dates_Baseline_Mechanical_Completion_Date]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: Short Date
+		displayFolder: Project_Data
+		lineageTag: 9eba3c1e-191d-4608-b4aa-f16261b9f042
+
+	measure _Storico_ProjectData_completion_forecast =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			CALCULATE(
+			    FIRSTDATE(PSR_Progress[PSR_Progress.Miles_Dates_Effective_or_Forecast_Early_Date_PAC_Date]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: Short Date
+		displayFolder: Project_Data
+		lineageTag: 180555e1-0fc9-48f9-bbcd-638418a8a93a
+
+	measure _Storico_ProjectData_revenues_RCB =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			CALCULATE(
+			    MIN(PSR_Revenues_Costs[PSR_Revenues_Costs.RCB_Total_Revenues_Fixed_Rate]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: Project_Data
+		lineageTag: 5c2ad9ac-1c02-4c9a-bff0-8ac1488e4100
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Storico_ProjectData_revenues_CF =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			CALCULATE(
+			    MIN(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		displayFolder: Project_Data
+		lineageTag: ea1681e7-f3db-48cc-aa56-bde9d6a554ef
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Storico_ProjectData_gross_margin_RCB =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			CALCULATE(
+			    SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.RCB_Gross_Margin]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: Project_Data
+		lineageTag: f2a0d5db-d08e-4f04-a46c-a8ce61ef448b
+
+	measure _Storico_ProjectData_gross_margin_CF =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			CALCULATE(
+			    SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Gross_Margin_Fixed_Rate]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		displayFolder: Project_Data
+		lineageTag: f639dd51-67f0-439b-aa83-e079ce5a8657
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Storico_ProjectData_Project_Risk_Rate_chart =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (gauge)
+			
+			VAR _value =
+			CALCULATE(
+			    SUM(PSR_Risks_Opportunity[PRR (Project Risk Rate)]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+			
+			RETURN
+			IF(
+			    ISBLANK(_value),
+			    0,
+			    _value
+			)
+		formatString: 0
+		displayFolder: Project_Data
+		lineageTag: a3031f52-3085-4ef0-966f-9c5957284e28
+
+	measure _Storico_ProjectData_PHI_chart =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (gauge)
+			
+			VAR _value =
+			CALCULATE(
+			    SUM('PHI Index'[[PHI_Index]]]),
+			    'PHI Index'[_Forecast_new] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+			
+			RETURN
+			IF(
+			    ISBLANK(_value),
+			    0,
+			    _value
+			)
+		displayFolder: Project_Data
+		lineageTag: 8ce6cf07-10e7-4824-9a63-03aa5204d154
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI1_Risk_expected_value_storico =
+			
+			
+			-- Misura per calcolare l'expected value nella tabella del KCI1 per i rischi
+			
+			CALCULATE(
+			    SUM('Frozen EV'[Exepcted Value]),
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: KCI_1
+		lineageTag: f1fab4f3-5f4e-4bb9-900a-c3a9bce192a0
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI1_Opportunity_expected_value_storico =
+			
+			
+			-- Misura per calcolare l'expected value nella tabella del KCI1 non tenendo conto del filtro sulla tabella (sul campo RO)
+			
+			CALCULATE(
+			    SUM('Frozen EV'[Exepcted Value]),
+			    REMOVEFILTERS('Frozen EV'[RO]),
+			    'Frozen EV'[RO] = "Opportunity",
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: KCI_1
+		lineageTag: 670b0a13-c277-41cd-8986-16316c3e8cba
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI1_Gross_margin_storico =
+			
+			
+			-- Misura per calcolare il gross margin in base al forecast selezionato
+			
+			CALCULATE(
+			    SUM('Revenue Costs 1'[Margine]),
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: KCI_1
+		lineageTag: ffee1e6b-6e8b-4467-bc89-6be2b9d5a30a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI1_Contingencies_storico =
+			
+			
+			-- Misura per calcolare le contingencies in base al forecast selezionato
+			
+			CALCULATE(
+			    SUM('Revenue Costs 1'[Contingencies]),
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: KCI_1
+		lineageTag: 865c944b-d43f-4629-8e16-3ac940c34439
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Count_all_KCI2 =
+			
+			
+			-- Misura utilizzata per calcolare il numero totale di progetti visibili nel KCI2
+			
+			VAR _sel_period = MAX('Frozen EV'[_Period_froz_sort])
+			
+			RETURN
+			IF(
+			    _sel_period = [Max_Periodo_GroupBy],
+			    CALCULATE(
+			        [CountProgetti],
+			        ALL('Frozen EV'[NEW_FORECAST_SLICER]),
+			        'PSR Group By'[_ForecastYearAxis] = _sel_period
+			        //,'PSR Group By'[_Flag_MaxIDPKEY] = 1
+			    ),
+			    CALCULATE(
+			        [CountProgetti],
+			        ALL('Frozen EV'[NEW_FORECAST_SLICER]),
+			        'PSR Group By'[_ForecastYearAxis] = _sel_period
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_2
+		lineageTag: b5a012b4-f9bc-4279-97fa-caa1c73389fc
+
+	measure _Alert_KCI4 =
+			
+			
+			-- Misura utilizzata per individuare i progetti in Alert per il KCI4
+			-- La misura sfrutta le colonne calcolate già impostate in precedenza
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy], -- Massimo forecast disponibile
+			    IF(
+			        SELECTEDVALUE(PSR_Card_Consolidated[_Flag_Progress_Margin_Alert]) = "ALERT",
+			        1
+			    ),
+			    IF(
+			        SELECTEDVALUE(PSR_Card_Consolidated[_Flag_Progress_Margin_Alert_CF-1]) = "ALERT",
+			        1
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_4
+		lineageTag: e8a0253d-41a2-4a17-a563-b826aa8f836f
+
+	measure _Indicatore_KCI4 =
+			
+			
+			-- Misura utilizzata per la creazione dell'indicatori normalizzati (da 1 a 3)
+			
+			VAR _MaxVal =
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(Cons_Proj_Table[_Short_Name_Code]),
+			        "value", MAX(PSR_Card_Consolidated[_Gross_Margin_Diff])
+			    ),
+			    [value]
+			)
+			
+			VAR _MinVal =
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(Cons_Proj_Table[_Short_Name_Code]),
+			        "value", MIN(PSR_Card_Consolidated[_Gross_Margin_Diff])
+			    ),
+			    [value]
+			)
+			
+			VAR _value = MAX(PSR_Card_Consolidated[_Gross_Margin_Diff])
+			VAR _norm = 1 + 2*DIVIDE( _value - _MinVal, _MaxVal - _MinVal )
+			
+			RETURN _norm
+		displayFolder: KCI_4
+		lineageTag: d52be74a-956a-47cb-bbeb-5ed2a3e56707
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Count_alert_KCI4 =
+			
+			
+			-- Misura utilizzata per calcolare il numero di alert nel KCI4
+			
+			COUNTROWS(
+			    FILTER(
+			        SUMMARIZE(
+			            ALL(Cons_Proj_Table[_Short_Name_Code]),
+			            Cons_Proj_Table[_Short_Name_Code],
+			            "value", [_Alert_KCI4]
+			        ),
+			        [value] = 1
+			    )
+			)
+		displayFolder: KCI_4
+		lineageTag: deb90577-e958-4f21-aa27-dc457894b39f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI4_line_chart =
+			
+			
+			
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast])
+			VAR _previous_rank = _sel_rank - 2
+			VAR _project = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj])
+			
+			RETURN
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) >= _previous_rank,
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) <= _sel_rank
+			    ),
+			    CALCULATE(
+			        SUM(PSR_Card_Consolidated[_Gross_Margin_Current]),
+			        REMOVEFILTERS( PSR_Card_Consolidated[_NEW_FORECAST_SLICER] ),
+			        'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			
+			    )
+			)
+		formatString: #,0
+		displayFolder: KCI_4
+		lineageTag: e84d1f18-49ed-47d0-b535-01b8e03b136f
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI4_line_chart_bar_progress =
+			
+			
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast])
+			VAR _previous_rank = _sel_rank - 2
+			VAR _project = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj])
+			
+			RETURN
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) >= _previous_rank,
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) <= _sel_rank
+			    ),
+			    CALCULATE(
+			        SUM(PSR_Card_Consolidated[_Planned - Current Progress%]),
+			        REMOVEFILTERS( PSR_Card_Consolidated[_NEW_FORECAST_SLICER] ),
+			        'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			    )
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_4
+		lineageTag: b25adcb3-9c1a-4d5d-ad4c-eb215cd7b50d
+
+	measure _KCI4_bar_overall =
+			
+			
+			-- Misura utilizzata nel grafico a barre per il KCI4
+			
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast])
+			VAR _previous_rank = _sel_rank - 2
+			VAR _project = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj])
+			
+			RETURN
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) >= _previous_rank,
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) <= _sel_rank
+			    ),
+			    CALCULATE(
+			        SUM(PSR_Card_Consolidated[_Overall_percentage_simb]),
+			        REMOVEFILTERS( PSR_Card_Consolidated[_NEW_FORECAST_SLICER] ),
+			        'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			    )
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_4
+		lineageTag: b2e07f9c-bb73-44ef-a33d-a3d3dc487a3d
+
+	measure _KCI4_bar_overall_progress =
+			
+			
+			-- Misura utilizzata nel grafico a barre per il KCI4
+			
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast])
+			VAR _previous_rank = _sel_rank - 2
+			VAR _project = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj])
+			
+			RETURN
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) >= _previous_rank,
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) <= _sel_rank
+			    ),
+			    CALCULATE(
+			        SUM(PSR_Card_Consolidated[Overall Progress Planned New]),
+			        REMOVEFILTERS( PSR_Card_Consolidated[_NEW_FORECAST_SLICER] ),
+			        'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			    )
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_4
+		lineageTag: 2005096b-86a1-4409-b270-1710b9e4c8d6
+
+	measure _Alert_KCI1 = ```
+			
+			
+			-- Misura utilizzata per individuare i progetti in Alert per il KCI1
+			-- La misura confronta i rischi con margin+contingencies per 3 forecast consecutivi (iniziando dal forecast selezionato in pagina)
+			
+			-- Forecast corrente
+			VAR sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast])
+			
+			-- Valori dei rischi per 3 forecast
+			VAR _risk_1 =
+			CALCULATE( 
+			    [_KCI1_Risk_expected_value_storico],
+			    ALL('PSR Group By'),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'PSR Group By'[_Rank_Desc_Forecast] = sel_rank
+			)
+			
+			VAR _risk_2 =
+			CALCULATE( 
+			    [_KCI1_Risk_expected_value_storico],
+			    ALL('PSR Group By'),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 1
+			)
+			
+			VAR _risk_3 =
+			CALCULATE( 
+			    [_KCI1_Risk_expected_value_storico],
+			    ALL('PSR Group By'),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 2
+			)
+			
+			-- Valori di margin+contingencies per 3 forecast
+			VAR _marg_cont_1 =
+			CALCULATE( 
+			    [_KCI1_Gross_margin_storico] + [_KCI1_Contingencies_storico],
+			    ALL('PSR Group By'),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'PSR Group By'[_Rank_Desc_Forecast] = sel_rank
+			)
+			
+			VAR _marg_cont_2 =
+			CALCULATE( 
+			    [_KCI1_Gross_margin_storico] + [_KCI1_Contingencies_storico],
+			    ALL('PSR Group By'),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 1
+			)
+			
+			VAR _marg_cont_3 =
+			CALCULATE( 
+			    [_KCI1_Gross_margin_storico] + [_KCI1_Contingencies_storico],
+			    ALL('PSR Group By'),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'PSR Group By'[_Rank_Desc_Forecast] = sel_rank
+			)
+			
+			RETURN 
+			IF(
+			    -- Se nessuno dei rischi è blank
+			    NOT ISBLANK(_risk_1) && 
+			    NOT ISBLANK(_risk_2) && 
+			    NOT ISBLANK(_risk_3),
+			    IF(
+			        -- Se i rischi sono maggiori dei margin+contingencies per 3 forecast consecutivi, allora è un progetto in alert
+			        _risk_1 > _marg_cont_1 && 
+			        _risk_2 > _marg_cont_2 && 
+			        _risk_3 > _marg_cont_3,
+			        1
+			    )
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_1
+		lineageTag: e3e5ba78-e825-4274-b108-c8cebddd6ce4
+
+	measure _Count_alert_KCI1 =
+			
+			
+			-- Misura utilizzata per calcolare il numero di alert nel KCI1
+			
+			COUNTROWS(
+			    FILTER(
+			        DISTINCT(Cons_Proj_Table[_Short_Name_Code]),
+			        [_Alert_KCI1] = 1 && NOT ISBLANK([_KCI1_Risk_expected_value_storico])
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_1
+		lineageTag: 99621359-90d3-4392-ad44-711acc626272
+
+	measure _Check_KCI1_forecast_3__ = ```
+			
+			
+			-- Check per mostrare solo 3 forecast (misura utilizzata esclusivamente per il KCI1)
+			-- La misura è scritta in questo modo perché i forecast della Frozen potrebbero differire dai forecast della PSR Group By in termini di ordinamento
+			
+			-- Forecast
+			VAR sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast])
+			VAR sel_forecast_1 = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			VAR sel_forecast_2 = CALCULATE( MAX('PSR Group By'[_ForecastYearAxis]), ALL(), 'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 1)
+			VAR sel_forecast_3 = CALCULATE( MAX('PSR Group By'[_ForecastYearAxis]), ALL(), 'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 2)
+			
+			RETURN 
+			IF(
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = sel_forecast_1  ||
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = sel_forecast_2  ||
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = sel_forecast_3,
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_1
+		lineageTag: 1f5f247f-ca6d-4855-b97a-cf57b0a04817
+
+	measure _Alert_KCI2 =
+			
+			
+			-- Misura utilizzata per individuare i progetti in Alert per il KCI2 (in base al numero di rischi con probabilità maggiore del 40 %)
+			
+			IF(
+			    [_KCI2_numero_rischi_new] > 0,
+			    1
+			)
+		formatString: 0
+		displayFolder: KCI_2
+		lineageTag: ebdd9b39-7964-479e-9323-3d6e7fcffb15
+
+	measure _Count_alert_KCI2 =
+			
+			
+			-- Misura utilizzata per calcolare il numero di alert per il KCI2
+			COUNTROWS(
+			    FILTER(
+			        ALL( Cons_Proj_Table[_Short_Name_Code] ),
+			        [_Alert_KCI2] = 1
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_2
+		lineageTag: 0d361161-cb3d-4506-9e43-154dd3efc389
+
+	measure _Count_alert_KC2_rischi =
+			
+			
+			-- Misura utilizzata per calcolare il numero di rischi nel KCI2 (per gli alert individuati)
+			
+			SUMX(
+			    ALL(Cons_Proj_Table[ShortName]),
+			    [_KCI2_numero_rischi_new]
+			)
+		formatString: 0
+		displayFolder: KCI_2
+		lineageTag: 68efb505-e491-4352-ae04-b48820ba84ec
+
+	measure _KCI2_EV = ```
+			
+			
+			VAR _sel_rank = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			VAR _prev_rank = _sel_rank + 2
+			
+			RETURN 
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_forecast_periods_FROZEN[sort_period]) >= _sel_rank,
+			        SELECTEDVALUE(Z_forecast_periods_FROZEN[sort_period]) <= _prev_rank
+			    ),
+			    CALCULATE(
+			        SUM('Frozen EV'[Exepcted Value Risk]),
+			        ALL( 'Frozen EV'[NEW_FORECAST_SLICER]),
+			        'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE(Z_forecast_periods_FROZEN[_Period_froz_sort])
+			    )
+			)
+			```
+		displayFolder: KCI_2
+		lineageTag: 00ddadf2-fc5d-4b08-bb97-53523bc1f05f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI2_Probab = ```
+			
+			
+			VAR _sel_rank = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			VAR _prev_rank = _sel_rank + 2
+			
+			RETURN 
+			IF(
+			    AND(
+			        AND(
+			            SELECTEDVALUE(Z_forecast_periods_FROZEN[sort_period]) >= _sel_rank,
+			            SELECTEDVALUE(Z_forecast_periods_FROZEN[sort_period]) <= _prev_rank
+			        ),
+			        [_Count_all_KCI2] > 0
+			    ),
+			    CALCULATE(
+			        MAX('Frozen EV'[Probab]),
+			        ALL( 'Frozen EV'[NEW_FORECAST_SLICER] ),
+			        'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE(Z_forecast_periods_FROZEN[_Period_froz_sort])
+			    )
+			)
+			```
+		formatString: 0%;-0%;0%
+		displayFolder: KCI_2
+		lineageTag: 168bb832-5f48-45b6-87b8-d6b1482d33c0
+
+	measure _Alert_KCI3 = ```
+			
+			
+			-- Misura utilizzata per individuare i progetti in Alert per il KCI3
+			-- La misura confronta i valori di opportunità+pending revenues e total revenues per 3 forecast consecutivi (iniziando dal forecast selezionato in pagina)
+			
+			VAR _max_p_key =
+			CALCULATE(
+			    DISTINCTCOUNT('PSR Group By'[List_Data_GroupBy.List_Data.P_Key]),
+			    ALLCROSSFILTERED('Frozen EV'),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE('Frozen EV'[_Period_froz_sort]),
+			    PSR_List_Data[WF_Status] = "Official PSR"
+			)
+			
+			-- Forecast corrente
+			VAR sel_rank = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			
+			-- Valori Opportunità 3 forecast
+			VAR _opp_1 =
+			CALCULATE( 
+			    SUM('Frozen EV'[I_Max]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Opportunity", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = sel_rank
+			)
+			
+			VAR _opp_2 =
+			CALCULATE( 
+			    SUM('Frozen EV'[I_Max]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Opportunity", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = sel_rank + 1
+			)
+			
+			VAR _opp_3 =
+			CALCULATE( 
+			    SUM('Frozen EV'[I_Max]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Opportunity", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = sel_rank + 2
+			)
+			
+			-- Valori Pending Revenues per 3 forecast
+			VAR _rev_1 =
+			CALCULATE( 
+			    SUM('Revenue Status 1'[Pending Revenues]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Opportunity", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = sel_rank
+			)
+			
+			VAR _rev_2 =
+			CALCULATE( 
+			    SUM('Revenue Status 1'[Pending Revenues]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Opportunity", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = sel_rank + 1
+			)
+			
+			VAR _rev_3 =
+			CALCULATE( 
+			    SUM('Revenue Status 1'[Pending Revenues]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Opportunity", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = sel_rank + 2
+			)
+			
+			-- Valori Total Revenues per 3 forecast
+			VAR _tot_rev_1 =
+			CALCULATE( 
+			    SUM('Revenue Costs 1'[Total Revenues]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Opportunity", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = sel_rank
+			)
+			
+			VAR _tot_rev_2 =
+			CALCULATE( 
+			    SUM('Revenue Costs 1'[Total Revenues]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Opportunity", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = sel_rank + 1
+			)
+			
+			VAR _tot_rev_3 =
+			CALCULATE( 
+			    SUM('Revenue Costs 1'[Total Revenues]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Opportunity", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = sel_rank + 2
+			)
+			
+			RETURN 
+			
+			-- Progetti in alert solo se, per tre forecast consecutivi, le revenue totali sono non balnk
+			-- E la somma di Opporunità e Pending Revenues è maggiore del 15% delle Revenues totali
+			IF(
+			    AND(
+			        _max_p_key > 0,
+			        NOT( ISBLANK(_tot_rev_1) || ISBLANK(_tot_rev_2) || ISBLANK(_tot_rev_3) )
+			    ),
+			    IF(
+			        _opp_1 + _rev_1 > _tot_rev_1*0.15   && 
+			        _opp_2 + _rev_2 > _tot_rev_2*0.15   && 
+			        _opp_3 + _rev_3 > _tot_rev_3*0.15,
+			        1
+			    )
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_3
+		lineageTag: 07431aa3-3963-4283-b6ee-7dedf2aa31ab
+
+	measure _Indicatore_KCI3 = ```
+			
+			
+			-- Misura utilizzata per creare le barre normalizzate (da 1 a 3) nella pagina di analisi del KCI3
+			-- Nella pagina di estrazione, le misure non hanno subito variazioni
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(Cons_Proj_Table[_Short_Name_Code]),
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", [_KCI3_percentage_revenues]
+			    ),
+			    [value]
+			)
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(Cons_Proj_Table[_Short_Name_Code]),
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", [_KCI3_percentage_revenues]
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [_KCI3_percentage_revenues]
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI_3
+		lineageTag: 59a1d39f-8011-4dba-8793-fcc6cbdeddca
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Count_all_KCI3 =
+			
+			
+			-- Misura utilizzata per calcolare il numero totale di progetti visibili nel KCI3
+			
+			VAR _sel_period = SELECTEDVALUE('Frozen EV'[_Period_froz_sort])
+			
+			RETURN
+			IF(
+			    _sel_period = [MaxPeriod],
+			    CALCULATE(
+			        [CountProgetti],
+			        ALL('Frozen EV'[NEW_FORECAST_SLICER]),
+			        'PSR Group By'[_ForecastYearAxis] = _sel_period
+			        //,'PSR Group By'[_Flag_MaxIDPKEY] = 1
+			    ),
+			    CALCULATE(
+			        [CountProgetti],
+			        ALL('Frozen EV'[NEW_FORECAST_SLICER]),
+			        'PSR Group By'[_ForecastYearAxis] = _sel_period
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_3
+		lineageTag: e2fdae98-dc22-44bc-bf75-0f352b59144a
+
+	measure _Count_alert_KCI3 =
+			
+			
+			-- Misura utilizzata per calcolare il numero di alert per il KCI3
+			
+			COUNTROWS(
+			    FILTER(
+			        ALL( Cons_Proj_Table[_Short_Name_Code] ),
+			        [_Alert_KCI3] = 1
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_3
+		lineageTag: 4ae360b0-618c-4bfb-9395-4a80b2f4fd46
+
+	measure _KCI3_IMAX = ```
+			
+			
+			VAR _sel_rank = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			
+			RETURN 
+			IF(
+			    SELECTEDVALUE(Z_forecast_periods_FROZEN[sort_period]) >= _sel_rank,
+			    CALCULATE(
+			        SUM('Frozen EV'[I_Max]),
+			        ALL('Frozen EV'),
+			        'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			        'Frozen EV'[RO] = "Opportunity",
+			        'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE(Z_forecast_periods_FROZEN[_Period_froz_sort])
+			    ) + 0
+			)
+			```
+		formatString: #,0.00
+		displayFolder: KCI_3
+		lineageTag: 5acb37d7-4b4d-41cb-8264-b8492c9b2632
+
+	measure _KCI3_Pending_Revenues = ```
+			
+			
+			VAR _sel_rank = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			
+			RETURN 
+			IF(
+			    SELECTEDVALUE(Z_forecast_periods_FROZEN[sort_period]) >= _sel_rank,
+			    CALCULATE(
+			        SUM('Revenue Status 1'[Pending Revenues]),
+			        ALL( 'Frozen EV' ),
+			        'Revenue Status 1'[_Forecast_Period] = SELECTEDVALUE(Z_forecast_periods_FROZEN[_Period_froz_sort])
+			    )
+			)
+			```
+		formatString: #,0
+		displayFolder: KCI_3
+		lineageTag: 979cb1b2-c07b-4bb7-84d4-86d86e0253cb
+
+	measure _KCI3_Total_Revenues = ```
+			
+			
+			VAR _sel_rank = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			
+			RETURN 
+			IF(
+			    SELECTEDVALUE(Z_forecast_periods_FROZEN[sort_period]) >= _sel_rank,
+			    CALCULATE(
+			        SUM('Revenue Costs 1'[Total Revenues]),
+			        ALL( 'Frozen EV' ),
+			        'Revenue Costs 1'[_Forecast_Period] = SELECTEDVALUE(Z_forecast_periods_FROZEN[_Period_froz_sort])
+			    )
+			)
+			```
+		formatString: #,0.00
+		displayFolder: KCI_3
+		lineageTag: 2d5ab995-7c9d-4f83-adf2-10a88146292a
+
+	measure _Alert_KCI5 = ```
+			
+			
+			-- Misura utilizzata per individuare i progetti in Alert per il KCI5
+			
+			IF(
+			    CALCULATE(
+			        [_KCI5_Flag_Alert_Costi],
+			        PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE"
+			    ) = 1,
+			    1
+			)
+			
+			```
+		formatString: 0
+		displayFolder: KCI_5
+		lineageTag: 7b203c09-24a0-4ef8-ab3c-b457fcfe6879
+
+	measure _Indicatore_KCI5 =
+			
+			
+			-- Misura utilizzata per la creazione dell'indicatori normalizzati (da 1 a 3) utilizzando le espressioni già impostate
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    [Value difference Costi KCI5 barre],
+			    [Value difference Costi KCI5 barre prev]
+			)
+		displayFolder: KCI_5
+		lineageTag: cbadf99e-b796-4d9a-8bbc-87f974475490
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Count_alert_KCI5 =
+			
+			
+			-- Misura utilizzata per calcolare il numero di alert per il KCI5
+			COUNTROWS(
+			    FILTER(
+			        DISTINCT(Cons_Proj_Table[_Short_Name_Code]),
+			        [_Alert_KCI5] = 1
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_5
+		lineageTag: 890e7ac7-27ad-40d1-b9f4-a54948ac2708
+
+	measure _KCI6_check_forecast =
+			
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    IF(
+			        SELECTEDVALUE(PSR_Card_Consolidated[_FlagMaxForecast]) = 1,
+			        1
+			    ),
+			    1
+			)
+		formatString: 0
+		displayFolder: KCI_6
+		lineageTag: 35d5c211-3988-4717-b262-23752d829fd5
+
+	measure _Indicatore_KCI7 =
+			
+			
+			-- Misura utilizzata per la creazione dell'indicatori normalizzati (da 1 a 3) utilizzando le espressioni già impostate.
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    [Indicatore Norm KCI7 current],
+			    [Indicatore Norm KCI7 prev]
+			)
+		displayFolder: KCI_7
+		lineageTag: a6883628-b513-4869-bcb7-df639bcc9424
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI8_overall_progress =
+			
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    [_KCI8_overall_process_current],
+			    [_KCI8_overall_process_prev]
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: KCI_8
+		lineageTag: 20fb4edf-5813-420f-b75e-50e8a2edfb63
+
+	measure _KCI8_Progress_act_plan =
+			
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    - [_KCI8_delta_progress_current],
+			    - [_KCI8_delta_progress_prev]
+			) * 100
+		displayFolder: KCI_8
+		lineageTag: 7cb70398-db0f-4a3a-a512-0c6863cfcdb8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Indicatore_KCI8 = ```
+			
+			
+			-- Misura utilizzata per la creazione dell'indicatori normalizzati (da 1 a 3) utilizzando delle espressioni simile a quelle già impostate in precedenza
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALLSELECTED(Cons_Proj_Table[_Short_Name_Code]),
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", [_Indicatore_KCI8_valore]
+			    ),
+			    [value]
+			)
+			    
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALLSELECTED(Cons_Proj_Table[_Short_Name_Code]),
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", [_Indicatore_KCI8_valore]
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [_Indicatore_KCI8_valore]
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI_8
+		lineageTag: fdb1e918-46e2-4679-84ef-7cc88a98139b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Alert_KCI8 = ```
+			
+			
+			-- Misura utilizzata per individuare i progetti in Alert per il KCI8
+			-- La misura è molto simile a quella impostata in precedenza con l'utilizzo di misure specifiche per calcolare i vari alert
+			
+			VAR Soglia = 0.05
+			VAR A_Card11 = 
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    [Delta Plan-Actual] > Soglia,
+			    [Delta Plan-Actual_prev] > Soglia
+			)
+			
+			VAR B_Frozen = [_KCI8_rischi] <= 0
+			VAR C_Card2 = ROUND([_KCI8_delta_total_cost],0) <= 0
+			
+			RETURN 
+			-- Se tutte le condizioni sono vere contemporaneamente, allora è un ALERT
+			IF(
+			    A_Card11 && B_Frozen && C_Card2,
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_8
+		lineageTag: f185c0bb-3d78-489e-b252-10f9893e6463
+
+	measure _KCI8_delta_total_cost = ```
+			
+			
+			-- Variabili di supporto
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast])
+			VAR _sel_cons = SELECTEDVALUE('PSR Group By'[List_Data_GroupBy.Cons_Project])
+			
+			-- Valori per calcolare il Delta
+			VAR _current_value = MAX(PSR_Card04_Revenue_Cost[_Total_Cost])
+			VAR _previous_value = 
+			CALCULATE(
+			    MAX(PSR_Card04_Revenue_Cost[_Total_Cost]),
+			    ALL( 'PSR Group By'),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = _sel_cons,
+			    'PSR Group By'[_Rank_Prev_Forecast] = _sel_rank - 1
+			)
+			
+			RETURN _current_value - _previous_value
+			```
+		formatString: #,0
+		displayFolder: KCI_8
+		lineageTag: db83c22f-c938-422c-a0f3-e73adcf741c5
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI9_lines_total_credit =
+			
+			
+			CALCULATE(
+			    [_KCI9_Totale_Crediti],
+			    REMOVEFILTERS( 'PSR Group By'[NEW_FORECAST_SLICER] ),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: KCI_9
+		lineageTag: 06a0a110-6cba-45eb-af84-b525964f69cb
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Check_forecast_6 = ```
+			
+			
+			-- Misura utilizzata per mostrare sei forecast
+			
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast])
+			VAR _prev_rank = _sel_rank - 5
+			
+			RETURN 
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) <= _sel_rank,
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) >= _prev_rank
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: Altre_misure
+		lineageTag: 0d2a619b-31bb-481b-94b6-6d5600bda42f
+
+	measure _KCI9_lines_Crediti_scaduti =
+			
+			
+			CALCULATE(
+			    [_KCI9_Crediti_Scaduti_over_12],
+			    REMOVEFILTERS( 'PSR Group By'[NEW_FORECAST_SLICER] ),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: KCI_9
+		lineageTag: e11dbacb-5fde-4b5d-bfe9-95e65beb3541
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI9_lines_RCB =
+			
+			
+			CALCULATE(
+			    MAX( PSR_Revenues_Costs[_RCB/OCB_Revenues] ),
+			    REMOVEFILTERS( 'PSR Group By'[NEW_FORECAST_SLICER] ),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: KCI_9
+		lineageTag: 15fccbef-23fd-4c6b-a047-c930ca283a88
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI10_lines_Pending_Included =
+			
+			
+			CALCULATE(
+			    SUM( PSR_Card08_Revenues_Details[Variation migliaia] ),
+			    REMOVEFILTERS( 'PSR Group By'[NEW_FORECAST_SLICER] ),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: KCI10
+		lineageTag: 7513d7d1-f97f-4efb-8596-ba9d07113222
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI10_lines_RCB =
+			
+			
+			CALCULATE(
+			    MAX( PSR_Revenues_Costs[_RCB/OCB_Revenues] ),
+			    REMOVEFILTERS( 'PSR Group By'[NEW_FORECAST_SLICER] ),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		formatString: #,0
+		displayFolder: KCI10
+		lineageTag: 37201dbd-0171-4fb1-b367-ff7efacdbcf5
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI8_rischi = ```
+			
+			
+			-- La misura calcola la differenza del valore dei rischi tra il forecast corrente e il precedente
+			
+			VAR _sel_forecast = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast])
+			
+			VAR _prev_forecast =
+			CALCULATE(
+			    MAX('PSR Group By'[_ForecastYearAxis]),
+			    ALL('PSR Group By'),
+			    'PSR Group By'[_Rank_Desc_Forecast] = _sel_rank + 1
+			)
+			
+			VAR _current_value = 
+			CALCULATE(
+			    SUM('Frozen EV'[I_Max]),
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]),
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[RO] = "Risk"
+			)
+			
+			VAR _prev_value = 
+			CALCULATE(
+			    SUM('Frozen EV'[I_Max]),
+			    'Frozen EV'[_Period_froz_sort] = _prev_forecast,
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[RO] = "Risk"
+			)
+			
+			RETURN _current_value - _prev_value + 0
+			
+			/* //VECCHIA GESTIONE
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    [_KCI8_delta_max_rischi_current],
+			    [_KCI8_delta_max_rischi_prev]
+			)
+			*/
+			```
+		formatString: #,0
+		displayFolder: KCI_8
+		lineageTag: ffe74da4-cec3-4d49-af6b-5305487652be
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Indicatore_KCI8_valore =
+			
+			
+			-- La misura ha segno negativo per gestire le barre nella tabella
+			
+			- ( [_KCI8_rischi] + [_KCI8_delta_total_cost] )
+		displayFolder: KCI_8
+		lineageTag: c474520c-c7b8-41c5-974c-5c6a950a298f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Count_alert_KCI8 =
+			
+			
+			-- Misura utilizzata per calcolare il numero di alert per il KCI8
+			COUNTROWS(
+			    FILTER(
+			        DISTINCT(Cons_Proj_Table[_Short_Name_Code]),
+			        [_Alert_KCI8] = 1
+			    )
+			)
+		formatString: 0
+		displayFolder: KCI_8
+		lineageTag: 42af1aef-bb08-403e-87ff-608461b41693
+
+	measure _Check_forecast_2 = ```
+			
+			
+			-- Misura utilizzata per mostrare due soli forecast
+			
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast])
+			VAR _prev_rank = _sel_rank - 1
+			
+			RETURN 
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) <= _sel_rank,
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast]) >= _prev_rank
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: Altre_misure
+		lineageTag: 959ae58a-1dc2-42ba-990c-c3cc3a66183a
+
+	measure _KCI8_lines_progress_plan =
+			
+			
+			CALCULATE(
+			    SUM( PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Plan_Progress] ),
+			    REMOVEFILTERS( 'PSR Group By'[NEW_FORECAST_SLICER] ),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			) + 0   -- Per mostrare anche i valori BLANK come 0
+		formatString: 0
+		displayFolder: KCI_8
+		lineageTag: 66a0cc4f-f0aa-4a61-a184-3a3b167d973b
+
+	measure _KCI8_lines_progress_actual =
+			
+			
+			CALCULATE(
+			    SUM( PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress] ),
+			    REMOVEFILTERS( 'PSR Group By'[NEW_FORECAST_SLICER] ),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			) + 0   -- Per mostrare anche i valori BLANK come 0
+		displayFolder: KCI_8
+		lineageTag: 2c6e9f6d-c977-4024-ba8a-39df784e582d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI8_lines_total_cost =
+			
+			
+			ROUND(
+			    CALCULATE(
+			        MAX( PSR_Card04_Revenue_Cost[_Total_Cost] ),
+			        REMOVEFILTERS( 'PSR Group By'[NEW_FORECAST_SLICER] ),
+			        'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			    ),
+			    0
+			) + 0   -- Per mostrare anche i valori BLANK come 0
+		formatString: #,0
+		displayFolder: KCI_8
+		lineageTag: f79ca531-fe06-40a4-b73f-1db088ea005b
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Check_KCI1_forecast_3 = ```
+			
+			
+			-- Check per mostrare solo 3 forecast (misura utilizzata esclusivamente per il KCI1)
+			-- La misura è scritta in questo modo perché i forecast della Frozen potrebbero differire dai forecast della PSR Group By in termini di ordinamento
+			
+			-- Forecast
+			VAR sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast])
+			VAR sel_forecast_1 = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			VAR sel_forecast_2 = CALCULATE( MAX('PSR Group By'[_ForecastYearAxis]), ALL(), 'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 1)
+			VAR sel_forecast_3 = CALCULATE( MAX('PSR Group By'[_ForecastYearAxis]), ALL(), 'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 2)
+			
+			RETURN 
+			IF(
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = sel_forecast_1  ||
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = sel_forecast_2  ||
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = sel_forecast_3,
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_1
+		lineageTag: c41d1102-b8b6-4919-aee9-fa89aa13a912
+
+	measure _Check_KCI4_forecast_3 = ```
+			
+			
+			-- Check per mostrare solo 3 forecast (misura utilizzata esclusivamente per il KCI4)
+			
+			VAR _sel_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast])
+			VAR _prev_rank = _sel_rank - 2
+			
+			RETURN 
+			IF(
+			    AND(
+			        SELECTEDVALUE(PSR_Card_Consolidated[_Rank_Forecast_Curr]) <= _sel_rank,
+			        SELECTEDVALUE(PSR_Card_Consolidated[_Rank_Forecast_Curr]) >= _prev_rank
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_4
+		lineageTag: b73101e1-4001-4a82-b32e-c0f9549a94f8
+
+	measure _Alert_KCI4_dettaglio = ```
+			
+			
+			-- Misura utilizzata per individuare i progetti in Alert per il KCI4 nella pagina di dettaglio
+			
+			CALCULATE( 
+			    [_Alert_KCI4], 
+			    ALL(PSR_Card_Consolidated),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis]) 
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_4
+		lineageTag: a3a909e0-86f3-4f93-aeb9-606a0c8bcfac
+
+	measure _Alert_KCI3_dettaglio = ```
+			
+			
+			-- Misura utilizzata per mostrare solo il progetti in alert nella pagina di dettaglio del KCI3
+			
+			CALCULATE( 
+			    [_Alert_KCI3], 
+			    ALL('Frozen EV'),
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis]) 
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_3
+		lineageTag: f6c28262-f8c7-4856-9278-04247383d0f2
+
+	measure _Check_KCI3_forecast_3 = ```
+			
+			
+			-- Check per mostrare solo 3 forecast (misura utilizzata esclusivamente per il KCI3)
+			-- La misura è scritta in questo modo perché i forecast della Frozen potrebbero differire dai forecast della PSR Group By in termini di ordinamento
+			
+			-- Forecast
+			VAR sel_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Desc_Forecast])
+			VAR sel_forecast_1 = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			VAR sel_forecast_2 = CALCULATE( MAX(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis]), ALL(), Z_Distinct_ForecastYearAxis_separated[_Rank_Desc_Forecast] = sel_rank + 1)
+			VAR sel_forecast_3 = CALCULATE( MAX(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis]), ALL(), Z_Distinct_ForecastYearAxis_separated[_Rank_Desc_Forecast] = sel_rank + 2)
+			
+			RETURN 
+			IF(
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = sel_forecast_1  ||
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = sel_forecast_2  ||
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = sel_forecast_3,
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_3
+		lineageTag: c820c699-0398-4b8d-94b5-275de49fd761
+
+	measure _Indicatore_KCI5_dettaglio_valore =
+			
+			
+			-- Misura utilizzata per la creazione dell'indicatori normalizzati (da 1 a 3) utilizzando le espressioni già impostate.
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    [Flag Alert Costi KCI5 Value difference current],
+			    [Flag Alert Costi KCI5 Value difference prev]
+			)
+		displayFolder: KCI_5
+		lineageTag: 01a9a64a-3341-4708-9001-636484ad6978
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Check_KCI8_forecast_rischi = ```
+			
+			
+			-- Misura utilizzata per indicare i forecast corretti in base alla selezione del forecast in pagina
+			
+			-- Check per mostrare solo 3 forecast (misura utilizzata esclusivamente per il KCI3)
+			-- La misura è scritta in questo modo perché i forecast della Frozen potrebbero differire dai forecast della PSR Group By in termini di ordinamento
+			
+			-- Forecast
+			VAR sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast])
+			VAR sel_forecast_1 = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			VAR sel_forecast_2 = CALCULATE( MAX('PSR Group By'[_ForecastYearAxis]), ALL(), 'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 1)
+			
+			RETURN 
+			IF(
+			    SELECTEDVALUE(tmp_pbi_RisksFrozen[_Period_froz_def]) = sel_forecast_1  ||
+			    SELECTEDVALUE(tmp_pbi_RisksFrozen[_Period_froz_def]) = sel_forecast_2,
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_8
+		lineageTag: 1be890b1-499f-474c-be4b-bb89c7ed5140
+
+	measure _KCI8_total_cost_dettaglio = ```
+			
+			
+			-- Variabili di supporto
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast])
+			VAR _sel_cons = SELECTEDVALUE('PSR Group By'[List_Data_GroupBy.Cons_Project])
+			
+			-- Valori per calcolare il Delta
+			VAR _current_value = MAX(PSR_Card04_Revenue_Cost[_Total_Cost])
+			VAR _previous_value = 
+			CALCULATE(
+			    MAX(PSR_Card04_Revenue_Cost[_Total_Cost]),
+			    ALL( 'PSR Group By'),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = _sel_cons,
+			    'PSR Group By'[_Rank_Prev_Forecast] = _sel_rank - 1
+			)
+			
+			RETURN 
+			IF(
+			    SELECTEDVALUE( Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis] ) = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]),
+			    _current_value,
+			    _previous_value
+			)
+			```
+		formatString: #,0
+		displayFolder: KCI_8
+		lineageTag: 535b5360-d46a-46bc-a531-9f7ac4df9c14
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI8_progress_dettaglio =
+			
+			
+			100 * IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    IF(
+			        SELECTEDVALUE( Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis] ) = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]),
+			        SUM(PSR_Card11_Progress[_MaxActualProgress_Overall]),
+			        SUM(PSR_Card11_Progress[_MaxPlanProgress_Overall])
+			    ),
+			    IF(
+			        SELECTEDVALUE( Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis] ) = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]),
+			        SUM(PSR_Card11_Progress[_MaxActualProgress_Overall_prev]),
+			        SUM(PSR_Card11_Progress[_MaxPlanProgress_Overall_prev])
+			    )
+			)
+		displayFolder: KCI_8
+		lineageTag: 944144ba-dec8-4486-87e1-5a7f5012fafb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI8_IMAX_dettaglio =
+			
+			
+			IF(
+			    SELECTEDVALUE( Z_Distinct_ForecastYearAxis_Details[_ForecastYearAxis] ) = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]),
+			    [Current_Forecast_FrozenEV_KCI8],
+			    [Previous_Forecast_FrozenEV_KCI8]
+			)
+		formatString: #,0
+		displayFolder: KCI_8
+		lineageTag: 79647c9f-a4f2-425f-a117-eeac16141ac5
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Indicatore_KCI8_dettaglio =
+			
+			
+			-- Misura utilizzata per la creazione dell'indicatori normalizzati (da 1 a 3) utilizzando le espressioni già impostate.
+			
+			IF(
+			    SELECTEDVALUE( 'PSR Group By'[_ForecastYearAxis] ) = [MaxPeriod],
+			    [Indicatore Norm KCI8 current],
+			    [Indicatore Norm KCI8 prev]
+			)
+		displayFolder: KCI_8
+		lineageTag: 844efdf6-3d11-4ca2-af7f-6a3692587e0e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Check_KCI10_forecast_2 = ```
+			
+			
+			-- Check per mostrare solo 2 forecast (misura utilizzata esclusivamente per il KCI10)
+			
+			VAR _sel_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast])
+			VAR _prev_rank = _sel_rank - 1
+			
+			RETURN 
+			IF(
+			    AND(
+			        SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) <= _sel_rank,
+			        SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast]) >= _prev_rank
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI10
+		lineageTag: 9307792a-ac3e-437d-ba4c-b41de893e2a9
+
+	measure _ProjectPortfolio_dettaglio_Valore_Revenue =
+			
+			
+			MAX(PSR_Revenues_Costs[_Cluster_Valore_Revenue_new])
+		displayFolder: Project_Portfolio
+		lineageTag: 29f154f6-fd06-4416-b9bc-f7f58f512014
+
+	measure _Storico_ProjectData_check_forecast_6 = ```
+			
+			
+			-- Misura utilizzata nella pagina Project Data (grafico a linee per mostrare 6 forecast)
+			
+			VAR _sel_rank = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_Rank_Prev_Forecast])
+			VAR _prev_rank = _sel_rank - 5
+			
+			RETURN 
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_Rank_Prev_Forecast]) <= _sel_rank,
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_Rank_Prev_Forecast]) >= _prev_rank
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: Project_Data
+		lineageTag: 2133c26c-c7ba-461e-94af-5303cb3b8517
+
+	measure _Alert_Dettaglio_Overview_alert_KCI1 =
+			
+			
+			-- Misura utilizzata per individuare i progetti in alert nella pagina di dettaglio di Project Portfolio (indiati con una X)
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    CALCULATE(
+			        [_Alert_KCI1],
+			        'Frozen EV'[RO] = "Risk",
+			        'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			        'PSR Group By'[_Flag_MaxIDPKEY] = 1
+			    ),
+			    CALCULATE(
+			        [_Alert_KCI1],
+			        'Frozen EV'[RO] = "Risk",
+			        'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"}
+			    )
+			)
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: 7424f4c4-c223-4ca7-ba95-5d04cd5b46dc
+
+	measure _Alert_Dettaglio_Overview_alert_KCI6 = ```
+			
+			
+			-- Misura utilizzata per individuare i progetti in alert nella pagina di dettaglio di Project Portfolio (indiati con una X)
+			
+			CALCULATE(
+			    [Count Progetti Alert KCI6],
+			    PSR_List_Data[WF_Status] = "Official PSR", 
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Level] = "2"
+			)
+			```
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: 6a6f0c27-bbca-4b98-be37-0ed9f8df62b4
+
+	measure _Alert_Dettaglio_Overview_alert_KCI7 =
+			
+			
+			-- Misura utilizzata per individuare i progetti in alert nella pagina di dettaglio di Project Portfolio (indiati con una X)
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    [_ALERT_KCI7_curr],
+			    [_ALERT_KCI7_prev]
+			)
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: cbf3a774-4050-4606-820b-3db54e6b5bf0
+
+	measure _Alert_Dettaglio_Overview_alert_KCI8 =
+			
+			
+			-- Misura utilizzata per individuare i progetti in alert nella pagina di dettaglio di Project Portfolio (indiati con una X)
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    CALCULATE(
+			        [_Alert_KCI8],
+			        PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Overall Project",
+			        'PSR Group By'[_Flag_MaxIDPKEY] = 1
+			    ),
+			    CALCULATE(
+			        [_Alert_KCI8],
+			        PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Overall Project"
+			    )
+			)
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: 3e78a7d7-4f2b-4a52-8d6e-4dfb28bc4f9f
+
+	measure _Alert_Dettaglio_Overview_alert_KCI10 =
+			
+			
+			-- Misura utilizzata per individuare i progetti in alert nella pagina di dettaglio di Project Portfolio (indiati con una X)
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    CALCULATE(
+			        [Flag Alert Crediti KCI10],
+			        'PSR Group By'[_Flag_MaxIDPKEY] = 1
+			    ),
+			    [Flag Alert Crediti KCI10]
+			)
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: c1034fb6-8f2e-4eb2-877b-f48537db7e56
+
+	measure _Alert_Dettaglio_Overview_TOTALE =
+			
+			
+			-- Misura utilizzata per contare il numero di alert totali per progetto, sommando tutte le misure utilizzata per l'individuazione degli alert (misura utilizzata nella pagina di dettaglio di Project Portfolio)
+			
+			[_Alert_KCI1] + [_Alert_Dettaglio_Overview_alert_KCI2] + [_Alert_Dettaglio_Overview_alert_KCI3] + [_Alert_KCI4] + [_Alert_KCI5] + [_Alert_Dettaglio_Overview_alert_KCI6] + [_Alert_Dettaglio_Overview_alert_KCI7] + [_Alert_Dettaglio_Overview_alert_KCI8] + [Flag Alert Crediti KCI9] + [_Alert_Dettaglio_Overview_alert_KCI10]
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: e4060deb-c198-4e6d-9431-aade9c13fffd
+
+	measure _Alert_Dettaglio_Overview_alert_KCI2 =
+			
+			
+			-- Misura utilizzata per individuare i progetti in alert nella pagina di dettaglio di Project Portfolio (indiati con una X)
+			
+			IF(
+			    CALCULATE( [_KCI2_numero_rischi_new], 'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) ) > 0,
+			    1
+			)
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: 63ffe9a2-cf14-4329-a328-1b1325ca818b
+
+	measure _Alert_Dettaglio_Overview_alert_KCI3 =
+			
+			
+			-- Misura utilizzata per individuare i progetti in alert nella pagina di dettaglio di Project Portfolio (indiati con una X)
+			
+			CALCULATE(
+			    [_Alert_KCI3],
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			)
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: b236c6a3-c53a-4945-9f21-464182af518e
+
+	measure _Percentage_progetti_con_PSR = ```
+			
+			
+			-- Misura utilizzata per mostrare la percentuale di progetti con PSR in Project Portfolio
+			-- La percentuale ha come numerato il numero di progetti che devono fare PSR e lo hanno effettivamente fatto (al forecast selezionato)
+			-- E al numeratore il numero di progetti totali che devono fare PSR (quindi con PSR = "TRUE")
+			
+			-- Business Line & Country (selezionati in pagina da grafici)
+			VAR _business_lines = CALCULATETABLE( VALUES(Cons_Proj_Table[Business_Organization_T1_Code]), ALL('PSR Group By'[NEW_FORECAST_SLICER]) )
+			VAR _countries = CALCULATETABLE( VALUES(Cons_Proj_Table[Country]), ALL('PSR Group By'[NEW_FORECAST_SLICER]) )
+			
+			VAR _projects_total =
+			CALCULATE(
+			    COUNTROWS(Z_Project_PSR),
+			    Z_Project_PSR[Country] IN _countries,
+			    Z_Project_PSR[Business_Organization_T1_Code] IN _business_lines
+			)
+			
+			VAR _projects_no_psr =
+			COUNTROWS(
+			    FILTER(
+			        SUMMARIZECOLUMNS(
+			            Z_Project_PSR[Cons_Proj],
+			            "value", [_Check_Progetti_senza_PSR]
+			        ),
+			        [value] = 1
+			    )
+			)
+			
+			RETURN 
+			
+			-- Visualizzo i dati solo se ultimo forecast
+			IF( 
+			    SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast]) = 1,
+			    DIVIDE( _projects_total - _projects_no_psr, _projects_total, 0 )
+			)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Project_Portfolio
+		lineageTag: fc41a727-10bb-4173-a0ba-15df871c6220
+
+	measure _Maximum_percentage =
+			
+			
+			-- Percentuale massima da mostrare nella barra colorata in Project Portfolio (solo all'ultimo forecast disponibile)
+			IF( SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast]) = 1, 1 )
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: 58eba623-c413-48e8-9b81-2810bea710fa
+
+	measure _KCI3_percentage_revenues = ```
+			
+			
+			VAR _perc =
+			DIVIDE(
+			    CALCULATE( 
+			        SUM('Frozen EV'[I_Max]), 
+			        ALL('Frozen EV'), 
+			        'Frozen EV'[RO] = "Opportunity", 
+			        'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			        'Frozen EV'[_Rank_Sort_Forecast] = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			    )
+			    +
+			    CALCULATE( SUM('Revenue Status 1'[Pending Revenues]), ALL('Frozen EV'[IdRisk])),
+			    SUM('Revenue Costs 1'[Total Revenues])
+			)
+			
+			RETURN _perc
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: KCI_3
+		lineageTag: 6f5cce06-9835-4b44-b4dd-7b0844bafdf7
+
+	measure _Check_KCI10_forecast_not_blank = ```
+			
+			
+			IF(
+			    CALCULATE(
+			        [Count Progetti Alert KCI10],
+			        'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis]) 
+			    ) > 0,
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI10
+		lineageTag: 08870438-1e2e-4226-9ea8-b6cc2cc88b86
+
+	measure _Check_Progetti_senza_PSR = ```
+			
+			
+			-- Misura utilizzata per mostrare i progetti senza PSR
+			-- La misura è utilizzata sulla tabella nella pagina di Tooltip
+			-- La misura si basa su una tabella scollegata con la lista di tutti i progetti con PSR e i relativi forecast
+			
+			-- Forecast selezionato
+			VAR _sel_rank_forecast = SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast])
+			
+			-- Business Line & Country (selezionati in pagina da grafici)
+			VAR _business_lines = CALCULATETABLE( VALUES(Cons_Proj_Table[Business_Organization_T1_Code]), ALL('PSR Group By'[NEW_FORECAST_SLICER]) )
+			VAR _countries = CALCULATETABLE( VALUES(Cons_Proj_Table[Country]), ALL('PSR Group By'[NEW_FORECAST_SLICER]) )
+			
+			-- La variabile mi dice se il progetto con PSR = TRUE (dalla tabella "Z_Project_PSR") ha effettivamente fatto PSR (i.e. è presente una riga nelal tabella "PSR Group By" per il forecast selezionato)
+			--Il numero di progetti dipende dalle business line eventualmente selezionate
+			VAR _progetto_con_PSR =
+			CALCULATE(
+			    MAX('PSR Group By'[List_Data_GroupBy.Cons_Project]),
+			    'PSR Group By'[List_Data_GroupBy.Cons_Project] = SELECTEDVALUE(Z_Project_PSR[Cons_Proj])
+			)
+			
+			VAR _progetto_PSR_da_fare =
+			CALCULATE(
+			    MAX(Z_Project_PSR[Cons_Proj]),
+			    Z_Project_PSR[Country] IN _countries,
+			    Z_Project_PSR[Business_Organization_T1_Code] IN _business_lines
+			)
+			
+			VAR _check_selection = 
+			CALCULATE(
+			    COUNTROWS(Z_Project_PSR),
+			    Z_Project_PSR[Country] IN _countries,
+			    Z_Project_PSR[Business_Organization_T1_Code] IN _business_lines
+			)
+			
+			RETURN
+			-- Se il progetto con PSR non viene trovato nella "PSR Group By" (per il forecast selezionato) significa che non ha fatto PSR (o non l'ha ancora fatto)
+			-- Il filtro deve valere SOLO all'ultimo PSR disponibile
+			IF(
+			    _check_selection > 0,
+			    IF( ISBLANK(_progetto_con_PSR), 1 )
+			)
+			
+			
+			/*
+			IF(
+			    _sel_rank_forecast = 1,
+			    IF(
+			        OR(
+			            ISFILTERED(Cons_Proj_Table[Business_Organization_T1_Code]),
+			            ISFILTERED(Cons_Proj_Table[Country])
+			        ),
+			        IF( 
+			            AND(
+			                SELECTEDVALUE(Cons_Proj_Table[Business_Organization_T1_Code]) = SELECTEDVALUE(Z_Project_PSR[Business_Organization_T1_Code]),
+			                SELECTEDVALUE(Cons_Proj_Table[Country]) = SELECTEDVALUE(Z_Project_PSR[Country])
+			            ),
+			            IF( ISBLANK(_progetto_con_PSR), 1 )
+			        ),
+			        IF( ISBLANK(_progetto_con_PSR), 1 )
+			    )
+			)
+			*/
+			```
+		formatString: 0
+		displayFolder: Project_Portfolio
+		lineageTag: fa797ecb-9000-4524-abf7-15d9aa6041a8
+
+	measure _Check_KCI3_forecast_3_frozen = ```
+			
+			
+			VAR _sel_rank = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			VAR _prev_rank = _sel_rank + 2
+			
+			RETURN 
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_forecast_periods_FROZEN[sort_period]) >= _sel_rank,
+			        SELECTEDVALUE(Z_forecast_periods_FROZEN[sort_period]) <= _prev_rank
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_3
+		lineageTag: 701fa7b9-9d73-410d-b0ad-9095344dc48e
+
+	measure _Text_last_available_forecast_project_portfolio =
+			
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis] ) = [Max_Periodo_GroupBy],
+			    "Forecast: " & SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]),
+			    "Forecast"
+			)
+		displayFolder: Altre_misure
+		lineageTag: 54e889b8-5f4e-4452-885e-f77f681c74e1
+
+	measure _Text_last_available_forecast =
+			
+			
+			-- Misura utilizzata per mostrare l'ultimo forecast selezionato (in Project Data Storico, KCI3, KCI4, KCI10)
+			IF(
+			    SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    "Forecast: " & SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis]),
+			    "Forecast"
+			)
+		displayFolder: Altre_misure
+		lineageTag: 35fe2dbf-0415-4400-b74a-de00a37a710c
+
+	measure _Text_last_available_forecast_KCI2 =
+			
+			
+			IF(
+			    SELECTEDVALUE('Frozen EV'[_Period_froz_sort]) = [Max_Periodo_GroupBy],
+			    "Forecast: " & SELECTEDVALUE('Frozen EV'[_Period_froz_sort]),
+			    "Forecast"
+			)
+		displayFolder: KCI_2
+		lineageTag: 06fef2dc-cf4d-4049-8c16-7c35a55a5a81
+
+	measure _Text_last_available_forecast_KCI4 =
+			
+			
+			IF(
+			    SELECTEDVALUE(PSR_Card_Consolidated[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    "Forecast: " & SELECTEDVALUE(PSR_Card_Consolidated[_ForecastYearAxis]),
+			    "Forecast"
+			)
+		displayFolder: KCI_4
+		lineageTag: ae7dfe59-dba1-4d8a-ba05-0e2bef2dd955
+
+	measure _Check_KCI8_forecast_2 = ```
+			
+			
+			-- Check per mostrare solo 2 forecast (misura utilizzata esclusivamente per il KCI8)
+			
+			VAR _sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Prev_Forecast])
+			VAR _prev_rank = _sel_rank - 1
+			
+			RETURN 
+			IF(
+			    AND(
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_Rank_Prev_Forecast]) <= _sel_rank,
+			        SELECTEDVALUE(Z_Distinct_ForecastYearAxis_Details[_Rank_Prev_Forecast]) >= _prev_rank
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_8
+		lineageTag: 43731454-b066-4c87-bc23-db86fcd2fb95
+
+	measure _Indice_rilevanza_KCI1 = ```
+			
+			
+			-- Misura utilizzata per la creazione dell'indicatori normalizzati (da 1 a 3) utilizzando le espressioni già impostate
+			-- La misura corrisponde alla differenza tra valori di Rischi e Contingencies
+			
+			VAR _risk = 
+			CALCULATE(
+			    SUM('Frozen EV'[Exepcted Value]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Risk", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			)
+			
+			VAR _cont = 
+			CALCULATE(
+			    SUM('Revenue Costs 1'[Contingencies]),
+			    ALL('Frozen EV'), 'Frozen EV'[RO] = "Risk", 'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			)
+			
+			RETURN _risk - _cont
+			```
+		displayFolder: KCI_1
+		lineageTag: 25ad92b8-6e53-401c-8619-3ec8e1936211
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI1_Indicatore_normalizzato = ```
+			
+			
+			-- Misura utilizzata per creare le barre normalizzate (da 1 a 3) nella pagina di analisi del KCI1
+			-- Nella pagina di estrazione, le misure non hanno subito variazioni
+			VAR MaxVal = 
+			MAXX(
+			    ALLSELECTED( Cons_Proj_Table[_Short_Name_Code] ),
+			    CALCULATE(
+			        [_KCI1_Risk_expected_value_storico] - [_KCI1_Contingencies_storico],
+			        ALL(PSR_Card_Consolidated[_Cluster_Progress]),
+			        ALL('Frozen EV'[IdRisk])
+			    )
+			)
+			
+			VAR MinVal = 
+			MINX(
+			    ALLSELECTED( Cons_Proj_Table[_Short_Name_Code] ),
+			    CALCULATE(
+			        [_KCI1_Risk_expected_value_storico] - [_KCI1_Contingencies_storico],
+			        ALL(PSR_Card_Consolidated[_Cluster_Progress]),
+			        ALL('Frozen EV'[IdRisk])
+			    )
+			)
+			
+			VAR CurrVal = CALCULATE( [_KCI1_Risk_expected_value_storico] - [_KCI1_Contingencies_storico], ALL('Frozen EV'[IdRisk]) )
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI_1
+		lineageTag: d59db980-2294-40d4-9141-af2f7c4f2eff
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Dashboard_card_total_revenue =
+			
+			
+			-- Faccio in modo che il valore sia in Miliardi nella card della dashboard
+			SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.CF_Total_Revenues_Fixed_Rate]) * 1000
+		displayFolder: Misure Dashboard\Card
+		lineageTag: d580358e-db4c-4352-942d-27f76c536db1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Dashboard_Titolo_Execution = "Project Execution"
+		displayFolder: Misure Dashboard\Altre
+		lineageTag: 3e77211e-5569-4712-9643-944bdd88003b
+
+	measure _Dashboard_KCI1_card = [_Count_alert_KCI1]
+		formatString: 0
+		displayFolder: Misure Dashboard\Card
+		lineageTag: 253df772-c743-4ec4-8021-013c88e755ac
+
+	measure _Dashboard_KCI1_description = "Progetti che presentano per 3 forecast consecutivi un profilo di rischio superiore ai relativi margini e contingencies"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: cf0c49b7-55a8-4b33-bbfb-e55a4b6d404b
+
+	measure _Dashboard_KCI1_tachimetro =
+			
+			
+			VAR _num = [_Count_alert_KCI1]
+			
+			VAR _den = [CountProgetti]
+			
+			RETURN DIVIDE( _num, _den )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: 555c2274-b259-4f9e-9662-c531ee98ed89
+
+	measure _Dashboard_KCI2_card = [_Count_alert_KCI2]
+		formatString: 0
+		displayFolder: Misure Dashboard\Card
+		lineageTag: 83e6f4e8-21cc-4c50-ac6a-958c640fd888
+
+	measure _Dashboard_KCI2_description = "Progetti che presentano per 3 forecast consecutivi rischi con probabilità di accadimento superiore a una certa soglia (40%) e valore atteso elevato (> 5 M€)"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: ccc00076-2439-4abf-82d5-a2953d3456e3
+
+	measure _Dashboard_KCI2_tachimetro =
+			
+			
+			VAR _num = [_Count_alert_KCI2]
+			
+			VAR _den = [_Count_all_KCI2]
+			
+			RETURN DIVIDE( _num, _den )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: 2135fbc3-f398-44fc-996f-b444fd6ac28d
+
+	measure _Dashboard_KCI3_card = [_Count_alert_KCI3]
+		formatString: 0
+		displayFolder: Misure Dashboard\Card
+		lineageTag: 1c394f6c-a501-4b43-a2f0-bdb6e5382f1c
+
+	measure _Dashboard_KCI3_description = "Progetti che presentano per 3 forecast consecutivi un ammontare di opportunità e pending revenues superiore al 15% del valore dei ricavi da Revised Control Budget"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: 4f3d2e95-7e07-49fb-ae84-d4b645cb133c
+
+	measure _Dashboard_KCI3_tachimetro =
+			
+			
+			VAR _num = [_Dashboard_KCI3_card]
+			
+			VAR _den = [_Count_all_KCI3]
+			
+			RETURN DIVIDE( _num, _den )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: 6e1b061b-dabb-48d2-9966-3bdf50c5aee9
+
+	measure _Dashboard_KCI4_card = [_Count_alert_KCI4]
+		formatString: 0
+		displayFolder: Misure Dashboard\Card
+		lineageTag: 490f0923-ec74-4812-9811-d6afd60b81bc
+
+	measure _Dashboard_KCI4_description = "Progetti che presentano per 3 forecast consecutivi un ritardo nel progress delle attività e una variazione positiva o stabile del margine"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: e332d888-217d-4b33-8779-9c2fa19f8ecd
+
+	measure _Dashboard_KCI4_tachimetro =
+			
+			
+			VAR _num = [_Count_alert_KCI4]
+			
+			VAR _den = [CountProgetti]
+			
+			RETURN DIVIDE( _num, _den )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: c6d7961c-b7c3-4679-b21a-42c54eb9a862
+
+	measure _Dashboard_KCI5_card = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [_Count_alert_KCI5],
+			    NOT CONTAINSSTRING('Frozen EV'[ConsolidationCode], "99-00099"),
+			    PSR_List_Data[WF_Status] = "Official PSR",
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			    Cons_Proj_Table[PSR] = "TRUE"
+			)
+			
+			RETURN _num
+			```
+		formatString: 0
+		displayFolder: Misure Dashboard\Card
+		lineageTag: 5549c8a4-874f-406e-a657-cbeba5b80cd7
+
+	measure _Dashboard_KCI5_description = "Progetti il cui avanzamento dei costi di supervisione delle attività di construction/fabrication è superiore all’avanzamento dei costi delle attività stesse"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: 536c7937-fcfa-4945-9457-33c3550f1edd
+
+	measure _Dashboard_KCI5_tachimetro = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [_Count_alert_KCI5],
+			    NOT CONTAINSSTRING('Frozen EV'[ConsolidationCode], "99-00099"),
+			    PSR_List_Data[WF_Status] = "Official PSR",
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			    Cons_Proj_Table[PSR] = "TRUE"
+			)
+			
+			VAR _den = [CountProgetti]
+			
+			RETURN DIVIDE( _num, _den )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: ecb435b0-991e-4d1c-bbf5-9f719c6e9ec5
+
+	measure _Dashboard_KCI6_card = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [Count Progetti Alert KCI6],
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Level] = "2",
+			    NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] IN {"Contingency", "Intercompany Costs"},
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			    PSR_List_Data[WF_Status] = "Official PSR"
+			)
+			
+			RETURN _num
+			```
+		formatString: 0
+		displayFolder: Misure Dashboard\Card
+		lineageTag: 4823cd28-6fb7-4a1d-843e-408b62e3aa7b
+
+	measure _Dashboard_KCI6_description = "Progetti il cui avanzamento dei costi actual committed  delle principali fasi esecutive è superiore all’avanzamento fisico delle attività stesse"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: 13d12ae5-7ed5-4c74-9439-5ac147fdf153
+
+	measure _Dashboard_KCI6_tachimetro = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [Count Progetti Alert KCI6],
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Level] = "2",
+			    NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] IN {"Contingency", "Intercompany Costs"},
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			    PSR_List_Data[WF_Status] = "Official PSR"
+			)
+			
+			VAR _den = [CountProgetti]
+			
+			RETURN DIVIDE( _num, _den )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: 608867d4-508c-462b-8a92-ec86b5592e36
+
+	measure _Dashboard_KCI7_card = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [Count Progetti Alert KCI7],
+			    NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] IN {"Contingency", "Intercompany Costs"},
+			    PSR_Card04_Revenue_Cost[_Flag_Alert_KCI7] = "ALERT",
+			    PSR_List_Data[WF_Status] = "Official PSR",
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Level] = "2",
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			    NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] IN {"C05A", "C05B", "C05C", "CTSEM", "MXD01_", "R01_", "R02_", "R04_", "R05_", "R07_", "RTSEM", "RXD01_"}
+			)
+			
+			RETURN _num
+			```
+		formatString: 0
+		displayFolder: Misure Dashboard\Card
+		lineageTag: 4ff2acaa-efab-4e9d-9e16-5d73c4562a6c
+
+	measure _Dashboard_KCI7_description = "Progetti per cui i costi associati alle principali fasi esecutive non variano per due forecast consecutivi"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: d853c804-2eda-4bd5-95b7-3f8e7062ad6d
+
+	measure _Dashboard_KCI7_tachimetro = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [Count Progetti Alert KCI7],
+			    NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Description] IN {"Contingency", "Intercompany Costs"},
+			    PSR_Card04_Revenue_Cost[_Flag_Alert_KCI7] = "ALERT",
+			    PSR_List_Data[WF_Status] = "Official PSR",
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Level] = "2",
+			    PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.IsConsProjectLevel] = "TRUE",
+			    NOT PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] IN {"C05A", "C05B", "C05C", "CTSEM", "MXD01_", "R01_", "R02_", "R04_", "R05_", "R07_", "RTSEM", "RXD01_"}
+			)
+			
+			
+			VAR _den = [CountProgetti]
+			
+			RETURN DIVIDE( _num, _den )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: 4688753a-9705-442f-90c0-0e7b6c53c944
+
+	measure _Dashboard_KCI8_description = "Progetti con ritardo nell’avanzamento del progress fisico che presentano valori invariati o in diminuzione dei rischi e dei costi rispetto al forecast precedente"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: 7782d411-3669-4b2d-928b-e7eac0c5bd32
+
+	measure _Dashboard_KCI8_tachimetro = DIVIDE( [_Count_alert_KCI8], [CountProgetti] )
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: bcae0c6a-62d2-46b8-aeba-f56012039891
+
+	measure _Dashboard_KCI9_description = "Progetti che presentano un ammontare di crediti scaduti pari ad almeno il 4% dei Ricavi da Revised Control Budget"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: 6d9bf2f5-862b-412d-adb2-9e6fcda89dc8
+
+	measure _Dashboard_KCI9_card = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [Count Progetti Alert KCI9],
+			    Cons_Proj_Table[Client] <> BLANK(),
+			    Cons_Proj_Table[PSR] = "TRUE"
+			)
+			
+			RETURN _num
+			```
+		formatString: 0
+		displayFolder: Misure Dashboard\Card
+		lineageTag: 09df1cc5-e57a-4d10-a07b-0e5f144f1aac
+
+	measure _Dashboard_KCI9_tachimetro = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [Count Progetti Alert KCI9],
+			    Cons_Proj_Table[Client] <> BLANK(),
+			    Cons_Proj_Table[PSR] = "TRUE"
+			)
+			
+			VAR _den = [CountProgetti]
+			
+			RETURN DIVIDE( _num, _den )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: 197e2260-692b-4f28-b34f-4df1cd9fc81a
+
+	measure _Dashboard_KCI10_card = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [Count Progetti Alert KCI10],
+			    OR( 
+			        PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = BLANK(), 
+			        PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = "Submitted"
+			    ),
+			    PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type] IN {"Amendment", "Bonus/Incentive included within Contract", "Change Orders", "Claims", "Insurance Coverage"},
+			    PSR_List_Data[WF_Status] = "Official PSR"
+			)
+			
+			RETURN _num
+			```
+		formatString: 0
+		displayFolder: Misure Dashboard\Card
+		lineageTag: 97c2d1bd-f802-4440-bcd6-1ae35bbda8f3
+
+	measure _Dashboard_KCI10_description = "Progetti che presentano un ammontare di pending revenues pari ad almeno il 4% dei Ricavi da Revised Control Budget"
+		displayFolder: Misure Dashboard\Description
+		lineageTag: debe14be-3f0b-4583-a643-981d8a645ecf
+
+	measure _Dashboard_KCI10_tachimetro = ```
+			
+			
+			VAR _num = 
+			CALCULATE( 
+			    [Count Progetti Alert KCI10],
+			    OR( 
+			        PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = BLANK(), 
+			        PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Status] = "Submitted"
+			    ),
+			    PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type] IN {"Amendment", "Bonus/Incentive included within Contract", "Change Orders", "Claims", "Insurance Coverage"},
+			    PSR_List_Data[WF_Status] = "Official PSR"
+			)
+			
+			VAR _den = [CountProgetti]
+			
+			RETURN DIVIDE( _num, _den )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Misure Dashboard\Tachimetro
+		lineageTag: 31e4cba4-39ee-4648-ac5f-baac330ef1c3
+
+	measure _KCI9_Crediti_Scaduti = SUM(PSR_Card14_Actual_Invoicing[_Overdue_Amount_Fixed_Rate])/1000
+		formatString: #,0
+		displayFolder: KCI_9
+		lineageTag: 5938ff3b-b4ef-4eb8-8329-1f156ebd12d6
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI9_Totale_Crediti = SUM(PSR_Card14_Actual_Invoicing[_Outstanding_Total_Fixed_Rate])
+		formatString: #,0
+		displayFolder: KCI_9
+		lineageTag: 668f134d-4907-4aa9-bc43-146d6b0a4ecc
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI9_Crediti_Scaduti_below_12 = SUM(PSR_Card14_Actual_Invoicing[_Outstanding_Below_12_month_Fixed_Rate])
+		formatString: #,0
+		displayFolder: KCI_9
+		lineageTag: b79ee610-6c2b-4c1d-ba52-874d5f864666
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI9_Crediti_Scaduti_over_12 = SUM(PSR_Card14_Actual_Invoicing[_Outstanding_Overdue_12_month_Fixed_Rate])
+		formatString: #,0
+		displayFolder: KCI_9
+		lineageTag: 83bec62a-0e45-4ff6-96c7-622c0a56bb10
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure __KCI9_Fixed_exchange_rate =
+			
+			
+			CALCULATE(
+			    MAX(PSR_Card14_Actual_Invoicing[_Fixed_Exchage_Rate]),
+			    PSR_Card14_Actual_Invoicing[_Consolidation_code] = MAX(Cons_Proj_Table[Cons_Proj])
+			)
+		displayFolder: KCI_9
+		lineageTag: c0e09e56-c9f2-4cc3-a1f8-a5a62e933166
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI9_flag_alert_crediti_dettaglio = ```
+			
+			
+			-- Misura utilizzata per individuare tutte le righe relative ai progetti in alert
+			-- Questa si differenzia dal flag alert del KCI9 in quanto quest'ultimo individua delle righe specifiche (e ne esclude altre)
+			
+			VAR _crediti_scaduti = 
+			CALCULATE(
+			    [_KCI9_Crediti_Scaduti],
+			    ALL(PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.Orig_Currency])
+			)
+			
+			VAR _revenues = [_KCI9_Revenues]
+			
+			RETURN
+			IF( 
+			    _crediti_scaduti >= _revenues*0.04,
+			    1
+			)
+			```
+		displayFolder: KCI_9
+		lineageTag: 4098095a-19af-4313-a7bb-189cfb8726d8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI9_Revenues = SUM(PSR_Revenues_Costs[_RCB/OCB_Revenues])
+		formatString: #,0
+		displayFolder: KCI_9
+		lineageTag: a5eec8ec-6194-469c-a990-cd20f590983a
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _KCI9_indice_rilevanza_dettaglio_new =
+			
+			
+			CALCULATE(
+			    [Indicatore KCI9],
+			    ALL(PSR_Card14_Actual_Invoicing[PSR5_Card14_Actual_Invoicing.Orig_Currency])
+			)
+		displayFolder: KCI_9
+		lineageTag: e3a4b6f0-d3a1-41f4-9f32-7aa96ec08912
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI9_indice_rilevanza_norm_dettaglio_new = ```
+			
+			
+			VAR sel_period = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			
+			VAR MinVal = 
+			MINX(
+			    SUMMARIZE(
+			        ALL(Cons_Proj_Table[_Short_Name_Code]),
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", CALCULATE( [_KCI9_indice_rilevanza_dettaglio_new], ALL(Cons_Proj_Table[Client], Cons_Proj_Table[Business_Organization_T1_Code]) )
+			    ),
+			    [value]
+			)
+			
+			VAR MaxVal = 
+			MAXX(
+			    SUMMARIZE(
+			        ALL(Cons_Proj_Table[_Short_Name_Code]),
+			        Cons_Proj_Table[_Short_Name_Code],
+			        "value", CALCULATE( [_KCI9_indice_rilevanza_dettaglio_new], ALL(Cons_Proj_Table[Client], Cons_Proj_Table[Business_Organization_T1_Code]) )
+			    ),
+			    [value]
+			)
+			
+			VAR CurrVal = [_KCI9_indice_rilevanza_dettaglio_new]
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal-MinVal, MaxVal-MinVal )
+			
+			RETURN NormVal
+			```
+		displayFolder: KCI_9
+		lineageTag: 6540b17f-10d1-4493-a8de-497b68db15e4
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI9_selected_period = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+		displayFolder: KCI_9
+		lineageTag: 0173643b-f21b-46be-9f9b-bb33ea543ac4
+
+	measure _KCI4_CountProgetti_new =
+			
+			
+			IF(
+			    SELECTEDVALUE('PSR Group By'[_ForecastYearAxis]) = [Max_Periodo_GroupBy],
+			    CALCULATE( DISTINCTCOUNT('PSR Group By'[List_Data_GroupBy.Cons_Project]), Cons_Proj_Table[PSR] = "TRUE" ),
+			    DISTINCTCOUNT('PSR Group By'[List_Data_GroupBy.Cons_Project])
+			)
+		formatString: 0
+		displayFolder: KCI_4
+		lineageTag: 81709fcb-0e7d-44d9-b33d-82c7cb1e1922
+
+	measure _KCI2_NEW_ALERT_table = ```
+			
+			
+			VAR _current_forecast = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			
+			VAR _perc_current_1 = 
+			CALCULATE(
+			    MAX('Frozen EV'[Probab]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_IdRisk-ROBOS] = SELECTEDVALUE('Frozen EV'[_IdRisk-ROBOS]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast
+			)
+			
+			VAR _perc_current_2 = 
+			CALCULATE(
+			    MAX('Frozen EV'[Probab]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_IdRisk-ROBOS] = SELECTEDVALUE('Frozen EV'[_IdRisk-ROBOS]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast + 1
+			)
+			
+			VAR _perc_current_3 = 
+			CALCULATE(
+			    MAX('Frozen EV'[Probab]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_IdRisk-ROBOS] = SELECTEDVALUE('Frozen EV'[_IdRisk-ROBOS]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast + 2
+			)
+			
+			VAR _ev_current_1 = 
+			CALCULATE(
+			    SUM('Frozen EV'[Exepcted Value Risk]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_IdRisk-ROBOS] = SELECTEDVALUE('Frozen EV'[_IdRisk-ROBOS]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast
+			)
+			
+			VAR _ev_current_2 = 
+			CALCULATE(
+			    SUM('Frozen EV'[Exepcted Value Risk]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_IdRisk-ROBOS] = SELECTEDVALUE('Frozen EV'[_IdRisk-ROBOS]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast + 1
+			)
+			
+			VAR _ev_current_3 = 
+			CALCULATE(
+			    SUM('Frozen EV'[Exepcted Value Risk]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_IdRisk-ROBOS] = SELECTEDVALUE('Frozen EV'[_IdRisk-ROBOS]),
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast + 2
+			)
+			RETURN 
+			IF(
+			    AND(
+			        AND(
+			        _perc_current_1 >= 0.4 && _perc_current_2 >= 0.4 && _perc_current_3 >= 0.4,
+			        _ev_current_1 > 5000 && _ev_current_2 > 5000 && _ev_current_3 > 5000
+			        ),
+			        [_Count_all_KCI2] > 0
+			    ),
+			    1
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_2
+		lineageTag: 1e8ccfdf-e22d-41cd-a1d1-0a9a1b4d2e8e
+
+	measure _KCI2_numero_rischi_new = ```
+			
+			
+			VAR _current_forecast = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			
+			VAR _count_1 = 
+			CALCULATETABLE(
+			    DISTINCT('Frozen EV'[_IdRisk-ROBOS]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast,
+			    'Frozen EV'[Probab] >= 0.4
+			)
+			
+			VAR _count_2 = 
+			CALCULATETABLE(
+			    DISTINCT('Frozen EV'[_IdRisk-ROBOS]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast + 1,
+			    'Frozen EV'[Probab] >= 0.4
+			)
+			
+			VAR _count_3 = 
+			CALCULATETABLE(
+			    DISTINCT('Frozen EV'[_IdRisk-ROBOS]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast + 2,
+			    'Frozen EV'[Probab] >= 0.4
+			)
+			
+			
+			RETURN 
+			IF(
+			    [_Count_all_KCI2] > 0,
+			    COUNTROWS( INTERSECT(INTERSECT( _count_1, _count_2 ), _count_3 ) )
+			)
+			```
+		formatString: 0
+		displayFolder: KCI_2
+		lineageTag: 43588948-b47a-4e91-967e-5ae58a7cc024
+
+	measure _KCI2_Risk_Expected_value_new = ```
+			
+			
+			-- Misura utilizzata per somma il valore relativo ai rischi in alert per 3 forecast consecutivi
+			-- Per ogni forecast, vengono individuati i rischi
+			-- L'intersezione dei 3 gruppi mi da i rischi in alert per 3 forecast consecutivi
+			-- Questi rischi vengono infine utilizzati per la somma finale
+			
+			VAR _current_forecast = SELECTEDVALUE('Frozen EV'[_Rank_Sort_Forecast])
+			
+			VAR _count_1 = 
+			CALCULATETABLE(
+			    DISTINCT('Frozen EV'[_IdRisk-ROBOS]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast,
+			    'Frozen EV'[Probab] >= 0.4
+			)
+			
+			VAR _count_2 = 
+			CALCULATETABLE(
+			    DISTINCT('Frozen EV'[_IdRisk-ROBOS]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast + 1,
+			    'Frozen EV'[Probab] >= 0.4
+			)
+			
+			VAR _count_3 = 
+			CALCULATETABLE(
+			    DISTINCT('Frozen EV'[_IdRisk-ROBOS]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_Rank_Sort_Forecast] = _current_forecast + 2,
+			    'Frozen EV'[Probab] >= 0.4
+			)
+			
+			// ID rischi con alert in 3 forecast consecutivi
+			VAR _id_alert = INTERSECT(INTERSECT( _count_1, _count_2 ), _count_3 )
+			
+			RETURN 
+			CALCULATE( 
+			    SUM('Frozen EV'[Exepcted Value Risk]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[_Flag_Value_5000] = "SI",
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE('Frozen EV'[_Period_froz_sort]),
+			    'Frozen EV'[Probab] >= 0.4,
+			    'Frozen EV'[_IdRisk-ROBOS] IN _id_alert     -- Solo rischi in alert per 3 forecast consecutivi
+			)
+			```
+		displayFolder: KCI_2
+		lineageTag: 9025efd3-d5a8-4440-ba61-6b8a775fbe06
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI2_Risk_Expected_value_bars_new = [_KCI2_Risk_Expected_value_new]
+		displayFolder: KCI_2
+		lineageTag: aad03c51-f871-45af-96f8-7239139df4dd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _KCI2_indicatore_norm_new =
+			
+			
+			VAR _max_value =
+			MAXX(
+			    ALLSELECTED( Cons_Proj_Table[_Short_Name_Code] ),
+			    DIVIDE( [_KCI2_Risk_Expected_value_new], [_KCI2_numero_rischi_new] )
+			)
+			
+			VAR _min_value =
+			MINX(
+			    ALLSELECTED( Cons_Proj_Table[_Short_Name_Code] ),
+			    DIVIDE( [_KCI2_Risk_Expected_value_new], [_KCI2_numero_rischi_new] )
+			)
+			
+			
+			VAR CurrVal = DIVIDE( [_KCI2_Risk_Expected_value_new], [_KCI2_numero_rischi_new] )
+			
+			VAR NormVal = 1 + 2*DIVIDE( CurrVal - _min_value, _max_value - _min_value )
+			
+			RETURN NormVal
+		displayFolder: KCI_2
+		lineageTag: 5044b73f-c06a-4fbe-9ef6-81252ba2255b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _titolo_dinamico_portfolio_perc = ```
+			
+			
+			-- La misura mostra il titolo solo se è selezionato l'ultimo forecast disponibile
+			
+			IF( 
+			    SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast]) = 1,
+			    "% Progetti"
+			)
+			```
+		displayFolder: Altre_misure
+		lineageTag: c53a330b-10e9-4093-b8b7-6200788853ca
+
+	measure _portfolio_background_percentage = ```
+			
+			
+			-- Misura utilizzata per mostrare la card della percentuale in Project Protfolio SOLo se il forecast selezionato è l'ultimo disponibile (coloro bianco o trasparente)
+			
+			IF( 
+			    SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast]) = 1,
+			    "#FFFFFF50",
+			    "#FFFFFF"
+			)
+			```
+		displayFolder: Altre_misure
+		lineageTag: c8658389-1ca3-45ba-8261-bb9504b86d5d
+
+	measure _titolo_dinamico_tooltip = ```
+			
+			
+			-- La misura mostra il titolo solo se è selezionato l'ultimo forecast disponibile
+			
+			IF( 
+			    SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast]) = 1,
+			    "Progetti no PSR"
+			)
+			```
+		displayFolder: Altre_misure
+		lineageTag: a5fd5010-0700-4c68-b808-785f6f32320c
+
+	measure _Alert_KCI1_dettaglio = ```
+			
+			
+			-- Misura utilizzata per individuare i progetti in Alert per il KCI1
+			-- La misura confronta i rischi con margin+contingencies per 3 forecast consecutivi (iniziando dal forecast selezionato in pagina)
+			
+			-- Forecast corrente
+			VAR sel_rank = SELECTEDVALUE('PSR Group By'[_Rank_Desc_Forecast])
+			VAR sel_forecast_1 = SELECTEDVALUE('PSR Group By'[_ForecastYearAxis])
+			VAR sel_forecast_2 = CALCULATE( MAX('PSR Group By'[_ForecastYearAxis]), ALL(), 'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 1)
+			VAR sel_forecast_3 = CALCULATE( MAX('PSR Group By'[_ForecastYearAxis]), ALL(), 'PSR Group By'[_Rank_Desc_Forecast] = sel_rank + 2)
+			
+			-- Valori dei rischi per 3 forecast
+			VAR _risk_1 =
+			CALCULATE( 
+			    [_KCI1_Risk_expected_value_storico],
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[_Period_froz_sort] = sel_forecast_1
+			)
+			
+			VAR _risk_2 =
+			CALCULATE( 
+			    SUM('Frozen EV'[Exepcted Value]),
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[_Period_froz_sort] = sel_forecast_2
+			)
+			
+			VAR _risk_3 =
+			CALCULATE( 
+			    [_KCI1_Risk_expected_value_storico],
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[_Period_froz_sort] = sel_forecast_3
+			)
+			
+			-- Valori di margin+contingencies per 3 forecast
+			VAR _marg_cont_1 =
+			CALCULATE( 
+			    [_KCI1_Gross_margin_storico] + [_KCI1_Contingencies_storico],
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[_Period_froz_sort] = sel_forecast_1
+			)
+			
+			VAR _marg_cont_2 =
+			CALCULATE( 
+			    [_KCI1_Gross_margin_storico] + [_KCI1_Contingencies_storico],
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[_Period_froz_sort] = sel_forecast_2
+			)
+			
+			VAR _marg_cont_3 =
+			CALCULATE( 
+			    [_KCI1_Gross_margin_storico] + [_KCI1_Contingencies_storico],
+			    ALL('Frozen EV'),
+			    'Frozen EV'[ConsolidationCode] = SELECTEDVALUE(Cons_Proj_Table[Cons_Proj]),
+			    'Frozen EV'[RO] = "Risk",
+			    'Frozen EV'[RiskStatus] IN {"Active", "Partially occurred"},
+			    'Frozen EV'[_Period_froz_sort] = sel_forecast_3
+			)
+			
+			RETURN 
+			IF(
+			    -- Se nessuno dei rischi è blank
+			    NOT ISBLANK(_risk_1) && NOT ISBLANK(_risk_2) && NOT ISBLANK(_risk_3),
+			    IF(
+			        -- Se i rischi sono maggiori dei margin+contingencies per 3 forecast consecutivi, allora è un progetto in alert
+			        _risk_1 > _marg_cont_1 && _risk_2 > _marg_cont_2 && _risk_3 > _marg_cont_3,
+			        1
+			    )
+			)
+			```
+		displayFolder: KCI_1
+		lineageTag: 61f8bdf3-724a-491d-ab12-ef0bdaac8716
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Indice_Rilevanza_KCI3 = ```
+			
+			
+			-- Misura utilizzata nella pagina di dettaglio del KCI3 
+			
+			CALCULATE(
+			    [_KCI3_percentage_revenues],
+			    ALL('Frozen EV'),
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+			```
+		displayFolder: KCI_3
+		lineageTag: 354e01b6-8e4a-45c0-9914-930da105bf79
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Indicatore_KCI10_dettaglio =
+			
+			
+			-- Misura utilizzata nella pagina di dettaglio del KCI10
+			
+			CALCULATE(
+			    [Indicatore KCI10],
+			    ALLSELECTED(PSR_Card08_Revenues_Details[PSR5_Card08_Revenues_Details.Type])
+			)
+		displayFolder: KCI10
+		lineageTag: 7e715603-f2ad-4a11-9871-9e3b482e5c65
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Indicatore_KCI4_dettaglio =
+			
+			
+			-- Misura utilizzata nella pagina di dettaglio del KCI4
+			
+			CALCULATE(
+			    MAX(PSR_Card_Consolidated[_Gross_Margin_Diff]),
+			    ALL(PSR_Card_Consolidated),
+			    PSR_Card_Consolidated[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+		displayFolder: KCI_4
+		lineageTag: bb8fce71-6cf1-46cc-8339-551444b892fd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ___TEST = ```
+			
+			
+			// Controllo valori in Card11
+			VAR Descr11C = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
+			)
+			
+			VAR Descr11F = 
+			CALCULATE(
+			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
+			)
+			
+			VAR Constr = 
+			IF(
+			    NOT ISBLANK(Descr11C),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			            //, PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]<=1000000
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
+			        )
+			    )
+			)
+			
+			VAR Fabr = 
+			IF(
+			    NOT ISBLANK(Descr11F),
+			    DIVIDE(
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        ),
+			        CALCULATE(
+			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
+			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
+			        )
+			    )
+			)
+			
+			RETURN Descr11C & "___" & Descr11F & "--" & Constr & "___" & Fabr
+			/*
+			SWITCH(
+			    SELECTEDVALUE(Z__Table_phase[Phase]),
+			    "Construction", Constr,
+			    "Fabrication", Fabr,
+			    "Site Supervision", [%Avanzamento costi 5A]
+			)
+			*/
+			```
+		lineageTag: a3fde4c5-1ab0-4c88-8374-ce5039b47785
+
+	measure _KCI8_valore_rischi_line =
+			
+			
+			-- Misura utilizzata nel grafico a linee dei Rischi nel KCI8
+			-- La misura è impostata in modo tale da mostrare 0 anche per i valori BLANK
+			
+			CALCULATE(
+			    SUM('Frozen EV'[I_Max]),
+			    'Frozen EV'[_Period_froz_sort] = SELECTEDVALUE(Z_forecast_periods_FROZEN[_Period_froz_sort])
+			) + 0   -- Per mostrare anche i valori BLANK come 0
+		formatString: #,0.00
+		displayFolder: KCI_8
+		lineageTag: 511c1f21-6989-4469-96b8-9bed5b40d0ea
+
+	measure _Storico_ProjectData_Project_Risk_Rate =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			VAR _value =
+			CALCULATE(
+			    SUM(PSR_Risks_Opportunity[PRR (Project Risk Rate)]),
+			    'PSR Group By'[_ForecastYearAxis] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+			
+			RETURN _value
+		formatString: 0
+		displayFolder: Project_Data
+		lineageTag: acc4c1f7-efc7-4cc5-b9df-4f5192dc28d1
+
+	measure _Storico_ProjectData_PHI =
+			
+			
+			-- Misura utilizzata nella pagina Project Data (card)
+			
+			VAR _value =
+			CALCULATE(
+			    SUM('PHI Index'[[PHI_Index]]]),
+			    'PHI Index'[_Forecast_new] = SELECTEDVALUE(Z_Distinct_ForecastYearAxis_separated[_ForecastYearAxis])
+			)
+			
+			RETURN _value
+		displayFolder: Project_Data
+		lineageTag: 0bd6e605-b8e7-474b-b0d2-01f856d4b5b5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure _Overview_PSR_project_true =
+			
+			
+			-- Misura utilizzata nella pagina di estrazione di Overview per mostreare il PSR del progetto dalla tabella Cons_Proj_Table
+			-- In questo modo, il calculation group agirà anche su questo campo quando verrà selezionato l'ultimo forecast
+			
+			MAX(Cons_Proj_Table[PSR])
+		displayFolder: Project_Portfolio
+		lineageTag: f7802739-88f2-43c3-afe8-2b809c8922a9
+
+	measure _Overview_ActualDateRevenue =
+			
+			
+			-- Misura utilizzata nella tabella di dettaglio della pagina di Overview
+			-- La misura è stata creata per sfruttare il Calculation Group sul PSR
+			
+			SUM(PSR_Revenues_Costs[PSR_Revenues_Costs.ActualToDate_Total_Revenues_Fixed_Rate])
+		formatString: #,0
+		displayFolder: Project_Portfolio
+		lineageTag: a219b1a6-b1c9-4975-82f4-7f78dae2777d
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure _Overview_ETC_Revenues =
+			
+			
+			-- Misura utilizzata nella pagina di dettaglio di Overview
+			-- La misura è stata creata per sfruttare il calculation group del PSR
+			
+			SUM(PSR_Revenues_Costs[_Backlog])
+		formatString: #,0
+		displayFolder: Project_Portfolio
+		lineageTag: a6313763-8f04-4136-893c-7e7ae16ebeff
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	partition _MISURE = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

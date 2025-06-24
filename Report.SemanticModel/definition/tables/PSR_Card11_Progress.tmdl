@@ -1,0 +1,230 @@
+table PSR_Card11_Progress
+	lineageTag: fb905dd2-1261-4ff4-b89e-4bf9a0ad1ff5
+
+	column 'PSR5_Card11_Progress.Cumulative_Actual_Progress'
+		dataType: double
+		lineageTag: ef398192-2f3f-4432-88b1-596ad669cedd
+		summarizeBy: sum
+		sourceColumn: PSR5_Card11_Progress.Cumulative_Actual_Progress
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR5_Card11_Progress.Cumulative_Plan_Progress'
+		dataType: double
+		lineageTag: 5106f620-3e56-455c-85c4-d9d3ded598b6
+		summarizeBy: sum
+		sourceColumn: PSR5_Card11_Progress.Cumulative_Plan_Progress
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'PSR5_Card11_Progress.Item_Description'
+		dataType: string
+		lineageTag: b15d92d1-898e-438b-967d-ea29cabdba19
+		summarizeBy: none
+		sourceColumn: PSR5_Card11_Progress.Item_Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'PSR5_Card11_Progress.P_Key'
+		dataType: string
+		lineageTag: 9eb90627-c991-4e05-86a8-7ac0759c2160
+		summarizeBy: none
+		sourceColumn: PSR5_Card11_Progress.P_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column _Rank_PKey = LOOKUPVALUE('PSR Group By'[_Forecast_Order],'PSR Group By'[List_Data_GroupBy.List_Data.P_Key], PSR_Card11_Progress[PSR5_Card11_Progress.P_Key])
+		dataType: int64
+		formatString: 0
+		lineageTag: 9d11cd67-c1eb-4af6-81f2-811de6204944
+		summarizeBy: count
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column _MaxActualProgress_Construction = ```
+			
+			
+			CALCULATE(
+			    MAX('PSR_Card11_Progress'[PSR5_Card11_Progress.Cumulative_Actual_Progress]), 
+			    'PSR Group By'[_Flagprevmaxfor] = "NO",
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction",
+			    ALLEXCEPT(
+			        'PSR_Card11_Progress', 
+			        'PSR_Card11_Progress'[PSR5_Card11_Progress.P_Key]
+			    )
+			) / 100
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 8564ff7e-03b5-4a4a-a93b-700631bec4c9
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _MaxActualProgress_Fabrication = ```
+			
+			
+			CALCULATE(
+			    MAX('PSR_Card11_Progress'[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    'PSR Group By'[_Flagprevmaxfor] = "NO",
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication",
+			    ALLEXCEPT(
+			        'PSR_Card11_Progress', 
+			        'PSR_Card11_Progress'[PSR5_Card11_Progress.P_Key]
+			    )
+			) / 100
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 243f588f-fe3b-4252-ad39-37ff9258576e
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _MaxActualProgress_Overall = ```
+			
+			
+			CALCULATE(
+			    SUM('PSR_Card11_Progress'[PSR5_Card11_Progress.Cumulative_Actual_Progress]), 
+			    'PSR Group By'[_Flagprevmaxfor] = "NO",
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Overall Project",
+			    ALLEXCEPT(
+			        'PSR_Card11_Progress', 
+			        'PSR_Card11_Progress'[PSR5_Card11_Progress.P_Key]
+			    )
+			) / 100
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: ba779760-11f3-49a0-814e-569c088523ac
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _MaxPlanProgress_Overall = ```
+			
+			
+			CALCULATE(
+			    MAX('PSR_Card11_Progress'[PSR5_Card11_Progress.Cumulative_Plan_Progress]), 
+			    'PSR Group By'[_Flagprevmaxfor] = "NO",
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Overall Project",
+			    ALLEXCEPT(
+			        'PSR_Card11_Progress', 
+			        'PSR_Card11_Progress'[PSR5_Card11_Progress.P_Key]
+			    )
+			)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 7205d11e-8305-4891-ad45-f5fba5e3d02f
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column _MaxActualProgress_prev_Construction = ```
+			
+			
+			CALCULATE(
+			    MAX('PSR_Card11_Progress'[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
+			    'PSR Group By'[_Flagprevmaxfor] = "SI",
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction",
+			    ALLEXCEPT(
+			        'PSR_Card11_Progress', 
+			        'PSR_Card11_Progress'[PSR5_Card11_Progress.P_Key]
+			    ) 
+			) / 100
+			```
+		lineageTag: 1e8061c6-e0e1-410c-a1a9-0f1946f44eab
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _MaxActualProgress_prev_Fabrication = ```
+			
+			
+			CALCULATE(
+			    MAX('PSR_Card11_Progress'[PSR5_Card11_Progress.Cumulative_Actual_Progress]), 
+			    'PSR Group By'[_Flagprevmaxfor] = "SI",
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication",
+			    ALLEXCEPT(
+			        'PSR_Card11_Progress', 
+			        'PSR_Card11_Progress'[PSR5_Card11_Progress.P_Key]
+			    )
+			) / 100
+			```
+		lineageTag: 05aa43e4-4dfa-48da-8807-3f43b94db79b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _MaxPlanProgress_Overall_prev = ```
+			
+			
+			CALCULATE(
+			    MAX('PSR_Card11_Progress'[PSR5_Card11_Progress.Cumulative_Plan_Progress]), 
+			    //'PSR Group By'[_Flagprevmaxfor] = "SI",
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Overall Project",
+			    ALLEXCEPT(
+			        'PSR_Card11_Progress', 
+			        'PSR_Card11_Progress'[PSR5_Card11_Progress.P_Key]
+			    )
+			)
+			```
+		lineageTag: 6e34a4a5-4bd9-4ddd-96c3-9b29a82e2bdd
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column _MaxActualProgress_Overall_prev = ```
+			
+			
+			CALCULATE(
+			    SUM('PSR_Card11_Progress'[PSR5_Card11_Progress.Cumulative_Actual_Progress]), 
+			    //'PSR Group By'[_Flagprevmaxfor] = "SI",
+			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Overall Project",
+			    ALLEXCEPT(
+			        'PSR_Card11_Progress', 
+			        'PSR_Card11_Progress'[PSR5_Card11_Progress.P_Key]
+			    )
+			) / 100
+			```
+		lineageTag: e3642678-1128-4508-80a3-1d5be21a820b
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition PSR_Card11_Progress = m
+		mode: import
+		source =
+				let
+				    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/myorg/RISCOP%20BI%20%26%20REPORTING", "PSR Data Model", [TypedMeasureColumns=true, Implementation="2.0"]),
+				    Model1 = Source{[Id="Model"]}[Data],
+				    Model2 = Model1{[Id="Model"]}[Data],
+				    #"Added Items" = Cube.Transform(Model2,
+				        {
+				            {Cube.AddAndExpandDimensionColumn, "[PSR5_Card11_Progress]", {"[PSR5_Card11_Progress].[Cumulative_Actual_Progress].[Cumulative_Actual_Progress]", "[PSR5_Card11_Progress].[Cumulative_Plan_Progress].[Cumulative_Plan_Progress]", "[PSR5_Card11_Progress].[Date_Upload].[Date_Upload]", "[PSR5_Card11_Progress].[Error_Upload].[Error_Upload]", "[PSR5_Card11_Progress].[Forecast_Next_Month_Progress].[Forecast_Next_Month_Progress]", "[PSR5_Card11_Progress].[ID].[ID]", "[PSR5_Card11_Progress].[Item_Description].[Item_Description]", "[PSR5_Card11_Progress].[Monthly_Actual_Progress].[Monthly_Actual_Progress]", "[PSR5_Card11_Progress].[Monthly_Plan_Progress].[Monthly_Plan_Progress]", "[PSR5_Card11_Progress].[P_Key].[P_Key]", "[PSR5_Card11_Progress].[Progress_Trend].[Progress_Trend]", "[PSR5_Card11_Progress].[Relative_Weight].[Relative_Weight]", "[PSR5_Card11_Progress].[Remarks].[Remarks]"}, {"PSR5_Card11_Progress.Cumulative_Actual_Progress", "PSR5_Card11_Progress.Cumulative_Plan_Progress", "PSR5_Card11_Progress.Date_Upload", "PSR5_Card11_Progress.Error_Upload", "PSR5_Card11_Progress.Forecast_Next_Month_Progress", "PSR5_Card11_Progress.ID", "PSR5_Card11_Progress.Item_Description", "PSR5_Card11_Progress.Monthly_Actual_Progress", "PSR5_Card11_Progress.Monthly_Plan_Progress", "PSR5_Card11_Progress.P_Key", "PSR5_Card11_Progress.Progress_Trend", "PSR5_Card11_Progress.Relative_Weight", "PSR5_Card11_Progress.Remarks"}}
+				        }),
+				
+				    // Filtro per rimuovere dati prima del 2022 (non essendoci una colonna "anno", il filtro è applicato cercando delle stringhe nella chiave)
+				    #"Filtered Rows_year" = Table.SelectRows(#"Added Items", each not Text.Contains([PSR5_Card11_Progress.P_Key], "_2010_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2011_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2012_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2013_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2014_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2015_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2016_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2017_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2018_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2019_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2020_") and not Text.Contains([PSR5_Card11_Progress.P_Key], "_2021_")),
+				
+				    #"Replaced Value" = Table.ReplaceValue(#"Filtered Rows_year"," %","",Replacer.ReplaceText,{"PSR5_Card11_Progress.Cumulative_Actual_Progress"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Replaced Value",{{"PSR5_Card11_Progress.Cumulative_Actual_Progress", type number}, {"PSR5_Card11_Progress.Cumulative_Plan_Progress", type number}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"PSR5_Card11_Progress.ID", "PSR5_Card11_Progress.Date_Upload", "PSR5_Card11_Progress.Error_Upload", "PSR5_Card11_Progress.Relative_Weight", "PSR5_Card11_Progress.Remarks", "PSR5_Card11_Progress.Progress_Trend", "PSR5_Card11_Progress.Monthly_Plan_Progress", "PSR5_Card11_Progress.Monthly_Actual_Progress", "PSR5_Card11_Progress.Forecast_Next_Month_Progress"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
