@@ -5163,7 +5163,7 @@ table _MISURE
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure ___TEST = "A"
+	measure ___TEST = "B"
 		lineageTag: a3fde4c5-1ab0-4c88-8374-ce5039b47785
 
 	measure _KCI8_valore_rischi_line =
