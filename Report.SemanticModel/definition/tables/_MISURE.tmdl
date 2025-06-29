@@ -5309,6 +5309,11 @@ table _MISURE
 		formatString: 0
 		lineageTag: 6218148a-1ef8-43cd-bc26-ddc6bda5bf4f
 
+	measure ___New_Measure = COUNTROWS('PSR Group By') + 2.5 --Aggiungo commento
+		lineageTag: 980a51f0-4eba-490f-a784-85868ca18ef3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	partition _MISURE = m
 		mode: import
 		source =
