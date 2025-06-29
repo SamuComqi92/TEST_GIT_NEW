@@ -14,7 +14,7 @@ queryGroup 'Tables not loaded'
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBIDesktopVersion = 2.144.878.0 (25.06)+9cca29236de5114792f4d7188221f91ad4a5cc50
+annotation PBIDesktopVersion = 2.144.1155.0 (25.06)+46435b07013d2a234d7fd007083a9e70b8e79f1c
 
 annotation PBI_QueryOrder = ["PSR_Card02_Project_Overview","PSR_Card03_Project_Summary","PSR Card4-Card11","PSR_PrevForecast","tmp_RiskRegisterReport","Max_Forecast","tmp_pbi_RisksFrozen","PSR Group By","PSR_Revenues_Costs","PSR_Card_Consolidated","PSR_Revenues_status","PSR_Progress","PSR_Risks_Opportunity","PHI Index","PSR_List_Data","PSR_Card04_Revenue_Cost","PSR_Card11_Progress","Cons_Proj_Table","_MISURE","PSR_Card14_Actual_Invoicing","PSR_Card08_Revenues_Details","PSR_CardER_Currency_Exch_Rates","Z__Table_phase"]
 
