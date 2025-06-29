@@ -5163,63 +5163,7 @@ table _MISURE
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure ___TEST = ```
-			
-			
-			// Controllo valori in Card11
-			VAR Descr11C = 
-			CALCULATE(
-			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
-			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Construction"
-			)
-			
-			VAR Descr11F = 
-			CALCULATE(
-			    MAX(PSR_Card11_Progress[PSR5_Card11_Progress.Cumulative_Actual_Progress]),
-			    PSR_Card11_Progress[PSR5_Card11_Progress.Item_Description] = "Fabrication"
-			)
-			
-			VAR Constr = 
-			IF(
-			    NOT ISBLANK(Descr11C),
-			    DIVIDE(
-			        CALCULATE(
-			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
-			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
-			            //, PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]<=1000000
-			        ),
-			        CALCULATE(
-			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
-			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C06_02","C06_03","C06_05"}
-			        )
-			    )
-			)
-			
-			VAR Fabr = 
-			IF(
-			    NOT ISBLANK(Descr11F),
-			    DIVIDE(
-			        CALCULATE(
-			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CommittedToDate]),
-			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
-			        ),
-			        CALCULATE(
-			            SUM(PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.Current_Forecast]),
-			            PSR_Card04_Revenue_Cost[PSR5_Card04_Revenues_Costs.CBS_Code] in {"C05A","C05B","C05C","C05D"}
-			        )
-			    )
-			)
-			
-			RETURN Descr11C & "___" & Descr11F & "--" & Constr & "___" & Fabr
-			/*
-			SWITCH(
-			    SELECTEDVALUE(Z__Table_phase[Phase]),
-			    "Construction", Constr,
-			    "Fabrication", Fabr,
-			    "Site Supervision", [%Avanzamento costi 5A]
-			)
-			*/
-			```
+	measure ___TEST = "A"
 		lineageTag: a3fde4c5-1ab0-4c88-8374-ce5039b47785
 
 	measure _KCI8_valore_rischi_line =
